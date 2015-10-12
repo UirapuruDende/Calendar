@@ -86,8 +86,8 @@ class Event
         if (Carbon::instance($startDate)->gt(Carbon::instance($endDate))) {
             throw new \Exception(sprintf(
                 "End date '%s' cannot be before start date '%s'",
-                $endDate->format(Globals::getDefaultDateTimeFormat()),
-                $startDate->format(Globals::getDefaultDateTimeFormat())
+                $endDate->format("Y-m-d H:i:s"),
+                $startDate->format("Y-m-d H:i:s")
             ));
         }
 
