@@ -1,0 +1,5 @@
+default:
+    suites:
+        calendar:
+            paths:    [%paths.base%/Tests/features/schedule.feature]
+            contexts: [Dende\Calendar\Tests\Context\CalendarContext]
