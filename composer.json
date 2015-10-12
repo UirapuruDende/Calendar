@@ -15,5 +15,8 @@
             "name": "Grzegorz Kaszuba",
             "email": "uirapuruadg@gmail.com"
         }
-    ]
+    ],
+    "config": {
+        "bin-dir": "bin"
+    }
 }
