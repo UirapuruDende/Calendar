@@ -1,5 +1,5 @@
 {
-    "name": "uirapuru/calendar",
+    "name": "Dende/Calendar",
     "description": "PHP Calendar component",
     "require": {
         "nesbot/carbon": "^1.20",
