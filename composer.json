@@ -1,5 +1,5 @@
 {
-    "name": "Dende/Calendar",
+    "name": "dende/calendar",
     "description": "PHP Calendar component",
     "require": {
         "nesbot/carbon": "^1.20",
@@ -7,10 +7,10 @@
     },
     "autoload": {
         "psr-0": {
-            "Dende\\Calendar\\": "./"
+            "Dende\\Calendar\\": ""
         },
         "psr-4": {
-            "Dende\\Calendar\\": "./"
+            "Dende\\Calendar\\": ""
         }
     },
     "require-dev": {
@@ -26,5 +26,6 @@
     ],
     "config": {
         "bin-dir": "bin"
-    }
+    },
+    "target-dir": "Dende/Calendar"
 }
