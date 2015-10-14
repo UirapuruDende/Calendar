@@ -3,7 +3,8 @@
     "description": "PHP Calendar component",
     "require": {
         "nesbot/carbon": "*",
-        "doctrine/common": "^2.5"
+        "doctrine/common": "^2.5",
+        "fabpot/php-cs-fixer": "2.0.*@dev"
     },
     "autoload": {
         "psr-0": {

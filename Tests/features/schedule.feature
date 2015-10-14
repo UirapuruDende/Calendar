@@ -63,8 +63,8 @@ Feature: Schedule adding, removing, editting
       | startDate             | endDate             | duration |
       | 2015-09-01 11:00:00   | 2015-09-01 13:30:00 | 150      |
 
-  Scenario: Updating occurrence of weekly event with 'all_inclusive' strategy changes
-            whole event and all occurrences
+  Scenario: Updating occurrence of weekly event with 'overwrte' strategy changes
+            whole event and all occurrences, removing old ones and putting freshly calculated ones
     When I add new calendar event with data
       | type    | startDate           | endDate             | duration | title      | repetition      |
       | weekly  | 2015-09-01 12:00:00 | 2015-09-13 13:30:00 |       90 | Test event | monday, tuesday, friday |

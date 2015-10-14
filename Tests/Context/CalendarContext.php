@@ -278,8 +278,7 @@ final class CalendarContext implements Context
         /** @var Event $event */
         $event = current($this->eventRepository->findOneByTitle($title));
 
-        if(!$event instanceof Event)
-        {
+        if (!$event instanceof Event) {
             throw new \Exception(sprintf("Event with title '%s' not found!", $title));
         }
 
@@ -345,8 +344,7 @@ final class CalendarContext implements Context
     {
         $event = current($this->eventRepository->findOneByTitle($title));
 
-        if(!$event instanceof Event)
-        {
+        if (!$event instanceof Event) {
             throw new \Exception(sprintf("Event with title '%s' not found!", $title));
         }
 

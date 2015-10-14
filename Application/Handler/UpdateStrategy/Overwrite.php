@@ -32,7 +32,7 @@ final class Overwrite implements UpdateStrategyInterface
         $event->changeTitle($command->title);
         $event->changeRepetitions(new Repetitions($command->repetitionDays));
 
-        foreach($event->occurrences() as $occurrence) {
+        foreach ($event->occurrences() as $occurrence) {
             $this->occurrenceRepository->remove($occurrence);
         }
 
@@ -42,7 +42,7 @@ final class Overwrite implements UpdateStrategyInterface
 
         $this->eventRepository->update($event);
 
-        foreach($event->occurrences() as $occurrence) {
+        foreach ($event->occurrences() as $occurrence) {
             $this->occurrenceRepository->insert($occurrence);
         }
     }

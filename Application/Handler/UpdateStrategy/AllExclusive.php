@@ -41,10 +41,8 @@ final class AllExclusive implements UpdateStrategyInterface
             $event->changeTitle($command->title);
             $event->changeRepetitions(new Repetitions($command->repetitionDays));
 
-            foreach($event->occurrences() as $occurrence)
-            {
-                if($occurrence->isModified())
-                {
+            foreach ($event->occurrences() as $occurrence) {
+                if ($occurrence->isModified()) {
                     continue;
                 }
 
@@ -52,7 +50,6 @@ final class AllExclusive implements UpdateStrategyInterface
             }
 
             $newOccurrences = OccurrenceFactory::generateCollectionFromEvent($event, true);
-
         }
 
         $this->eventRepository->update($event);
