@@ -350,12 +350,12 @@ final class CalendarContext implements Context
             throw new \Exception(sprintf("Event with title '%s' not found!", $title));
         }
 
-        $occurrences = $event->occurrences();
+        $occurrences = $event->occurrences()->getValues();
 
-        die(var_dump($occurrences));
+        $rows = $table->getColumnsHash();
 
         foreach ($occurrences as $key => $occurrence) {
-            echo $key;
+            $this->assertOccurrenceEqualsRow($occurrence, $rows[$key]);
         }
     }
 

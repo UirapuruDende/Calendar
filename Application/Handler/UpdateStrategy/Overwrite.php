@@ -41,6 +41,7 @@ final class Overwrite implements UpdateStrategyInterface
         $event->setOccurrences($occurrences);
 
         $this->eventRepository->update($event);
+
         foreach($event->occurrences() as $occurrence) {
             $this->occurrenceRepository->insert($occurrence);
         }
