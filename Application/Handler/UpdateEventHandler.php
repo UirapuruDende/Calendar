@@ -31,6 +31,7 @@ final class UpdateEventHandler
     const MODE_ALL_EXCLUSIVE = 'all_exclusive';
     const MODE_NEXT_INCLUSIVE = 'next_inclusive';
     const MODE_NEXT_EXCLUSIVE = 'next_exclusive';
+    const MODE_OVERWRITE = 'overwrite';
 
     /**
      * @var array
@@ -41,6 +42,7 @@ final class UpdateEventHandler
         self::MODE_ALL_EXCLUSIVE,
         self::MODE_NEXT_INCLUSIVE,
         self::MODE_NEXT_EXCLUSIVE,
+        self::MODE_OVERWRITE,
     ];
 
     /**

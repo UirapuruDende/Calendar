@@ -2,8 +2,16 @@
 namespace Dende\Calendar\Application\Handler\UpdateStrategy;
 
 use Dende\Calendar\Application\Command\UpdateEventCommand;
+use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
+use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
 
-class AllInclusive implements UpdateStrategyInterface
+/**
+ * Class AllInclusive
+ * @package Dende\Calendar\Application\Handler\UpdateStrategy
+ * @property OccurrenceRepositoryInterface occurrenceRepository
+ * @property EventRepositoryInterface eventRepository
+ */
+final class AllInclusive implements UpdateStrategyInterface
 {
     use SetRepositoriesTrait;
 
@@ -13,6 +21,6 @@ class AllInclusive implements UpdateStrategyInterface
      */
     public function update(UpdateEventCommand $command)
     {
-        // TODO: Implement update() method.
+        $event = $command->occurrence->event();
     }
 }

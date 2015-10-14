@@ -48,4 +48,10 @@ interface OccurrenceRepositoryInterface
      * @return Occurrence[]
      */
     public function findAllByEventUnmodified(Event $event);
+
+    /**
+     * @param Occurrence $occurrence
+     * @return mixed
+     */
+    public function remove(Occurrence $occurrence);
 }

@@ -10,6 +10,8 @@ use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Handler\CreateEventHandler;
 use Dende\Calendar\Application\Handler\UpdateEventHandler;
 use Dende\Calendar\Application\Handler\UpdateStrategy\AllExclusive;
+use Dende\Calendar\Application\Handler\UpdateStrategy\AllInclusive;
+use Dende\Calendar\Application\Handler\UpdateStrategy\Overwrite;
 use Dende\Calendar\Application\Handler\UpdateStrategy\Single;
 use Dende\Calendar\Application\Service\FindCurrentEvent;
 use Dende\Calendar\Domain\Calendar;
@@ -74,7 +76,7 @@ final class CalendarContext implements Context
 
         $updateEventHandler->setStrategies([
             UpdateEventHandler::MODE_SINGLE        => new Single(),
-            UpdateEventHandler::MODE_ALL_EXCLUSIVE => new AllExclusive(),
+            UpdateEventHandler::MODE_OVERWRITE => new Overwrite(),
         ]);
 
         $this->updateEventHandler = $updateEventHandler;

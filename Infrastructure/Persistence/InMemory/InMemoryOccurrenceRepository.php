@@ -136,4 +136,13 @@ final class InMemoryOccurrenceRepository implements OccurrenceRepositoryInterfac
             new InMemoryOccurrenceByEventSpecification($event, true)
         );
     }
+
+    /**
+     * @param Occurrence $occurrence
+     * @return mixed
+     */
+    public function remove(Occurrence $occurrence)
+    {
+        unset($this->occurrences[$occurrence->id()->id()]);
+    }
 }
