@@ -2,7 +2,7 @@
     "name": "dende/calendar",
     "description": "PHP Calendar component",
     "require": {
-        "nesbot/carbon": "1.*",
+        "nesbot/carbon": "*",
         "doctrine/common": "^2.5"
     },
     "autoload": {
