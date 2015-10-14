@@ -8,5 +8,5 @@ install:
  - composer install -n
 
 script:
-  - phpunit
+  - ./bin/phpunit
   - ./bin/behat
