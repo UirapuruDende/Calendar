@@ -84,7 +84,7 @@ class EventTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage End date '2015.08.01 12:00:00' cannot be before start date '2015.09.01 12:00:00'
+     * @expectedExceptionMessage End date '2015-08-01 12:00:00' cannot be before start date '2015-09-01 12:00:00'
      */
     public function testConstructorExceptions()
     {
