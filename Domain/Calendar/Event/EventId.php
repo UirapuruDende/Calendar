@@ -5,7 +5,7 @@ namespace Dende\Calendar\Domain\Calendar\Event;
  * Class EventId
  * @package Dende\Calendar\Domain\Calendar\Event
  */
-class EventId
+final class EventId
 {
     /**
      * @var string
@@ -31,5 +31,13 @@ class EventId
     public function id()
     {
         return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    function __toString()
+    {
+        return (string) $this->id();
     }
 }

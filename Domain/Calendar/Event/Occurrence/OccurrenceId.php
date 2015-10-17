@@ -8,7 +8,7 @@ namespace Dende\Calendar\Domain\Calendar\Event\Occurrence;
 final class OccurrenceId
 {
     /**
-     * @var
+     * @var string
      */
     private $id;
 
@@ -26,10 +26,18 @@ final class OccurrenceId
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function id()
     {
         return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    function __toString()
+    {
+        return (string) $this->id();
     }
 }

@@ -1,18 +1,15 @@
 <?php
 namespace Dende\Calendar\Domain;
 
-use DateTime;
 use Dende\Calendar\Domain\Calendar\CalendarId;
 use Dende\Calendar\Domain\Calendar\Event;
-use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Criteria;
 
 /**
  * Class Calendar
  * @package Gyman\Domain\Domain
  */
-final class Calendar
+class Calendar
 {
     /**
      * @var CalendarId
@@ -32,7 +29,7 @@ final class Calendar
     /**
      * @param CalendarId $id
      */
-    public function __construct(CalendarId $id, $name = '')
+    public function __construct(CalendarId $id = null, $name = '')
     {
         $this->id = $id;
         $this->name = $name;

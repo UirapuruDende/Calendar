@@ -12,7 +12,6 @@ use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Doctrine\Common\Collections\ArrayCollection;
-use Gyman\Bundle\AppBundle\Globals;
 
 /**
  * Class Event

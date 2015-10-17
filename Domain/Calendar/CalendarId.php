@@ -5,21 +5,28 @@ namespace Dende\Calendar\Domain\Calendar;
  * Class CalendarId
  * @package Dende\Calendar\Model
  */
-class CalendarId
+final class CalendarId
 {
+    /**
+     * @var string
+     */
     private $id;
 
     /**
      * CalendarId constructor.
      * @param $id
      */
-    public function __construct($id)
+    public function __construct($id = null)
     {
+        if (is_null($id)) {
+            $id = uniqid('calendar_');
+        }
+
         $this->id = $id;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function id()
     {
@@ -33,5 +40,13 @@ class CalendarId
     public function isEqual(CalendarId $id)
     {
         return $this->id === $id->id();
+    }
+
+    /**
+     * @return string
+     */
+    function __toString()
+    {
+        return (string) $this->id();
     }
 }
