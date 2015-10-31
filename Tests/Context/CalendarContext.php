@@ -7,6 +7,9 @@ use Carbon\Carbon;
 use DateTime;
 use Dende\Calendar\Application\Command\CreateEventCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
+use Dende\Calendar\Application\Factory\EventFactory;
+use Dende\Calendar\Application\Factory\OccurrenceFactory;
+use Dende\Calendar\Application\Generator\InMemory\IdGenerator;
 use Dende\Calendar\Application\Handler\CreateEventHandler;
 use Dende\Calendar\Application\Handler\UpdateEventHandler;
 use Dende\Calendar\Application\Handler\UpdateStrategy\AllExclusive;
@@ -61,17 +64,24 @@ final class CalendarContext implements Context
      */
     public function prepareUseCases()
     {
-        $this->calendar = new Calendar(new CalendarId(0), 'calendar-title');
+        $eventFactory = new EventFactory(new IdGenerator());
+        $occurrenceFactory = new OccurrenceFactory(new IdGenerator());
+
+        $this->calendar = new Calendar(0, 'calendar-title');
         $this->eventRepository = new InMemoryEventRepository();
         $this->occurrenceRepository = new InMemoryOccurrenceRepository();
         $this->createEventHandler = new CreateEventHandler(
             $this->eventRepository,
-            $this->occurrenceRepository
+            $this->occurrenceRepository,
+            $eventFactory,
+            $occurrenceFactory
         );
 
         $updateEventHandler = new UpdateEventHandler(
             $this->eventRepository,
-            $this->occurrenceRepository
+            $this->occurrenceRepository,
+            $eventFactory,
+            $occurrenceFactory
         );
 
         $updateEventHandler->setStrategies([
@@ -150,6 +160,8 @@ final class CalendarContext implements Context
      */
     public function currentEventHasTitle($title)
     {
+
+
         $service = new FindCurrentEvent($this->occurrenceRepository);
         $event = $service->getCurrentEvent($this->calendar);
 

@@ -3,10 +3,8 @@ namespace Dende\Calendar\Tests\Unit\Model;
 
 use DateTime;
 use Dende\Calendar\Domain\Calendar;
-use Dende\Calendar\Domain\Calendar\CalendarId;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
-use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Tests\AssertDatesEqualTrait;
@@ -23,9 +21,9 @@ class EventTest extends \PHPUnit_Framework_TestCase
     public function testCalculateOccurrencesDatesWeekly()
     {
         $event = new Event(
-            new EventId(0),
+            0,
             new Calendar(
-                new CalendarId(0),
+                0,
                 'calendar-title'
             ),
             new EventType(EventType::TYPE_WEEKLY),
@@ -62,9 +60,9 @@ class EventTest extends \PHPUnit_Framework_TestCase
     public function testCalculateOccurrencesDatesSingle()
     {
         $event = new Event(
-            new EventId(0),
+            0,
             new Calendar(
-                new CalendarId(0),
+                0,
                 'calendar-title'
             ),
             new EventType(EventType::TYPE_SINGLE),
@@ -89,9 +87,9 @@ class EventTest extends \PHPUnit_Framework_TestCase
     public function testConstructorExceptions()
     {
         $event = new Event(
-            new EventId(0),
+            0,
             new Calendar(
-                new CalendarId(0),
+                0,
                 'calendar-title'
             ),
             new EventType(EventType::TYPE_WEEKLY),

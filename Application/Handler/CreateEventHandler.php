@@ -25,13 +25,28 @@ final class CreateEventHandler
     private $occurrenceRepository;
 
     /**
+     * @var EventFactory
+     */
+    private $eventFactory;
+
+    /**
+     * @var OccurrenceFactory
+     */
+    private $occurrenceFactory;
+
+    /**
      * CreateEventHandler constructor.
      * @param EventRepositoryInterface $eventRepository
+     * @param OccurrenceRepositoryInterface $occurrenceRepository
+     * @param EventFactory $eventFactory
+     * @param OccurrenceFactory $occurrenceFactory
      */
-    public function __construct(EventRepositoryInterface $eventRepository, OccurrenceRepositoryInterface $occurrenceRepository)
+    public function __construct(EventRepositoryInterface $eventRepository, OccurrenceRepositoryInterface $occurrenceRepository, EventFactory $eventFactory, OccurrenceFactory $occurrenceFactory)
     {
         $this->eventRepository = $eventRepository;
         $this->occurrenceRepository = $occurrenceRepository;
+        $this->eventFactory = $eventFactory;
+        $this->occurrenceFactory = $occurrenceFactory;
     }
 
     /**
@@ -39,17 +54,17 @@ final class CreateEventHandler
      */
     public function handle(CreateEventCommand $command)
     {
-        $event = EventFactory::createFromCommand($command);
+        $event = $this->eventFactory->createFromCommand($command);
 
         $this->eventRepository->insert($event);
 
-        $occurrences = OccurrenceFactory::generateCollectionFromEvent($event);
-
-        $event->setOccurrences($occurrences);
+        $occurrences = $this->occurrenceFactory->generateCollectionFromEvent($event);
 
         if (count($occurrences) === 0) {
             throw new Exception('Could not generate occurrences from event');
         }
+
+        $event->setOccurrences($occurrences);
 
         foreach ($occurrences as $occurrence) {
             $this->occurrenceRepository->insert($occurrence);

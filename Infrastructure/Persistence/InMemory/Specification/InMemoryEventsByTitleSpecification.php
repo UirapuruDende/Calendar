@@ -38,7 +38,7 @@ final class InMemoryEventsByTitleSpecification implements InMemoryEventSpecifica
      */
     public function specifies(Event $event)
     {
-        if (!is_null($this->calendar) && !$event->calendar()->id()->isEqual($this->calendar->id()->id())) {
+        if (!is_null($this->calendar) && !$event->calendar()->id() === $this->calendar->id()) {
             return false;
         }
 

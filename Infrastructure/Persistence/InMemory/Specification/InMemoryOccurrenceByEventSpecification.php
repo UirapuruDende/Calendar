@@ -41,6 +41,6 @@ final class InMemoryOccurrenceByEventSpecification implements InMemoryOccurrence
             return false;
         }
 
-        return $occurrence->event()->id()->id() === $this->event->id()->id();
+        return $occurrence->event()->id() === $this->event->id();
     }
 }

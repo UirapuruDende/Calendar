@@ -7,11 +7,11 @@ use DatePeriod;
 use DateTime;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
-use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Doctrine\Common\Collections\ArrayCollection;
+use Exception;
 
 /**
  * Class Event
@@ -20,7 +20,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 class Event
 {
     /**
-     * @var EventId
+     * @var string
      */
     private $id;
 
@@ -69,7 +69,7 @@ class Event
 
     /**
      * Event constructor.
-     * @param EventId $id
+     * @param string $id
      * @param Calendar $calendar
      * @param EventType $type
      * @param DateTime $startDate
@@ -80,7 +80,7 @@ class Event
      * @param ArrayCollection|Occurrence[] $occurrences
      * @throws \Exception
      */
-    public function __construct(EventId $id, Calendar $calendar, EventType $type, DateTime $startDate, DateTime $endDate, $title, Repetitions $repetitions, Duration $duration)
+    public function __construct($id, Calendar $calendar, EventType $type, DateTime $startDate, DateTime $endDate, $title, Repetitions $repetitions, Duration $duration)
     {
         if (Carbon::instance($startDate)->gt(Carbon::instance($endDate))) {
             throw new \Exception(sprintf(
@@ -186,6 +186,8 @@ class Event
                         $occurrences->add($date);
                     }
                 }
+            } else {
+                throw new Exception("Invalid event type!");
             }
 
             $this->occurrencesDates = $occurrences;
@@ -227,7 +229,7 @@ class Event
     }
 
     /**
-     * @return EventId
+     * @return string
      */
     public function id()
     {

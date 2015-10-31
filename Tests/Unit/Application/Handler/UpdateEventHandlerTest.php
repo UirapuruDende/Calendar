@@ -19,12 +19,16 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
 
         $eventRepositoryMock = m::mock("Dende\Calendar\Domain\Repository\EventRepositoryInterface");
         $occurrenceRepositoryMock = m::mock("Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface");
+        $eventFactoryMock = m::mock("Dende\Calendar\Application\Factory\EventFactory");
+        $occurrenceFactoryMock = m::mock("Dende\Calendar\Application\Factory\OccurrenceFactory");
         $strategyMock = m::mock("Dende\Calendar\Application\Handler\UpdateStrategy\UpdateStrategyInterface");
         $strategyMock->shouldReceive('update')->once()->with($command);
         $strategyMock->shouldReceive('setEventRepository')->once()->with($eventRepositoryMock);
         $strategyMock->shouldReceive('setOccurrenceRepository')->once()->with($occurrenceRepositoryMock);
+        $strategyMock->shouldReceive('setEventFactory')->once()->with($eventFactoryMock);
+        $strategyMock->shouldReceive('setOccurrenceFactory')->once()->with($occurrenceFactoryMock);
 
-        $handler = new UpdateEventHandler($eventRepositoryMock, $occurrenceRepositoryMock);
+        $handler = new UpdateEventHandler($eventRepositoryMock, $occurrenceRepositoryMock, $eventFactoryMock, $occurrenceFactoryMock);
         $handler->addStrategy(UpdateEventHandler::MODE_SINGLE, $strategyMock);
 
         $handler->handle($command);
@@ -42,8 +46,10 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
 
         $eventRepositoryMock = m::mock("Dende\Calendar\Domain\Repository\EventRepositoryInterface");
         $occurrenceRepositoryMock = m::mock("Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface");
+        $eventFactoryMock = m::mock("Dende\Calendar\Application\Factory\EventFactory");
+        $occurrenceFactoryMock = m::mock("Dende\Calendar\Application\Factory\OccurrenceFactory");
 
-        $handler = new UpdateEventHandler($eventRepositoryMock, $occurrenceRepositoryMock);
+        $handler = new UpdateEventHandler($eventRepositoryMock, $occurrenceRepositoryMock, $eventFactoryMock, $occurrenceFactoryMock);
 
         $handler->handle($command);
     }
@@ -60,8 +66,10 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
 
         $eventRepositoryMock = m::mock("Dende\Calendar\Domain\Repository\EventRepositoryInterface");
         $occurrenceRepositoryMock = m::mock("Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface");
+        $eventFactoryMock = m::mock("Dende\Calendar\Application\Factory\EventFactory");
+        $occurrenceFactoryMock = m::mock("Dende\Calendar\Application\Factory\OccurrenceFactory");
 
-        $handler = new UpdateEventHandler($eventRepositoryMock, $occurrenceRepositoryMock);
+        $handler = new UpdateEventHandler($eventRepositoryMock, $occurrenceRepositoryMock, $eventFactoryMock, $occurrenceFactoryMock);
 
         $handler->handle($command);
     }
@@ -79,8 +87,10 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
         $eventRepositoryMock = m::mock("Dende\Calendar\Domain\Repository\EventRepositoryInterface");
         $occurrenceRepositoryMock = m::mock("Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface");
         $strategyMock = m::mock("Dende\Calendar\Application\Handler\UpdateStrategy\UpdateStrategyInterface");
+        $eventFactoryMock = m::mock("Dende\Calendar\Application\Factory\EventFactory");
+        $occurrenceFactoryMock = m::mock("Dende\Calendar\Application\Factory\OccurrenceFactory");
 
-        $handler = new UpdateEventHandler($eventRepositoryMock, $occurrenceRepositoryMock);
+        $handler = new UpdateEventHandler($eventRepositoryMock, $occurrenceRepositoryMock, $eventFactoryMock, $occurrenceFactoryMock);
         $handler->addStrategy('weird_strategy', $strategyMock);
 
         $handler->handle($command);

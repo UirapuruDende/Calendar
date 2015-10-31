@@ -3,11 +3,10 @@ namespace Dende\Calendar\Application\Factory;
 
 use DateTime;
 use Dende\Calendar\Application\Command\CreateEventCommand;
+use Dende\Calendar\Application\Generator\IdGeneratorInterface;
 use Dende\Calendar\Domain\Calendar;
-use Dende\Calendar\Domain\Calendar\CalendarId;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
-use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -16,21 +15,35 @@ use Doctrine\Common\Collections\ArrayCollection;
  * Class EventFactory
  * @package Gyman\Domain
  */
-final class EventFactory implements EventFactoryInterface
+class EventFactory implements EventFactoryInterface
 {
+    /**
+     * @var IdGeneratorInterface
+     */
+    private $idGenerator;
+
+    /**
+     * EventFactory constructor.
+     * @param IdGeneratorInterface $idGenerator
+     */
+    public function __construct(IdGeneratorInterface $idGenerator)
+    {
+        $this->idGenerator = $idGenerator;
+    }
+
     /**
      * @param $params
      * @return Event
      */
-    public static function createFromArray($array)
+    public function createFromArray($array)
     {
         $template = [
-            'id'                     => new EventId(null),
+            'id'                     => $this->idGenerator->generateId(),
             'title'                  => '',
             'repetitions'            => new Repetitions([]),
             'type'                   => new EventType(),
             'occurrences'            => new ArrayCollection(),
-            'calendar'               => new Calendar(new CalendarId(null), ''),
+            'calendar'               => new Calendar(null, ''),
             'duration'               => new Duration(0),
             'startDate'              => new DateTime('now'),
             'endDate'                => new DateTime('now'),
@@ -53,7 +66,7 @@ final class EventFactory implements EventFactoryInterface
     /**
      * @return Event
      */
-    public static function create()
+    public function create()
     {
         return self::createFromArray([]);
     }
@@ -62,7 +75,7 @@ final class EventFactory implements EventFactoryInterface
      * @param CreateEventCommand $command
      * @return Event
      */
-    public static function createFromCommand(CreateEventCommand $command)
+    public function createFromCommand(CreateEventCommand $command)
     {
         return self::createFromArray([
             'title'           => $command->title,
