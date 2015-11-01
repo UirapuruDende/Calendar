@@ -11,7 +11,7 @@ use Dende\Calendar\Domain\Calendar\Event\EventType;
  */
 final class Single implements UpdateStrategyInterface
 {
-    use SetRepositoriesTrait;
+    use SetRepositoriesTrait, SetFactoriesTrait;
 
     /**
      * @param UpdateEventCommand $command

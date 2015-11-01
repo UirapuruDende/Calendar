@@ -6,7 +6,7 @@ class InMemoryOccurrenceRepositoryTestCase extends \PHPUnit_Framework_TestCase
     //    public function testGetOccurenceByDateWeekly()
 //    {
 //        $event = new Event(
-//            new EventId(0),
+//            0,
 //            new Calendar(
 //                new CalendarId(0),
 //                'calendar-title'
@@ -41,7 +41,7 @@ class InMemoryOccurrenceRepositoryTestCase extends \PHPUnit_Framework_TestCase
 //    public function testGetOccurenceByDateSingle()
 //    {
 //        $event = new Event(
-//            new EventId(0),
+//            0,
 //            new Calendar(
 //                new CalendarId(0),
 //                'calendar-title'
@@ -70,7 +70,7 @@ class InMemoryOccurrenceRepositoryTestCase extends \PHPUnit_Framework_TestCase
 //    public function testGetOccurenceByDateReturnsNothingWeekly()
 //    {
 //        $event = new Event(
-//            new EventId(0),
+//            0,
 //            new Calendar(
 //                new CalendarId(0),
 //                'calendar-title'
@@ -100,7 +100,7 @@ class InMemoryOccurrenceRepositoryTestCase extends \PHPUnit_Framework_TestCase
 //    public function testGetOccurenceByDateReturnsNothingSingle()
 //    {
 //        $event = new Event(
-//            new EventId(0),
+//            0,
 //            new Calendar(
 //                new CalendarId(0),
 //                'calendar-title'
@@ -126,7 +126,7 @@ class InMemoryOccurrenceRepositoryTestCase extends \PHPUnit_Framework_TestCase
 //    public function testGetCurrentOccurenceSingle()
 //    {
 //        $event = new Event(
-//            new EventId(0),
+//            0,
 //            new Calendar(
 //                new CalendarId(0),
 //                'calendar-title'
@@ -154,7 +154,7 @@ class InMemoryOccurrenceRepositoryTestCase extends \PHPUnit_Framework_TestCase
 //    public function testGetCurrentOccurenceWeekly()
 //    {
 //        $event = new Event(
-//            new EventId(0),
+//            0,
 //            new Calendar(
 //                new CalendarId(0),
 //                'calendar-title'
@@ -188,7 +188,7 @@ class InMemoryOccurrenceRepositoryTestCase extends \PHPUnit_Framework_TestCase
 //    public function testIsOngoingSingle()
 //    {
 //        $event = new Event(
-//            new EventId(0),
+//            0,
 //            new Calendar(
 //                new CalendarId(0),
 //                'calendar-title'
@@ -213,7 +213,7 @@ class InMemoryOccurrenceRepositoryTestCase extends \PHPUnit_Framework_TestCase
 //    public function testIsOngoingWeekly()
 //    {
 //        $event = new Event(
-//            new EventId(0),
+//            0,
 //            new Calendar(
 //                new CalendarId(0),
 //                'calendar-title'
@@ -243,7 +243,7 @@ class InMemoryOccurrenceRepositoryTestCase extends \PHPUnit_Framework_TestCase
 //        $this->assertCount(1, $totalOccurences);
 //
 //        $event = new Event(
-//            new EventId(0),
+//            0,
 //            new Calendar(
 //                new CalendarId(0),
 //                'calendar-title'

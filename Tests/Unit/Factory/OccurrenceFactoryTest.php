@@ -3,11 +3,10 @@ namespace Dende\Calendar\UserInterface\Symfony\CalendarBundle\Tests\Unit\Model;
 
 use DateTime;
 use Dende\Calendar\Application\Factory\OccurrenceFactory;
+use Dende\Calendar\Application\Generator\InMemory\IdGenerator;
 use Dende\Calendar\Domain\Calendar;
-use Dende\Calendar\Domain\Calendar\CalendarId;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
-use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Tests\AssertDatesEqualTrait;
@@ -24,9 +23,9 @@ class OccurrenceFactoryTest extends \PHPUnit_Framework_TestCase
     public function testGenerateOccurencesCollection()
     {
         $event = new Event(
-            new EventId(0),
+            0,
             new Calendar(
-                new CalendarId(0),
+                0,
                 'calendar-title'
             ),
             new EventType(EventType::TYPE_WEEKLY),
@@ -42,7 +41,7 @@ class OccurrenceFactoryTest extends \PHPUnit_Framework_TestCase
             new ArrayCollection()
         );
 
-        $collection = OccurrenceFactory::generateCollectionFromEvent($event);
+        $collection = (new OccurrenceFactory(new IdGenerator()))->generateCollectionFromEvent($event);
 
         $this->assertCount(13, $collection);
 
@@ -64,9 +63,9 @@ class OccurrenceFactoryTest extends \PHPUnit_Framework_TestCase
     public function testProduceEveryDayOccurrence()
     {
         $event = new Event(
-            new EventId(0),
+            0,
             new Calendar(
-                new CalendarId(0),
+                0,
                 'calendar-title'
             ),
             new EventType(EventType::TYPE_WEEKLY),
@@ -86,7 +85,7 @@ class OccurrenceFactoryTest extends \PHPUnit_Framework_TestCase
             new ArrayCollection()
         );
 
-        $collection = OccurrenceFactory::generateCollectionFromEvent($event);
+        $collection = (new OccurrenceFactory(new IdGenerator()))->generateCollectionFromEvent($event);
 
         $this->assertCount(30, $collection);
 
@@ -98,9 +97,9 @@ class OccurrenceFactoryTest extends \PHPUnit_Framework_TestCase
     public function testProduceNoOccurrenceWeekly()
     {
         $event = new Event(
-            new EventId(0),
+            0,
             new Calendar(
-                new CalendarId(0),
+                0,
                 'calendar-title'
             ),
             new EventType(EventType::TYPE_WEEKLY),
@@ -114,12 +113,12 @@ class OccurrenceFactoryTest extends \PHPUnit_Framework_TestCase
             new ArrayCollection()
         );
 
-        $this->assertCount(0, OccurrenceFactory::generateCollectionFromEvent($event));
+        $this->assertCount(0, (new OccurrenceFactory(new IdGenerator()))->generateCollectionFromEvent($event));
 
         $event = new Event(
-            new EventId(0),
+            0,
             new Calendar(
-                new CalendarId(0),
+                0,
                 'calendar-title'
             ),
             new EventType(EventType::TYPE_WEEKLY),
@@ -131,6 +130,6 @@ class OccurrenceFactoryTest extends \PHPUnit_Framework_TestCase
             new ArrayCollection()
         );
 
-        $this->assertCount(0, OccurrenceFactory::generateCollectionFromEvent($event));
+        $this->assertCount(0, (new OccurrenceFactory(new IdGenerator()))->generateCollectionFromEvent($event));
     }
 }

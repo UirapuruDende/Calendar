@@ -57,7 +57,7 @@ final class InMemoryOccurrenceByDateRangeAndCalendarSpecification implements InM
 
         $calendarId = $occurrence->event()->calendar()->id();
 
-        if (!$calendarId->isEqual($this->calendar->id())) {
+        if (!$calendarId === $this->calendar->id()) {
             return false;
         }
 

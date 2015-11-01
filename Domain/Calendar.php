@@ -12,7 +12,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 class Calendar
 {
     /**
-     * @var CalendarId
+     * @var string
      */
     private $id;
 
@@ -27,9 +27,10 @@ class Calendar
     private $events;
 
     /**
-     * @param CalendarId $id
+     * @param string $id
+     * @param string $name
      */
-    public function __construct(CalendarId $id = null, $name = '')
+    public function __construct($id = null, $name = '')
     {
         $this->id = $id;
         $this->name = $name;
@@ -54,7 +55,7 @@ class Calendar
     }
 
     /**
-     * @return CalendarId
+     * @return string
      */
     public function id()
     {

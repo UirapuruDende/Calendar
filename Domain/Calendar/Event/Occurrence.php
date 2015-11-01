@@ -38,18 +38,18 @@ class Occurrence
     private $event;
 
     /**
-     * @var OccurrenceId
+     * @var string
      */
     private $id;
 
     /**
      * Occurrence constructor.
-     * @param Occurrence\OccurrenceId $id
+     * @param string $id
      * @param DateTime $startDate
      * @param Duration $duration
      * @param Event $event
      */
-    public function __construct(OccurrenceId $id, DateTime $startDate, Duration $duration, Event $event)
+    public function __construct($id, DateTime $startDate, Duration $duration, Event $event)
     {
         $this->id = $id;
         $this->startDate = $startDate;
@@ -139,7 +139,7 @@ class Occurrence
     }
 
     /**
-     * @return OccurrenceId
+     * @return string
      */
     public function id()
     {

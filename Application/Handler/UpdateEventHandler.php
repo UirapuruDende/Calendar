@@ -2,6 +2,8 @@
 namespace Dende\Calendar\Application\Handler;
 
 use Dende\Calendar\Application\Command\UpdateEventCommand;
+use Dende\Calendar\Application\Factory\EventFactory;
+use Dende\Calendar\Application\Factory\OccurrenceFactory;
 use Dende\Calendar\Application\Handler\UpdateStrategy\UpdateStrategyInterface;
 use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
 use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
@@ -61,13 +63,30 @@ final class UpdateEventHandler
     private $strategy = [];
 
     /**
+     * @var EventFactory
+     */
+    private $eventFactory;
+
+    /**
+     * @var OccurrenceFactory
+     */
+    private $occurrenceFactory;
+
+    /**
      * CreateEventHandler constructor.
      * @param EventRepositoryInterface $eventRepository
      */
-    public function __construct(EventRepositoryInterface $eventRepository, OccurrenceRepositoryInterface $occurrenceRepository)
+    public function __construct(
+        EventRepositoryInterface $eventRepository,
+        OccurrenceRepositoryInterface $occurrenceRepository,
+        EventFactory $eventFactory,
+        OccurrenceFactory $occurrenceFactory
+    )
     {
         $this->eventRepository = $eventRepository;
         $this->occurrenceRepository = $occurrenceRepository;
+        $this->eventFactory = $eventFactory;
+        $this->occurrenceFactory = $occurrenceFactory;
     }
 
     public function addStrategy($name, UpdateStrategyInterface $strategy)
@@ -86,6 +105,8 @@ final class UpdateEventHandler
 
         $strategy->setEventRepository($this->eventRepository);
         $strategy->setOccurrenceRepository($this->occurrenceRepository);
+        $strategy->setEventFactory($this->eventFactory);
+        $strategy->setOccurrenceFactory($this->occurrenceFactory);
 
         $this->strategy[$name] = $strategy;
     }

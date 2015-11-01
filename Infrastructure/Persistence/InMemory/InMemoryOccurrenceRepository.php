@@ -39,7 +39,7 @@ final class InMemoryOccurrenceRepository implements OccurrenceRepositoryInterfac
      */
     public function insert(Occurrence $occurrence)
     {
-        $this->occurrences[$occurrence->id()->id()] = $occurrence;
+        $this->occurrences[$occurrence->id()] = $occurrence;
     }
 
     /**
@@ -120,11 +120,11 @@ final class InMemoryOccurrenceRepository implements OccurrenceRepositoryInterfac
      */
     public function update(Occurrence $occurrence)
     {
-        if (!isset($this->occurrences[$occurrence->id()->id()])) {
-            throw new Exception(sprintf('Occurrence with id %s is not set, cannot update!', $occurrence->id()->id()));
+        if (!isset($this->occurrences[$occurrence->id()])) {
+            throw new Exception(sprintf('Occurrence with id %s is not set, cannot update!', $occurrence->id()));
         }
 
-        $this->occurrences[$occurrence->id()->id()] = $occurrence;
+        $this->occurrences[$occurrence->id()] = $occurrence;
     }
 
     /**
@@ -143,6 +143,6 @@ final class InMemoryOccurrenceRepository implements OccurrenceRepositoryInterfac
      */
     public function remove(Occurrence $occurrence)
     {
-        unset($this->occurrences[$occurrence->id()->id()]);
+        unset($this->occurrences[$occurrence->id()]);
     }
 }

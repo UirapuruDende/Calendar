@@ -16,7 +16,7 @@ use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
  */
 final class Overwrite implements UpdateStrategyInterface
 {
-    use SetRepositoriesTrait;
+    use SetRepositoriesTrait, SetFactoriesTrait;
 
     /**
      * @param UpdateEventCommand $command
@@ -36,7 +36,7 @@ final class Overwrite implements UpdateStrategyInterface
             $this->occurrenceRepository->remove($occurrence);
         }
 
-        $occurrences = OccurrenceFactory::generateCollectionFromEvent($event);
+        $occurrences = $this->occurrenceFactory->generateCollectionFromEvent($event);
 
         $event->setOccurrences($occurrences);
 

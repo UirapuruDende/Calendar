@@ -57,7 +57,7 @@ final class InMemoryEventsByDateRangeAndCalendarSpecification implements InMemor
     {
         $calendarId = $event->calendar()->id();
 
-        if (!$calendarId->isEqual($this->calendar->id())) {
+        if (!$calendarId === $this->calendar->id()) {
             return false;
         }
 

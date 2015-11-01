@@ -42,7 +42,7 @@ final class InMemoryOccurrenceByDateAndCalendarSpecification implements InMemory
 
         $calendarId = $occurrence->event()->calendar()->id();
 
-        if (!$calendarId->isEqual($this->calendar->id())) {
+        if (!$calendarId === $this->calendar->id()) {
             return false;
         }
 
