@@ -293,4 +293,14 @@ class Event
         $this->repetitions = $repetitions;
         $this->calculateOccurrencesDates(true);
     }
+
+    /**
+     * @param EventType $type
+     * @throws Exception
+     */
+    public function changeType(EventType $type)
+    {
+        $this->type = $type;
+        $this->calculateOccurrencesDates(true);
+    }
 }

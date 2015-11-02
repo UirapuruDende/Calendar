@@ -4,14 +4,16 @@ namespace Dende\Calendar\Application\Handler\UpdateStrategy;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Factory\OccurrenceFactory;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
+use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
 use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
+use Dende\CalendarBundle\Repository\ORM\OccurrenceRepository;
 
 /**
  * Class AllInclusive
  * @package Dende\Calendar\Application\Handler\UpdateStrategy
- * @property OccurrenceRepositoryInterface occurrenceRepository
+ * @property OccurrenceRepositoryInterface|OccurrenceRepository occurrenceRepository
  * @property EventRepositoryInterface eventRepository
  */
 final class Overwrite implements UpdateStrategyInterface
@@ -30,6 +32,7 @@ final class Overwrite implements UpdateStrategyInterface
         $event->changeStartDate($command->startDate);
         $event->changeEndDate($command->endDate);
         $event->changeTitle($command->title);
+        $event->changeType(new EventType($command->type));
         $event->changeRepetitions(new Repetitions($command->repetitionDays));
 
         foreach ($event->occurrences() as $occurrence) {
@@ -38,12 +41,9 @@ final class Overwrite implements UpdateStrategyInterface
 
         $occurrences = $this->occurrenceFactory->generateCollectionFromEvent($event);
 
+        $this->occurrenceRepository->insertCollection($occurrences);
         $event->setOccurrences($occurrences);
 
         $this->eventRepository->update($event);
-
-        foreach ($event->occurrences() as $occurrence) {
-            $this->occurrenceRepository->insert($occurrence);
-        }
     }
 }
