@@ -7,6 +7,7 @@ use Dende\Calendar\Domain\Calendar;
 /**
  * Class CalendarFactory
  * @package Gyman\Domain
+ * @todo change 'title' to name, because calendar has 'name' field
  */
 class CalendarFactory
 {

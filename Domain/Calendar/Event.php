@@ -303,4 +303,12 @@ class Event
         $this->type = $type;
         $this->calculateOccurrencesDates(true);
     }
+
+    /**
+     * @param Calendar $calendar
+     */
+    public function changeCalendar(Calendar $calendar)
+    {
+        $this->calendar = $calendar;
+    }
 }
