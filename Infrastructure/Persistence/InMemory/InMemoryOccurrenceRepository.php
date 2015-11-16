@@ -156,4 +156,17 @@ final class InMemoryOccurrenceRepository implements OccurrenceRepositoryInterfac
     {
         unset($this->occurrences[$occurrence->id()]);
     }
+
+    /**
+     * @param Event $event
+     * @return void
+     */
+    public function removeAllForEvent(Event $event)
+    {
+        foreach($this->occurrences as $occurrence) {
+            if($occurrence->event() === $event) {
+                $this->remove($occurrence);
+            }
+        }
+    }
 }
