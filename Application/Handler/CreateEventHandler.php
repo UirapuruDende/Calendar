@@ -55,9 +55,6 @@ final class CreateEventHandler
     public function handle(CreateEventCommand $command)
     {
         $event = $this->eventFactory->createFromCommand($command);
-
-        $this->eventRepository->insert($event);
-
         $occurrences = $this->occurrenceFactory->generateCollectionFromEvent($event);
 
         if (count($occurrences) === 0) {
@@ -66,8 +63,10 @@ final class CreateEventHandler
 
         $event->setOccurrences($occurrences);
 
-        foreach ($occurrences as $occurrence) {
-            $this->occurrenceRepository->insert($occurrence);
-        }
+        $this->eventRepository->insert($event);
+
+//        foreach ($occurrences as $occurrence) {
+//            $this->occurrenceRepository->insert($occurrence);
+//        }
     }
 }

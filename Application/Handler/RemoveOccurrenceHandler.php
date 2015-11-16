@@ -2,27 +2,34 @@
 namespace Dende\Calendar\Application\Handler;
 
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
+use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
 use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
 
 /**
  * Class RemoveOccurrenceHandler
  * @package Dende\Calendar\Application\Handler
  */
-final class RemoveOccurrenceHandler
+class RemoveOccurrenceHandler
 {
     /**
-     * @var OccurrenceRepositoryInterface
+     * @var RemoveEventHandler
      */
-    private $occurrenceRepository;
+    private $removeEventHandler;
 
     /**
-     * CreateEventHandler constructor.
-     * @param OccurrenceRepositoryInterface $occurrenceRepository
-     * @internal param EventRepositoryInterface $eventRepository
+     * @var EventRepositoryInterface
      */
-    public function __construct(OccurrenceRepositoryInterface $occurrenceRepository)
+    private $eventRepository;
+
+    /**
+     * RemoveOccurrenceHandler constructor.
+     * @param RemoveEventHandler $removeEventHandler
+     * @param EventRepositoryInterface $eventRepository
+     */
+    public function __construct(RemoveEventHandler $removeEventHandler, EventRepositoryInterface $eventRepository)
     {
-        $this->occurrenceRepository = $occurrenceRepository;
+        $this->removeEventHandler = $removeEventHandler;
+        $this->eventRepository = $eventRepository;
     }
 
     /**
@@ -30,6 +37,12 @@ final class RemoveOccurrenceHandler
      */
     public function remove(Occurrence $occurrence)
     {
-        $this->occurrenceRepository->remove($occurrence);
+        if(1 == count($occurrence->event()->occurrences())) {
+            $this->removeEventHandler->remove($occurrence->event());
+        } else {
+            $event = $occurrence->event();
+            $event->removeOccurrence($occurrence);
+            $this->eventRepository->update($event);
+        }
     }
 }

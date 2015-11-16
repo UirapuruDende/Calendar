@@ -14,7 +14,7 @@ use Exception;
  * Class RemoveEventHandler
  * @package Dende\Calendar\Application\Handler
  */
-final class RemoveEventHandler
+class RemoveEventHandler
 {
     /**
      * @var EventRepositoryInterface
@@ -40,11 +40,21 @@ final class RemoveEventHandler
     }
 
     /**
-     * @param UpdateEventCommand $command
+     * @param Event $event
      */
     public function remove(Event $event)
     {
-        $this->occurrenceRepository->removeAllForEvent($event);
         $this->eventRepository->remove($event);
+    }
+
+    /**
+     * @param Event[] $events
+     */
+    public function removeCollection($events = [])
+    {
+        foreach($events as $event)
+        {
+            $this->remove($event);
+        }
     }
 }

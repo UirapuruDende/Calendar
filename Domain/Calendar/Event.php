@@ -311,4 +311,14 @@ class Event
     {
         $this->calendar = $calendar;
     }
+
+    public function removeOccurrence(Occurrence $occurrenceToRemove)
+    {
+        foreach($this->occurrences() as $key => $occurrence) {
+            if($occurrence->id() === $occurrenceToRemove->id()) {
+                $this->occurrences->remove($key);
+                break;
+            }
+        }
+    }
 }
