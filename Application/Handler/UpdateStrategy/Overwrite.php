@@ -3,6 +3,7 @@ namespace Dende\Calendar\Application\Handler\UpdateStrategy;
 
 use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Factory\OccurrenceFactory;
+use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
@@ -26,6 +27,7 @@ final class Overwrite implements UpdateStrategyInterface
      */
     public function update(UpdateEventCommand $command)
     {
+        /** @var Event $event */
         $event = $command->occurrence->event();
 
         $event->changeDuration(new Duration($command->duration));
@@ -34,6 +36,10 @@ final class Overwrite implements UpdateStrategyInterface
         $event->changeTitle($command->title);
         $event->changeType(new EventType($command->type));
         $event->changeRepetitions(new Repetitions($command->repetitionDays));
+
+        if($command->calendar->id() != $event->calendar()->id()) {
+            $event->changeCalendar($command->calendar);
+        }
 
         foreach ($event->occurrences() as $occurrence) {
             $this->occurrenceRepository->remove($occurrence);

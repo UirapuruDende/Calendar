@@ -54,4 +54,10 @@ interface OccurrenceRepositoryInterface
      * @return mixed
      */
     public function remove(Occurrence $occurrence);
+
+    /**
+     * @param Event $event
+     * @return void
+     */
+    public function removeAllForEvent(Event $event);
 }

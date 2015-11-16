@@ -44,7 +44,7 @@ final class RemoveEventHandler
      */
     public function remove(Event $event)
     {
-        $this->occurrenceRepository->deleteAllForEvent($event);
+        $this->occurrenceRepository->removeAllForEvent($event);
 
         $this->eventRepository->remove($event);
     }
