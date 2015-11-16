@@ -10,6 +10,10 @@ use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
 use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
 use Exception;
 
+/**
+ * Class RemoveEventHandler
+ * @package Dende\Calendar\Application\Handler
+ */
 final class RemoveEventHandler
 {
     /**
@@ -18,14 +22,21 @@ final class RemoveEventHandler
     private $eventRepository;
 
     /**
+     * @var OccurrenceRepositoryInterface
+     */
+    private $occurrenceRepository;
+
+    /**
      * CreateEventHandler constructor.
      * @param EventRepositoryInterface $eventRepository
      */
     public function __construct(
-        EventRepositoryInterface $eventRepository
+        EventRepositoryInterface $eventRepository,
+        OccurrenceRepositoryInterface $occurrenceRepository
     )
     {
         $this->eventRepository = $eventRepository;
+        $this->occurrenceRepository = $occurrenceRepository;
     }
 
     /**
@@ -33,6 +44,8 @@ final class RemoveEventHandler
      */
     public function remove(Event $event)
     {
+        $this->occurrenceRepository->deleteAllForEvent($event);
+
         $this->eventRepository->remove($event);
     }
 }
