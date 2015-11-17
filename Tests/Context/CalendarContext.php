@@ -160,10 +160,12 @@ final class CalendarContext implements Context
      */
     public function currentEventHasTitle($title)
     {
-
-
         $service = new FindCurrentEvent($this->occurrenceRepository);
         $event = $service->getCurrentEvent($this->calendar);
+
+        if(is_null($event)) {
+            throw new \Exception(sprintf("Event with title '%s' not found", $title));
+        }
 
         if (!is_null($event) && $event->title() === $title) {
             return;
@@ -308,6 +310,10 @@ final class CalendarContext implements Context
         $occurrences = $this->occurrenceRepository->findAllByEvent($event);
 
         $occurrence = current(array_slice($occurrences->toArray(), $index, 1));
+
+        if(!$occurrence) {
+            throw new \Exception('Occurrence does not exists');
+        }
 
         foreach ($table as $row) {
             $repetitions = [];

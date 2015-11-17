@@ -29,7 +29,7 @@ class InMemoryEventRepository implements EventRepositoryInterface
      * @param Event $event
      * @return null
      */
-    public function insert($event)
+    public function insert(Event $event)
     {
         $this->events[$event->id()] = $event;
     }
@@ -90,7 +90,7 @@ class InMemoryEventRepository implements EventRepositoryInterface
     /**
      * @param Event $event
      */
-    public function update($event)
+    public function update(Event $event)
     {
         if (!isset($this->events[$event->id()])) {
             throw new Exception(sprintf('Event with id %s is not set, cannot update!', $event->id()));
@@ -98,4 +98,13 @@ class InMemoryEventRepository implements EventRepositoryInterface
 
         $this->events[$event->id()] = $event;
     }
+
+    /**
+     * @param Event $event
+     */
+    public function remove(Event $event)
+    {
+        unset($this->events[$event->id()]);
+    }
 }
+

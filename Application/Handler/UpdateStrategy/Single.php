@@ -20,6 +20,7 @@ final class Single implements UpdateStrategyInterface
     public function update(UpdateEventCommand $command)
     {
         $occurrence = $command->occurrence;
+
         $event = $occurrence->event();
 
         if ($event->isType(EventType::TYPE_SINGLE)) {

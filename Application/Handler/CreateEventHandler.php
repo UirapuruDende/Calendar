@@ -64,9 +64,5 @@ final class CreateEventHandler
         $event->setOccurrences($occurrences);
 
         $this->eventRepository->insert($event);
-
-//        foreach ($occurrences as $occurrence) {
-//            $this->occurrenceRepository->insert($occurrence);
-//        }
     }
 }
