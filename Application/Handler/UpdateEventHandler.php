@@ -127,6 +127,10 @@ final class UpdateEventHandler
      */
     public function handle(UpdateEventCommand $command)
     {
+        if (is_null($command->calendar)) {
+            throw new Exception("Calendar is null and it has to be set!");
+        }
+
         if (!in_array($command->method, self::$availableModes)) {
             throw new Exception(sprintf(
                 "Mode '%s' not allowed. Only %s allowed.",

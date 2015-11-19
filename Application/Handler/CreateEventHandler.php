@@ -54,6 +54,10 @@ final class CreateEventHandler
      */
     public function handle(CreateEventCommand $command)
     {
+        if (is_null($command->calendar)) {
+            throw new Exception("Calendar is null and it has to be set!");
+        }
+
         $event = $this->eventFactory->createFromCommand($command);
         $occurrences = $this->occurrenceFactory->generateCollectionFromEvent($event);
 
