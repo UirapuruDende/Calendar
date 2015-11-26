@@ -70,6 +70,11 @@ class Calendar
         return $this->name;
     }
 
+    public function updateName($title)
+    {
+        $this->name = $title;
+    }
+
 //    public function getCurrentEvent()
 //    {
 //        return $this->getEventsByDate(new DateTime('now'));
