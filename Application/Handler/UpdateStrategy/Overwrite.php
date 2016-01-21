@@ -41,6 +41,8 @@ final class Overwrite implements UpdateStrategyInterface
             $event->changeCalendar($command->calendar);
         }
 
+        $this->occurrenceRepository->removeAllForEvent($event);
+
         $occurrences = $this->occurrenceFactory->generateCollectionFromEvent($event);
         $event->setOccurrences($occurrences);
 
