@@ -86,6 +86,14 @@ class Occurrence
         return Carbon::now()->between(Carbon::instance($this->startDate()), Carbon::instance($this->endDate()));
     }
 
+    /**
+     * @return bool
+     */
+    public function isPast()
+    {
+        return Carbon::now()->greaterThan(Carbon::instance($this->endDate()));
+    }
+
     private function updateEndDate()
     {
         $endDate = clone($this->startDate());
