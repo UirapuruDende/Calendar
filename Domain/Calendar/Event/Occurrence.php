@@ -15,32 +15,32 @@ class Occurrence
     /**
      * @var DateTime
      */
-    private $startDate;
+    protected $startDate;
 
     /**
      * @var DateTime
      */
-    private $endDate;
+    protected $endDate;
 
     /**
      * @var Duration
      */
-    private $duration;
+    protected $duration;
 
     /**
      * @var bool
      */
-    private $modified = false;
+    protected $modified = false;
 
     /**
      * @var Event
      */
-    private $event;
+    protected $event;
 
     /**
      * @var string
      */
-    private $id;
+    protected $id;
 
     /**
      * Occurrence constructor.
@@ -94,7 +94,7 @@ class Occurrence
         return Carbon::now()->greaterThan(Carbon::instance($this->endDate()));
     }
 
-    private function updateEndDate()
+    protected function updateEndDate()
     {
         $endDate = clone($this->startDate());
         $diff = new \DateInterval(sprintf('PT%dM', abs($this->duration()->minutes())));
@@ -172,7 +172,7 @@ class Occurrence
         $this->setAsModified();
     }
 
-    private function setAsModified()
+    protected function setAsModified()
     {
         $this->modified = true;
     }
