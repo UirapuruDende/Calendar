@@ -5,12 +5,12 @@ namespace Dende\Calendar\Domain\Calendar\Event;
  * Class Duration
  * @package Gyman\Domain\Model
  */
-final class Duration
+class Duration
 {
     /**
      * @var int
      */
-    private $minutes;
+    protected $minutes;
 
     /**
      * Duration constructor.

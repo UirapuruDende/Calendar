@@ -6,19 +6,18 @@ use Dende\Calendar\Application\Generator\IdGeneratorInterface;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
-use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Class OccurrenceFactory
  * @package Gyman\Domain\Factory
  */
-class OccurrenceFactory
+class OccurrenceFactory implements OccurrenceFactoryInterface
 {
     /**
      * @var IdGeneratorInterface
      */
-    private $idGenerator;
+    protected $idGenerator;
 
     /**
      * EventFactory constructor.

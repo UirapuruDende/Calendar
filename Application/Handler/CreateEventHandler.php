@@ -4,6 +4,7 @@ namespace Dende\Calendar\Application\Handler;
 use Dende\Calendar\Application\Command\CreateEventCommand;
 use Dende\Calendar\Application\Factory\EventFactory;
 use Dende\Calendar\Application\Factory\OccurrenceFactory;
+use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
 use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
 use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
 use Exception;
@@ -41,7 +42,7 @@ final class CreateEventHandler
      * @param EventFactory $eventFactory
      * @param OccurrenceFactory $occurrenceFactory
      */
-    public function __construct(EventRepositoryInterface $eventRepository, OccurrenceRepositoryInterface $occurrenceRepository, EventFactory $eventFactory, OccurrenceFactory $occurrenceFactory)
+    public function __construct(EventRepositoryInterface $eventRepository, OccurrenceRepositoryInterface $occurrenceRepository, EventFactory $eventFactory, OccurrenceFactoryInterface $occurrenceFactory)
     {
         $this->eventRepository = $eventRepository;
         $this->occurrenceRepository = $occurrenceRepository;

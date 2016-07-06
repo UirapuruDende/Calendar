@@ -17,7 +17,7 @@ interface OccurrenceRepositoryInterface
      * @param $occurrence
      * @return mixed
      */
-    public function insert(Occurrence $occurrence);
+    public function insert($occurrence);
 
     /**
      * @param Event $event

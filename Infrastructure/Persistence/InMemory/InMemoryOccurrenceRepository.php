@@ -37,7 +37,7 @@ final class InMemoryOccurrenceRepository implements OccurrenceRepositoryInterfac
      * @param Occurrence $occurrence
      * @return null
      */
-    public function insert(Occurrence $occurrence)
+    public function insert($occurrence)
     {
         $this->occurrences[$occurrence->id()] = $occurrence;
     }
