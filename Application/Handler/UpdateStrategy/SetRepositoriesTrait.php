@@ -28,6 +28,9 @@ trait SetRepositoriesTrait
         $this->eventRepository = $eventRepository;
     }
 
+    /**
+     * @param OccurrenceRepositoryInterface $occurrenceRepository
+     */
     public function setOccurrenceRepository(OccurrenceRepositoryInterface $occurrenceRepository)
     {
         $this->occurrenceRepository = $occurrenceRepository;

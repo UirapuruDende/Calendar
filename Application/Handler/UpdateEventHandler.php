@@ -1,10 +1,13 @@
 <?php
 namespace Dende\Calendar\Application\Handler;
 
+use Carbon\Carbon;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Factory\EventFactory;
 use Dende\Calendar\Application\Factory\OccurrenceFactory;
+use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
 use Dende\Calendar\Application\Handler\UpdateStrategy\UpdateStrategyInterface;
+use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
 use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
 use Exception;
@@ -68,7 +71,7 @@ final class UpdateEventHandler
     private $eventFactory;
 
     /**
-     * @var OccurrenceFactory
+     * @var OccurrenceFactoryInterface
      */
     private $occurrenceFactory;
 
@@ -80,7 +83,7 @@ final class UpdateEventHandler
         EventRepositoryInterface $eventRepository,
         OccurrenceRepositoryInterface $occurrenceRepository,
         EventFactory $eventFactory,
-        OccurrenceFactory $occurrenceFactory
+        OccurrenceFactoryInterface $occurrenceFactory
     )
     {
         $this->eventRepository = $eventRepository;
@@ -145,6 +148,17 @@ final class UpdateEventHandler
                 $command->method
             ));
         }
+
+        if($command->type === EventType::TYPE_SINGLE) {
+            /** @var Carbon $date */
+            $date = Carbon::instance($command->startDate)
+                ->addMinutes($command->duration);
+        } else {
+            /** @var Carbon $date */
+            $date = Carbon::instance($command->endDate);
+        }
+
+        $command->endDate = $date;
 
         $this->strategy[$command->method]->update($command);
     }

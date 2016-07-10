@@ -3,6 +3,7 @@ namespace Dende\Calendar\Application\Handler\UpdateStrategy;
 
 use Dende\Calendar\Application\Factory\EventFactory;
 use Dende\Calendar\Application\Factory\OccurrenceFactory;
+use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
 use Dende\Calendar\Domain\Calendar\Event;
 
 /**
@@ -17,7 +18,7 @@ trait SetFactoriesTrait
     private $eventFactory;
 
     /**
-     * @var OccurrenceFactory
+     * @var OccurrenceFactoryInterface
      */
     private $occurrenceFactory;
 
@@ -30,9 +31,9 @@ trait SetFactoriesTrait
     }
 
     /**
-     * @param OccurrenceFactory $occurrenceFactory
+     * @param OccurrenceFactoryInterface $occurrenceFactory
      */
-    public function setOccurrenceFactory(OccurrenceFactory $occurrenceFactory)
+    public function setOccurrenceFactory(OccurrenceFactoryInterface $occurrenceFactory)
     {
         $this->occurrenceFactory = $occurrenceFactory;
     }

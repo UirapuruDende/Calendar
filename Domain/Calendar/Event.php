@@ -22,50 +22,50 @@ class Event
     /**
      * @var string
      */
-    private $id;
+    protected $id;
 
     /**
      * @var Calendar
      */
-    private $calendar;
+    protected $calendar;
 
     /**
      * @var EventType
      */
-    private $type;
+    protected $type;
 
     /**
      * @var DateTime
      */
-    private $startDate;
+    protected $startDate;
 
     /**
      * @var DateTime
      */
-    private $endDate;
+    protected $endDate;
 
     /**
      * @var string
      */
-    private $title;
+    protected $title;
 
     /**
      * @var Repetitions
      */
-    private $repetitions;
+    protected $repetitions;
 
     /**
      * @var Duration
      */
-    private $duration;
+    protected $duration;
 
     /** @var ArrayCollection|Occurrence[] */
-    private $occurrences;
+    protected $occurrences;
 
     /**
      * @var DateTime[]
      */
-    private $occurrencesDates;
+    protected $occurrencesDates;
 
     /**
      * Event constructor.

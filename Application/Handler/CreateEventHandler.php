@@ -1,10 +1,12 @@
 <?php
 namespace Dende\Calendar\Application\Handler;
 
+use Carbon\Carbon;
 use Dende\Calendar\Application\Command\CreateEventCommand;
 use Dende\Calendar\Application\Factory\EventFactory;
 use Dende\Calendar\Application\Factory\OccurrenceFactory;
 use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
+use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
 use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
 use Exception;
@@ -58,6 +60,17 @@ final class CreateEventHandler
         if (is_null($command->calendar)) {
             throw new Exception("Calendar is null and it has to be set!");
         }
+
+        if($command->type === EventType::TYPE_SINGLE) {
+            /** @var Carbon $date */
+            $date = Carbon::instance($command->startDate)
+                ->addMinutes($command->duration);
+        } else {
+            /** @var Carbon $date */
+            $date = Carbon::instance($command->endDate);
+        }
+
+        $command->endDate = $date;
 
         $event = $this->eventFactory->createFromCommand($command);
         $occurrences = $this->occurrenceFactory->generateCollectionFromEvent($event);
