@@ -21,7 +21,7 @@ class EventFactory implements EventFactoryInterface
     /**
      * @var IdGeneratorInterface
      */
-    private $idGenerator;
+    protected $idGenerator;
 
     /**
      * EventFactory constructor.
