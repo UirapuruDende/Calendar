@@ -14,7 +14,7 @@ class CalendarFactory
     /**
      * @var IdGeneratorInterface
      */
-    private $idGenerator;
+    protected $idGenerator;
 
     /**
      * CalendarFactory constructor.

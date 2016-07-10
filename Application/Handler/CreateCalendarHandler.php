@@ -2,6 +2,8 @@
 namespace Dende\Calendar\Application\Handler;
 
 use Dende\Calendar\Application\Factory\CalendarFactory;
+use Dende\Calendar\Application\Factory\CalendarFactoryInterface;
+use Dende\Calendar\Domain\Repository\CalendarRepositoryInterface;
 use Dende\CalendarBundle\Event\CalendarAfterCreationEvent;
 use Dende\CalendarBundle\Events;
 use Dende\CalendarBundle\Repository\ORM\CalendarRepository;
@@ -15,12 +17,12 @@ use Symfony\Component\Form\Form;
 class CreateCalendarHandler
 {
     /**
-     * @var CalendarFactory
+     * @var CalendarFactoryInterface
      */
     private $calendarFactory;
 
     /**
-     * @var CalendarRepository
+     * @var CalendarRepositoryInterface
      */
     private $calendarRepository;
 
@@ -34,7 +36,7 @@ class CreateCalendarHandler
      * @param CalendarFactory $calendarFactory
      * @param CalendarRepository $calendarRepository
      */
-    public function __construct(CalendarFactory $calendarFactory, CalendarRepository $calendarRepository, EventDispatcherInterface $eventDispatcher)
+    public function __construct(CalendarFactoryInterface $calendarFactory, CalendarRepositoryInterface $calendarRepository, EventDispatcherInterface $eventDispatcher)
     {
         $this->calendarFactory = $calendarFactory;
         $this->calendarRepository = $calendarRepository;

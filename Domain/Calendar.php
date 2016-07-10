@@ -14,17 +14,17 @@ class Calendar
     /**
      * @var string
      */
-    private $id;
+    protected $id;
 
     /**
      * @var string
      */
-    private $name;
+    protected $name;
 
     /**
      * @var ArrayCollection|Event[]
      */
-    private $events;
+    protected $events;
 
     /**
      * @param string $id
