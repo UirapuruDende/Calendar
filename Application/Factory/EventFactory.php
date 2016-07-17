@@ -78,7 +78,7 @@ class EventFactory implements EventFactoryInterface
      */
     public function createFromCommand(CreateEventCommand $command)
     {
-        return self::createFromArray([
+        return static::createFromArray([
             'title'           => $command->title,
             'calendar'        => $command->calendar,
             'repetitions'     => new Repetitions($command->repetitionDays),

@@ -9,7 +9,7 @@ use Dende\Calendar\Domain\Calendar;
  * @package Dende\Calendar\Application\Factory
  * @todo change 'title' to name, because calendar has 'name' field
  */
-class CalendarFactory
+class CalendarFactory implements CalendarFactoryInterface
 {
     /**
      * @var IdGeneratorInterface
