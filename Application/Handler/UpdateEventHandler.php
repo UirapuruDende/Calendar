@@ -4,6 +4,7 @@ namespace Dende\Calendar\Application\Handler;
 use Carbon\Carbon;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Factory\EventFactory;
+use Dende\Calendar\Application\Factory\EventFactoryInterface;
 use Dende\Calendar\Application\Factory\OccurrenceFactory;
 use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
 use Dende\Calendar\Application\Handler\UpdateStrategy\UpdateStrategyInterface;
@@ -82,7 +83,7 @@ final class UpdateEventHandler
     public function __construct(
         EventRepositoryInterface $eventRepository,
         OccurrenceRepositoryInterface $occurrenceRepository,
-        EventFactory $eventFactory,
+        EventFactoryInterface $eventFactory,
         OccurrenceFactoryInterface $occurrenceFactory
     )
     {

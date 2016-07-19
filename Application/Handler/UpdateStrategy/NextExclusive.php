@@ -5,7 +5,7 @@ use Dende\Calendar\Application\Command\UpdateEventCommand;
 
 class NextExclusive implements UpdateStrategyInterface
 {
-    use SetRepositoriesTrait;
+    use SetRepositoriesTrait, SetFactoriesTrait;
 
     /**
      * @param UpdateEventCommand $command

@@ -3,6 +3,7 @@ namespace Dende\Calendar\Application\Handler\UpdateStrategy;
 
 use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Factory\EventFactory;
+use Dende\Calendar\Application\Factory\EventFactoryInterface;
 use Dende\Calendar\Application\Factory\OccurrenceFactory;
 use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
 use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
@@ -33,7 +34,7 @@ interface UpdateStrategyInterface
     /**
      * @param EventFactory $eventFactory
      */
-    public function setEventFactory(EventFactory $eventFactory);
+    public function setEventFactory(EventFactoryInterface $eventFactory);
 
     /**
      * @param OccurrenceFactory $occurrenceFactory

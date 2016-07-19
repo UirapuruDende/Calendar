@@ -13,7 +13,7 @@ use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
  */
 final class AllInclusive implements UpdateStrategyInterface
 {
-    use SetRepositoriesTrait;
+    use SetRepositoriesTrait, SetFactoriesTrait;
 
     /**
      * @param UpdateEventCommand $command

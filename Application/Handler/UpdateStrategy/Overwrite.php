@@ -14,7 +14,7 @@ use Dende\CalendarBundle\Repository\ORM\OccurrenceRepository;
 /**
  * Class AllInclusive
  * @package Dende\Calendar\Application\Handler\UpdateStrategy
- * @property OccurrenceRepositoryInterface|OccurrenceRepository occurrenceRepository
+ * @property OccurrenceRepositoryInterface|OccurrenceRepositoryInterface occurrenceRepository
  * @property EventRepositoryInterface eventRepository
  */
 final class Overwrite implements UpdateStrategyInterface

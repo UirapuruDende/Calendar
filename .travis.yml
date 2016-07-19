@@ -8,4 +8,3 @@ install:
 
 script:
   - ./bin/phpunit
-  - ./bin/behat
