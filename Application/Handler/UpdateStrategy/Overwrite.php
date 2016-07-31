@@ -2,14 +2,12 @@
 namespace Dende\Calendar\Application\Handler\UpdateStrategy;
 
 use Dende\Calendar\Application\Command\UpdateEventCommand;
-use Dende\Calendar\Application\Factory\OccurrenceFactory;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
 use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
-use Dende\CalendarBundle\Repository\ORM\OccurrenceRepository;
 
 /**
  * Class AllInclusive
@@ -22,6 +20,7 @@ final class Overwrite implements UpdateStrategyInterface
     use SetRepositoriesTrait, SetFactoriesTrait;
 
     /**
+     * @todo add fabrics for value objects or update commands
      * @param UpdateEventCommand $command
      * @return null
      */

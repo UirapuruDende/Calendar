@@ -10,7 +10,7 @@ use Dende\Calendar\Domain\Calendar\Event\Occurrence;
  * Class CreateEventCommand
  * @package Gyman\Domain\Command
  */
-final class UpdateEventCommand
+final class UpdateEventCommand implements  EventCommandInterface
 {
     use CommandConstructorTrait;
 
@@ -25,6 +25,7 @@ final class UpdateEventCommand
     public $type;
 
     /**
+     * Update Strategy Method
      * @var string
      */
     public $method;

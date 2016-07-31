@@ -14,6 +14,7 @@ final class Single implements UpdateStrategyInterface
     use SetRepositoriesTrait, SetFactoriesTrait;
 
     /**
+     * @todo: crate and update to DurationFactory
      * @param UpdateEventCommand $command
      * @return null
      */
@@ -31,8 +32,7 @@ final class Single implements UpdateStrategyInterface
 
             $occurrence->changeStartDate($command->startDate);
             $occurrence->changeDuration(new Duration($command->duration));
-        }
-        if ($event->isType(EventType::TYPE_WEEKLY)) {
+        } else if ($event->isType(EventType::TYPE_WEEKLY)) {
             $occurrence->changeStartDate($command->startDate);
             $occurrence->changeDuration(new Duration($command->duration));
         }

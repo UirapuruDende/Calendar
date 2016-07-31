@@ -4,6 +4,7 @@ namespace Dende\Calendar\Application\Factory;
 use Carbon\Carbon;
 use DateTime;
 use Dende\Calendar\Application\Command\CreateEventCommand;
+use Dende\Calendar\Application\Command\EventCommandInterface;
 use Dende\Calendar\Application\Generator\IdGeneratorInterface;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
@@ -33,10 +34,10 @@ class EventFactory implements EventFactoryInterface
     }
 
     /**
-     * @param $params
+     * @param array $array
      * @return Event
      */
-    public function createFromArray($array)
+    public function createFromArray(array $array = [])
     {
         $template = [
             'id'                     => $this->idGenerator->generateId(),
@@ -76,7 +77,7 @@ class EventFactory implements EventFactoryInterface
      * @param CreateEventCommand $command
      * @return Event
      */
-    public function createFromCommand(CreateEventCommand $command)
+    public function createFromCommand(EventCommandInterface $command)
     {
         return static::createFromArray([
             'title'           => $command->title,

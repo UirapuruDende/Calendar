@@ -8,7 +8,7 @@ use Dende\Calendar\Domain\Calendar;
  * Class CreateEventCommand
  * @package Gyman\Domain\Command
  */
-final class CreateEventCommand
+final class CreateEventCommand implements EventCommandInterface
 {
     /**
      * @var string
