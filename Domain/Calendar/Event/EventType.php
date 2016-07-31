@@ -44,6 +44,7 @@ final class EventType
 
     /**
      * @return string
+     * @codeCoverageIgnore
      */
     public function type()
     {

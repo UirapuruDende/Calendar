@@ -1,5 +1,5 @@
 <?php
-namespace Dende\Calendar\UserInterface\Symfony\CalendarBundle\Tests\Unit\Model;
+namespace Dende\Calendar\UserInterface\Symfony\CalendarBundle\Tests\Unit\Factory;
 
 use DateTime;
 use Dende\Calendar\Application\Factory\OccurrenceFactory;

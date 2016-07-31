@@ -116,17 +116,6 @@ final class UpdateEventHandler
     }
 
     /**
-     * @param UpdateStrategyInterface[] $array
-     * @throws Exception
-     */
-    public function setStrategies($array)
-    {
-        foreach ($array as $name => $strategy) {
-            $this->addStrategy($name, $strategy);
-        }
-    }
-
-    /**
      * @param UpdateEventCommand $command
      */
     public function handle(UpdateEventCommand $command)

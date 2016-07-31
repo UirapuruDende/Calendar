@@ -15,6 +15,7 @@ final class EventId
     /**
      * EventId constructor.
      * @param $id
+     * @codeCoverageIgnore
      */
     public function __construct($id = null)
     {
@@ -27,6 +28,7 @@ final class EventId
 
     /**
      * @return string
+     * @codeCoverageIgnore
      */
     public function id()
     {
@@ -35,6 +37,7 @@ final class EventId
 
     /**
      * @return string
+     * @codeCoverageIgnore
      */
     function __toString()
     {

@@ -19,13 +19,32 @@ use Mockery as m;
  */
 final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testHandleUpdateCommand()
+    /**
+     * @expectedException Exception
+     * @expectedExceptionMessage Calendar is null and it has to be set!
+     */
+    public function testNullCalendar()
+    {
+        $command = new UpdateEventCommand();
+
+        $eventRepositoryMock = m::mock(EventRepositoryInterface::class);
+        $occurrenceRepositoryMock = m::mock(OccurrenceRepositoryInterface::class);
+        $eventFactoryMock = m::mock(EventFactoryInterface::class);
+        $occurrenceFactoryMock = m::mock(OccurrenceFactoryInterface::class);
+
+        $handler = new UpdateEventHandler($eventRepositoryMock, $occurrenceRepositoryMock, $eventFactoryMock, $occurrenceFactoryMock);
+        $handler->handle($command);
+    }
+
+    public function testHandleUpdateCommandSingle()
     {
         $command = new UpdateEventCommand();
         $command->calendar = m::mock(Calendar::class);
         $command->method = UpdateEventHandler::MODE_SINGLE;
         $command->startDate = new DateTime("+1 hour");
-        $command->endDate = new DateTime("+2 hour");
+        $command->endDate = new DateTime("+1 year +2 hour");
+        $command->duration = 60;
+        $command->type = Calendar\Event\EventType::TYPE_SINGLE;
 
         $eventRepositoryMock = m::mock(EventRepositoryInterface::class);
         $occurrenceRepositoryMock = m::mock(OccurrenceRepositoryInterface::class);
@@ -44,6 +63,63 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
         $handler->addStrategy(UpdateEventHandler::MODE_SINGLE, $strategyMock);
 
         $handler->handle($command);
+
+        $this->assertEquals($command->endDate, new DateTime("+2 hour"));
+    }
+
+    public function testHandleUpdateCommandWeekly()
+    {
+        $command = new UpdateEventCommand();
+        $command->calendar = m::mock(Calendar::class);
+        $command->method = UpdateEventHandler::MODE_SINGLE;
+        $command->startDate = new DateTime("+1 hour");
+        $command->endDate = new DateTime("+1 year +2 hour");
+        $command->duration = 60;
+        $command->type = Calendar\Event\EventType::TYPE_WEEKLY;
+
+        $eventRepositoryMock = m::mock(EventRepositoryInterface::class);
+        $occurrenceRepositoryMock = m::mock(OccurrenceRepositoryInterface::class);
+        $eventFactoryMock = m::mock(EventFactoryInterface::class);
+        $occurrenceFactoryMock = m::mock(OccurrenceFactoryInterface::class);
+
+        /** @var UpdateStrategyInterface|m\Mock $strategyMock */
+        $strategyMock = m::mock(UpdateStrategyInterface::class);
+        $strategyMock->shouldReceive('update')->once()->with($command);
+        $strategyMock->shouldReceive('setEventRepository')->once()->with($eventRepositoryMock);
+        $strategyMock->shouldReceive('setOccurrenceRepository')->once()->with($occurrenceRepositoryMock);
+        $strategyMock->shouldReceive('setEventFactory')->once()->with($eventFactoryMock);
+        $strategyMock->shouldReceive('setOccurrenceFactory')->once()->with($occurrenceFactoryMock);
+
+        $handler = new UpdateEventHandler($eventRepositoryMock, $occurrenceRepositoryMock, $eventFactoryMock, $occurrenceFactoryMock);
+        $handler->addStrategy(UpdateEventHandler::MODE_SINGLE, $strategyMock);
+
+        $handler->handle($command);
+
+        $this->assertEquals($command->endDate, new DateTime("+1 year +2 hour"));
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Strategy name 'single' already set!
+     */
+    public function testStrategyAlreadySet()
+    {
+        $eventRepositoryMock = m::mock(EventRepositoryInterface::class);
+        $occurrenceRepositoryMock = m::mock(OccurrenceRepositoryInterface::class);
+        $eventFactoryMock = m::mock(EventFactoryInterface::class);
+        $occurrenceFactoryMock = m::mock(OccurrenceFactoryInterface::class);
+
+        /** @var UpdateStrategyInterface|m\Mock $strategyMock */
+        $strategyMock = m::mock(UpdateStrategyInterface::class);
+
+        $handler = new UpdateEventHandler($eventRepositoryMock, $occurrenceRepositoryMock, $eventFactoryMock, $occurrenceFactoryMock);
+        $strategyMock->shouldReceive('setEventRepository')->once()->with($eventRepositoryMock);
+        $strategyMock->shouldReceive('setOccurrenceRepository')->once()->with($occurrenceRepositoryMock);
+        $strategyMock->shouldReceive('setEventFactory')->once()->with($eventFactoryMock);
+        $strategyMock->shouldReceive('setOccurrenceFactory')->once()->with($occurrenceFactoryMock);
+
+        $handler->addStrategy(UpdateEventHandler::MODE_SINGLE, $strategyMock);
+        $handler->addStrategy(UpdateEventHandler::MODE_SINGLE, $strategyMock);
     }
 
     /**
