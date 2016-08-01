@@ -35,7 +35,7 @@ final class UpdateEventHandler
     const MODE_SINGLE = 'single';
     const MODE_ALL_INCLUSIVE = 'all_inclusive';
     const MODE_ALL_EXCLUSIVE = 'all_exclusive';
-    const MODE_NEXT_INCLUSIVE = 'next_inclusive';
+    const MODE_NEXT_INCLUSIVE = 'nextinclusive';
     const MODE_NEXT_EXCLUSIVE = 'next_exclusive';
     const MODE_OVERWRITE = 'overwrite';
 
