@@ -5,6 +5,7 @@ use Carbon\Carbon;
 use DateTime;
 use Dende\Calendar\Application\Command\CreateEventCommand;
 use Dende\Calendar\Application\Command\EventCommandInterface;
+use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Generator\IdGeneratorInterface;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
@@ -49,6 +50,7 @@ class EventFactory implements EventFactoryInterface
             'duration'               => new Duration(0),
             'startDate'              => new DateTime('now'),
             'endDate'                => new DateTime('now'),
+            'previousEvent'         => null
         ];
 
         $array = array_merge($template, $array);
@@ -61,7 +63,8 @@ class EventFactory implements EventFactoryInterface
             $array['endDate'],
             $array['title'],
             $array['repetitions'],
-            $array['duration']
+            $array['duration'],
+            $array['previousEvent']
         );
     }
 
@@ -74,7 +77,7 @@ class EventFactory implements EventFactoryInterface
     }
 
     /**
-     * @param CreateEventCommand $command
+     * @param CreateEventCommand|UpdateEventCommand $command
      * @return Event
      */
     public function createFromCommand(EventCommandInterface $command)
@@ -87,6 +90,7 @@ class EventFactory implements EventFactoryInterface
             'startDate'       => $command->startDate,
             'endDate'         => $command->endDate,
             'duration'        => new Duration($command->duration),
+            'previousEvent'  => isset($command->occurrence) ? $command->occurrence->event() : null
         ]);
     }
 }

@@ -36,7 +36,7 @@ class EventTest extends \PHPUnit_Framework_TestCase
                 Repetitions::FRIDAY,
             ]),
             new Duration(90),
-            new ArrayCollection()
+            null
         );
 
         $collection = $event->calculateOccurrencesDates();
@@ -71,7 +71,7 @@ class EventTest extends \PHPUnit_Framework_TestCase
             'some title',
             new Repetitions([]),
             new Duration(90),
-            new ArrayCollection()
+            null
         );
 
         $collection = $event->calculateOccurrencesDates();
@@ -100,7 +100,7 @@ class EventTest extends \PHPUnit_Framework_TestCase
                 Repetitions::TUESDAY,
             ]),
             new Duration(90),
-            new ArrayCollection()
+            null
         );
     }
 }

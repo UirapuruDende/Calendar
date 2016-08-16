@@ -68,6 +68,11 @@ class Event
     protected $occurrencesDates;
 
     /**
+     * @var Event
+     */
+    protected $previousEvent;
+
+    /**
      * Event constructor.
      * @param string $id
      * @param Calendar $calendar
@@ -80,7 +85,7 @@ class Event
      * @param ArrayCollection|Occurrence[] $occurrences
      * @throws \Exception
      */
-    public function __construct($id, Calendar $calendar, EventType $type, DateTime $startDate, DateTime $endDate, $title, Repetitions $repetitions, Duration $duration)
+    public function __construct($id, Calendar $calendar, EventType $type, DateTime $startDate, DateTime $endDate, $title, Repetitions $repetitions, Duration $duration, Event $previousEvent=null)
     {
         if (Carbon::instance($startDate)->gt(Carbon::instance($endDate))) {
             throw new \Exception(sprintf(
@@ -100,6 +105,7 @@ class Event
         $this->title = $title;
         $this->repetitions = $repetitions;
         $this->duration = $duration;
+        $this->previousEvent = $previousEvent;
     }
 
     /**
@@ -312,6 +318,9 @@ class Event
         $this->calendar = $calendar;
     }
 
+    /**
+     * @param Occurrence $occurrenceToRemove
+     */
     public function removeOccurrence(Occurrence $occurrenceToRemove)
     {
         foreach($this->occurrences() as $key => $occurrence) {
@@ -320,5 +329,13 @@ class Event
                 break;
             }
         }
+    }
+
+    /**
+     * @return Event
+     */
+    public function previous()
+    {
+        return $this->previousEvent;
     }
 }

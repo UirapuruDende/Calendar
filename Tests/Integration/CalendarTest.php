@@ -50,7 +50,7 @@ class CalendarTest extends \PHPUnit_Framework_TestCase
                 Repetitions::FRIDAY,
             ]),
             new Duration(90),
-            new ArrayCollection()
+            null
         );
 
         $event2 = new Event(
@@ -64,7 +64,7 @@ class CalendarTest extends \PHPUnit_Framework_TestCase
                 Repetitions::WEDNESDAY,
             ]),
             new Duration(90),
-            new ArrayCollection()
+            null
         );
 
         $event3 = new Event(
@@ -78,7 +78,7 @@ class CalendarTest extends \PHPUnit_Framework_TestCase
                 Repetitions::MONDAY,
             ]),
             new Duration(90),
-            new ArrayCollection()
+            null
         );
 
         $event4 = new Event(
@@ -94,7 +94,7 @@ class CalendarTest extends \PHPUnit_Framework_TestCase
                 Repetitions::FRIDAY,
             ]),
             new Duration(90),
-            new ArrayCollection()
+            null
         );
 
         $event5 = new Event(
@@ -110,7 +110,7 @@ class CalendarTest extends \PHPUnit_Framework_TestCase
                 Repetitions::FRIDAY,
             ]),
             new Duration(90),
-            new ArrayCollection()
+            null
         );
 
         $eventRepository = new InMemoryEventRepository();

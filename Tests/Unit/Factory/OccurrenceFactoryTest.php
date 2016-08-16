@@ -38,7 +38,7 @@ class OccurrenceFactoryTest extends \PHPUnit_Framework_TestCase
                 Repetitions::FRIDAY,
             ]),
             new Duration(90),
-            new ArrayCollection()
+            null
         );
 
         $collection = (new OccurrenceFactory(new IdGenerator()))->generateCollectionFromEvent($event);
@@ -82,7 +82,7 @@ class OccurrenceFactoryTest extends \PHPUnit_Framework_TestCase
                 Repetitions::SUNDAY,
             ]),
             new Duration(90),
-            new ArrayCollection()
+            null
         );
 
         $collection = (new OccurrenceFactory(new IdGenerator()))->generateCollectionFromEvent($event);
@@ -110,7 +110,7 @@ class OccurrenceFactoryTest extends \PHPUnit_Framework_TestCase
                 Repetitions::TUESDAY,
             ]),
             new Duration(90),
-            new ArrayCollection()
+            null
         );
 
         $this->assertCount(0, (new OccurrenceFactory(new IdGenerator()))->generateCollectionFromEvent($event));
@@ -127,7 +127,7 @@ class OccurrenceFactoryTest extends \PHPUnit_Framework_TestCase
             'some title',
             new Repetitions([]),
             new Duration(90),
-            new ArrayCollection()
+            null
         );
 
         $this->assertCount(0, (new OccurrenceFactory(new IdGenerator()))->generateCollectionFromEvent($event));
