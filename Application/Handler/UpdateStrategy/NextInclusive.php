@@ -31,8 +31,11 @@ class NextInclusive implements UpdateStrategyInterface
 
         $originalEvent->setOccurrences($filteredCollection);
 
+        $newCommand = clone($command);
+        $newCommand->startDate = $pivot;
+
         /** @var Event $newEvent */
-        $newEvent = $this->eventFactory->createFromCommand($command);
+        $newEvent = $this->eventFactory->createFromCommand($newCommand);
         $newOccurrences = $this->occurrenceFactory->generateCollectionFromEvent($newEvent);
         $newEvent->setOccurrences($newOccurrences);
 
