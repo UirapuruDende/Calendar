@@ -50,12 +50,12 @@ final class NextInclusiveTest extends \PHPUnit_Framework_TestCase
         $command->startDate = new DateTime("-2 day");
         $command->endDate = new DateTime("-1 day");
         $command->title = "New title";
-        $command->method = 'next_inclusive';
+        $command->method = 'nextinclusive';
         $command->repetitionDays = [];
         $command->occurrence = $occurrenceMock;
 
         $eventFactoryMock = m::mock(EventFactoryInterface::class);
-        $eventFactoryMock->shouldReceive("createFromCommand")->with($command)->andReturn($newEventMock);
+        $eventFactoryMock->shouldReceive("createFromCommand")->andReturn($newEventMock);
 
         $occurrenceFactoryMock = m::mock(OccurrenceFactoryInterface::class);
         $occurrenceFactoryMock->shouldReceive("generateCollectionFromEvent")->with($newEventMock)->andReturn($newOccurrencesCollection);

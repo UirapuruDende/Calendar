@@ -125,7 +125,7 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @throws \Exception
      * @expectedException Exception
-     * @expectedExceptionMessage Mode 'weird_mode' not allowed. Only single, all_inclusive, all_exclusive, next_inclusive, next_exclusive, overwrite allowed.
+     * @expectedExceptionMessage Mode 'weird_mode' not allowed. Only single, all_inclusive, all_exclusive, nextinclusive, next_exclusive, overwrite allowed.
      */
     public function testMethodNotAllowedException()
     {
@@ -171,7 +171,7 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @throws Exception
      * @expectedException Exception
-     * @expectedExceptionMessage Strategy 'weird_strategy' not allowed. Only single, all_inclusive, all_exclusive, next_inclusive, next_exclusive, overwrite allowed.
+     * @expectedExceptionMessage Strategy 'weird_strategy' not allowed. Only single, all_inclusive, all_exclusive, nextinclusive, next_exclusive, overwrite allowed.
      */
     public function testStrategyNotAllowedException()
     {
