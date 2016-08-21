@@ -43,6 +43,11 @@ class Occurrence
     protected $id;
 
     /**
+     * @var DateTime|null
+     */
+    protected $deletedAt;
+
+    /**
      * Occurrence constructor.
      * @param string $id
      * @param DateTime $startDate

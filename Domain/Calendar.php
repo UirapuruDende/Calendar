@@ -1,6 +1,7 @@
 <?php
 namespace Dende\Calendar\Domain;
 
+use DateTime;
 use Dende\Calendar\Domain\Calendar\CalendarId;
 use Dende\Calendar\Domain\Calendar\Event;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -25,6 +26,11 @@ class Calendar
      * @var ArrayCollection|Event[]
      */
     protected $events;
+
+    /**
+     * @var DateTime|null
+     */
+    protected $deletedAt;
 
     /**
      * @param string $id
@@ -74,28 +80,4 @@ class Calendar
     {
         $this->name = $title;
     }
-
-//    public function getCurrentEvent()
-//    {
-//        return $this->getEventsByDate(new DateTime('now'));
-//    }
-
-//    public function getEventsByDate(DateTime $date)
-//    {
-//        $expr = Criteria::expr();
-//        $criteria = Criteria::create();
-//
-//        $criteria->where(
-//            $expr->orX(
-//                $expr->andX(
-//                    $expr->eq('.type()', new EventType(EventType::TYPE_WEEKLY))
-//                ),
-//                $expr->andX(
-//                    $expr->eq('type', new EventType(EventType::TYPE_SINGLE))
-//                )
-//            )
-//        );
-//
-//        return $this->events()->matching($criteria);
-//    }
 }
