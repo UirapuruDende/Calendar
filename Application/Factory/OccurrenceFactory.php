@@ -4,8 +4,8 @@ namespace Dende\Calendar\Application\Factory;
 use DateTime;
 use Dende\Calendar\Application\Generator\IdGeneratorInterface;
 use Dende\Calendar\Domain\Calendar\Event;
-use Dende\Calendar\Domain\Calendar\Event\Duration;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
+use Dende\Calendar\Domain\Calendar\Event\Occurrence\Duration as OccurrenceDuration;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
@@ -37,7 +37,7 @@ class OccurrenceFactory implements OccurrenceFactoryInterface
         $template = [
             'id'             => $this->idGenerator->generateId(),
             'startDate'      => new DateTime('now'),
-            'duration'       => new Duration(90),
+            'duration'       => new OccurrenceDuration(90),
             'event'          => null,
         ];
 
@@ -59,16 +59,16 @@ class OccurrenceFactory implements OccurrenceFactoryInterface
     {
         $dates = $event->calculateOccurrencesDates();
 
-        $occurences = new ArrayCollection();
+        $occurrences = new ArrayCollection();
 
         foreach ($dates as $date) {
-            $occurences->add($this->createFromArray([
+            $occurrences->add($this->createFromArray([
                 'startDate' => $date,
-                'duration'  => $event->duration(),
+                'duration'  => new OccurrenceDuration($event->duration()->minutes()),
                 'event'     => $event,
             ]));
         }
 
-        return $occurences;
+        return $occurrences;
     }
 }

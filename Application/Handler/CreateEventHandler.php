@@ -81,7 +81,7 @@ final class CreateEventHandler
         }
 
         $event->setOccurrences($occurrences);
-
-        $this->eventRepository->insert($event);
+        $this->occurrenceRepository->insert($occurrences);
+//        $this->eventRepository->insert($event);
     }
 }

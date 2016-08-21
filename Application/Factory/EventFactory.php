@@ -1,7 +1,6 @@
 <?php
 namespace Dende\Calendar\Application\Factory;
 
-use Carbon\Carbon;
 use DateTime;
 use Dende\Calendar\Application\Command\CreateEventCommand;
 use Dende\Calendar\Application\Command\EventCommandInterface;

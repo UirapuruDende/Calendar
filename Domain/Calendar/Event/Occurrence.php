@@ -5,6 +5,7 @@ use Carbon\Carbon;
 use DateTime;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
+use Dende\Calendar\Domain\Calendar\Event\Occurrence\Duration as OccurrenceDuration;
 
 /**
  * Class Occurrence
@@ -23,7 +24,7 @@ class Occurrence
     protected $endDate;
 
     /**
-     * @var Duration
+     * @var OccurrenceDuration
      */
     protected $duration;
 
@@ -38,7 +39,7 @@ class Occurrence
     protected $event;
 
     /**
-     * @var string
+     * @var string|OccurrenceId
      */
     protected $id;
 
@@ -51,10 +52,10 @@ class Occurrence
      * Occurrence constructor.
      * @param string $id
      * @param DateTime $startDate
-     * @param Duration $duration
+     * @param OccurrenceDuration $duration
      * @param Event $event
      */
-    public function __construct($id, DateTime $startDate, Duration $duration, Event $event)
+    public function __construct($id, DateTime $startDate, OccurrenceDuration $duration, Event $event)
     {
         $this->id = $id;
         $this->startDate = $startDate;
@@ -64,9 +65,9 @@ class Occurrence
     }
 
     /**
-     * @param Duration $newDuration
+     * @param OccurrenceDuration $newDuration
      */
-    public function resize(Duration $newDuration)
+    public function resize(OccurrenceDuration $newDuration)
     {
         $this->modified = true;
         $this->duration = $newDuration;
@@ -117,7 +118,7 @@ class Occurrence
     }
 
     /**
-     * @return Duration
+     * @return OccurrenceDuration
      */
     public function duration()
     {
@@ -169,9 +170,9 @@ class Occurrence
     }
 
     /**
-     * @param Duration $duration
+     * @param OccurrenceDuration $duration
      */
-    public function changeDuration(Duration $duration)
+    public function changeDuration(OccurrenceDuration $duration)
     {
         $this->duration = $duration;
         $this->setAsModified();

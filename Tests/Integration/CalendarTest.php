@@ -6,7 +6,8 @@ use Dende\Calendar\Application\Factory\OccurrenceFactory;
 use Dende\Calendar\Application\Generator\InMemory\IdGenerator;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
-use Dende\Calendar\Domain\Calendar\Event\Duration;
+use Dende\Calendar\Domain\Calendar\Event\Duration as EventDuration;
+use Dende\Calendar\Domain\Calendar\Event\Occurrence\Duration as OccurrenceDuration;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryEventRepository;
@@ -49,7 +50,7 @@ class CalendarTest extends \PHPUnit_Framework_TestCase
                 Repetitions::WEDNESDAY,
                 Repetitions::FRIDAY,
             ]),
-            new Duration(90),
+            new EventDuration(90),
             null
         );
 
@@ -63,7 +64,7 @@ class CalendarTest extends \PHPUnit_Framework_TestCase
             new Repetitions([
                 Repetitions::WEDNESDAY,
             ]),
-            new Duration(90),
+            new EventDuration(90),
             null
         );
 
@@ -77,7 +78,7 @@ class CalendarTest extends \PHPUnit_Framework_TestCase
             new Repetitions([
                 Repetitions::MONDAY,
             ]),
-            new Duration(90),
+            new EventDuration(90),
             null
         );
 
@@ -93,7 +94,7 @@ class CalendarTest extends \PHPUnit_Framework_TestCase
                 Repetitions::WEDNESDAY,
                 Repetitions::FRIDAY,
             ]),
-            new Duration(90),
+            new EventDuration(90),
             null
         );
 
@@ -109,7 +110,7 @@ class CalendarTest extends \PHPUnit_Framework_TestCase
                 Repetitions::WEDNESDAY,
                 Repetitions::FRIDAY,
             ]),
-            new Duration(90),
+            new EventDuration(90),
             null
         );
 

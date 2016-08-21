@@ -2,7 +2,8 @@
 namespace Dende\Calendar\Application\Handler\UpdateStrategy;
 
 use Dende\Calendar\Application\Command\UpdateEventCommand;
-use Dende\Calendar\Domain\Calendar\Event\Duration;
+use Dende\Calendar\Domain\Calendar\Event\Duration as EventDuration;
+use Dende\Calendar\Domain\Calendar\Event\Occurrence\Duration as OccurrenceDuration;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 
 /**
@@ -27,14 +28,14 @@ final class Single implements UpdateStrategyInterface
         if ($event->isType(EventType::TYPE_SINGLE)) {
             $event->changeStartDate($command->startDate);
             $event->changeEndDate($command->endDate);
-            $event->changeDuration(new Duration($command->duration));
+            $event->changeDuration(new EventDuration($command->duration));
             $event->changeTitle($command->title);
 
             $occurrence->changeStartDate($command->startDate);
-            $occurrence->changeDuration(new Duration($command->duration));
+            $occurrence->changeDuration(new OccurrenceDuration($command->duration));
         } else if ($event->isType(EventType::TYPE_WEEKLY)) {
             $occurrence->changeStartDate($command->startDate);
-            $occurrence->changeDuration(new Duration($command->duration));
+            $occurrence->changeDuration(new OccurrenceDuration($command->duration));
         }
 
         $this->eventRepository->update($event);
