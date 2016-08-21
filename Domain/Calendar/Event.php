@@ -73,6 +73,11 @@ class Event
     protected $previousEvent;
 
     /**
+     * @var DateTime|null
+     */
+    protected $deletedAt;
+
+    /**
      * Event constructor.
      * @param string $id
      * @param Calendar $calendar

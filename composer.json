@@ -4,7 +4,7 @@
     "require": {
         "nesbot/carbon": "*",
         "doctrine/common": "*",
-        "fabpot/php-cs-fixer": "2.0.*@dev",
+        "friendsofphp/php-cs-fixer": "*",
         "doctrine/orm": "^2.5"
     },
     "autoload": {
