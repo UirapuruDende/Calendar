@@ -50,10 +50,10 @@ interface OccurrenceRepositoryInterface
     public function findAllByEventUnmodified(Event $event);
 
     /**
-     * @param Occurrence $occurrence
-     * @return mixed
+     * @param Occurrence|Occurrence[]|ArrayCollection $occurrences
+     * @throws \Exception
      */
-    public function remove(Occurrence $occurrence);
+    public function remove($occurrences);
 
     /**
      * @param Event $event

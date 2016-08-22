@@ -12,6 +12,8 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class Calendar
 {
+    use SoftDeleteable;
+
     /**
      * @var string
      */

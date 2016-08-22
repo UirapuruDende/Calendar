@@ -1,6 +1,7 @@
 <?php
 namespace Dende\Calendar\Application\Command;
 
+use Carbon\Carbon;
 use DateTime;
 use Dende\Calendar\Domain\Calendar;
 
@@ -21,12 +22,12 @@ final class CreateEventCommand implements EventCommandInterface
     public $calendar;
 
     /**
-     * @var DateTime
+     * @var DateTime|Carbon
      */
     public $startDate;
 
     /**
-     * @var DateTime
+     * @var DateTime|Carbon
      */
     public $endDate;
 
