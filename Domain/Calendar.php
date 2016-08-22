@@ -12,6 +12,8 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class Calendar
 {
+    use SoftDeleteable;
+
     /**
      * @var string
      */
@@ -26,11 +28,6 @@ class Calendar
      * @var ArrayCollection|Event[]
      */
     protected $events;
-
-    /**
-     * @var DateTime|null
-     */
-    protected $deletedAt;
 
     /**
      * @param string $id

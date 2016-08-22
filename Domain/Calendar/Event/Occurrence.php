@@ -6,6 +6,7 @@ use DateTime;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\Duration as OccurrenceDuration;
+use Dende\Calendar\Domain\SoftDeleteable;
 
 /**
  * Class Occurrence
@@ -13,6 +14,8 @@ use Dende\Calendar\Domain\Calendar\Event\Occurrence\Duration as OccurrenceDurati
  */
 class Occurrence
 {
+    use SoftDeleteable;
+
     /**
      * @var DateTime
      */
@@ -42,11 +45,6 @@ class Occurrence
      * @var string|OccurrenceId
      */
     protected $id;
-
-    /**
-     * @var DateTime|null
-     */
-    protected $deletedAt;
 
     /**
      * Occurrence constructor.

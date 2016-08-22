@@ -10,6 +10,7 @@ use Dende\Calendar\Domain\Calendar\Event\Duration;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
+use Dende\Calendar\Domain\SoftDeleteable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Exception;
 
@@ -19,6 +20,8 @@ use Exception;
  */
 class Event
 {
+    use SoftDeleteable;
+
     /**
      * @var string
      */
@@ -71,11 +74,6 @@ class Event
      * @var Event
      */
     protected $previousEvent;
-
-    /**
-     * @var DateTime|null
-     */
-    protected $deletedAt;
 
     /**
      * Event constructor.

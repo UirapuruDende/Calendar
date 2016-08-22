@@ -22,12 +22,19 @@ class RemoveEventHandler
     private $eventRepository;
 
     /**
-     * CreateEventHandler constructor.
-     * @param EventRepositoryInterface $eventRepository
+     * @var OccurrenceRepositoryInterface
      */
-    public function __construct(EventRepositoryInterface $eventRepository)
+    private $occurrenceRepository;
+
+    /**
+     * RemoveEventHandler constructor.
+     * @param EventRepositoryInterface $eventRepository
+     * @param OccurrenceRepositoryInterface $occurrenceRepository
+     */
+    public function __construct(EventRepositoryInterface $eventRepository, OccurrenceRepositoryInterface $occurrenceRepository)
     {
         $this->eventRepository = $eventRepository;
+        $this->occurrenceRepository = $occurrenceRepository;
     }
 
     /**
@@ -35,6 +42,7 @@ class RemoveEventHandler
      */
     public function remove(Event $event)
     {
+        $this->occurrenceRepository->remove($event->occurrences());
         $this->eventRepository->remove($event);
     }
 
