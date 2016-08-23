@@ -17,24 +17,30 @@ class NextInclusive implements UpdateStrategyInterface
     {
         /** @var Event $originalEvent */
         $originalEvent = $command->occurrence->event();
-        $originalEvent->changeEndDate($command->occurrence->startDate());
-        $pivot = $command->occurrence->startDate();
 
-        $filteredCollection = $originalEvent->occurrences()->filter(function(Occurrence $occurrence) use ($pivot) {
-            return $occurrence->endDate() < $pivot;
-        });
+        if($originalEvent->type()->isType(Event\EventType::TYPE_SINGLE)) {
+            $originalEvent->updateWithCommand($command);
+            $originalEvent->occurrences()->first()->updateWithCommand($command);
+        } elseif($originalEvent->type()->isType(Event\EventType::TYPE_WEEKLY)) {
+            $originalEvent->changeEndDate($command->occurrence->startDate());
+            $pivot = $command->occurrence->startDate();
 
-        $originalEvent->setOccurrences($filteredCollection);
+            $filteredCollection = $originalEvent->occurrences()->filter(function(Occurrence $occurrence) use ($pivot) {
+                return $occurrence->endDate() < $pivot;
+            });
 
-        $newCommand = clone($command);
-        $newCommand->startDate = $pivot;
+            $originalEvent->setOccurrences($filteredCollection);
 
-        /** @var Event $newEvent */
-        $newEvent = $this->eventFactory->createFromCommand($newCommand);
-        $newOccurrences = $this->occurrenceFactory->generateCollectionFromEvent($newEvent);
-        $newEvent->setOccurrences($newOccurrences);
+            $newCommand = clone($command);
+            $newCommand->startDate = $pivot;
 
-        $this->eventRepository->update($originalEvent);
-        $this->eventRepository->insert($newEvent);
+            /** @var Event $newEvent */
+            $newEvent = $this->eventFactory->createFromCommand($newCommand);
+            $newOccurrences = $this->occurrenceFactory->generateCollectionFromEvent($newEvent);
+            $newEvent->setOccurrences($newOccurrences);
+
+            $this->eventRepository->update($originalEvent);
+            $this->eventRepository->insert($newEvent);
+        }
     }
 }

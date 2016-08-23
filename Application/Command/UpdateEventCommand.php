@@ -15,12 +15,13 @@ final class UpdateEventCommand implements  EventCommandInterface
     use CommandConstructorTrait;
 
     /**
+     * Occurrence that was clicked to edit relating event
      * @var Occurrence
      */
     public $occurrence;
 
     /**
-     * @var EventType
+     * @var string
      */
     public $type;
 

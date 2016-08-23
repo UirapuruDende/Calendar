@@ -5,6 +5,7 @@ use Carbon\Carbon;
 use DateInterval;
 use DatePeriod;
 use DateTime;
+use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
@@ -340,5 +341,36 @@ class Event
     public function previous()
     {
         return $this->previousEvent;
+    }
+
+    public function updateWithCommand(UpdateEventCommand $command)
+    {
+        if($command->calendar instanceof Calendar && $this->calendar !== $command->calendar) {
+            $this->calendar = $command->calendar;
+            $eventsCollection = $this->calendar->events();
+            if(!$eventsCollection->contains($this)){
+                $eventsCollection->add($this);
+            }
+        }
+
+        $this->changeStartDate($command->startDate);
+        $this->changeEndDate($command->endDate);
+        $this->changeDuration(new Duration($command->duration));
+        $this->changeTitle($command->title);
+
+
+        if($command->type === EventType::TYPE_SINGLE && !$this->isType($command->type)) {
+            $this->changeType(new EventType($command->type));
+            $this->changeRepetitions(new Repetitions([]));
+        }
+
+        if($command->type === EventType::TYPE_WEEKLY) {
+            if($this->isType($command->type)) {
+                $this->changeRepetitions(new Repetitions($command->repetitionDays));
+            } else {
+                $this->changeType(new EventType($command->type));
+                $this->changeRepetitions(new Repetitions([]));
+            }
+        }
     }
 }
