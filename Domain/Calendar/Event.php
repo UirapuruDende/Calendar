@@ -192,7 +192,7 @@ class Event
                 /** @var DateTime[] $period */
                 $period = new DatePeriod($this->startDate, $interval, $this->endDate);
                 foreach ($period as $date) {
-                    if (in_array($date->format('N'), $this->repetitions->weekly())) {
+                    if (in_array($date->format('N'), $this->repetitions->weekdays())) {
                         $occurrences->add($date);
                     }
                 }

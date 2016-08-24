@@ -45,7 +45,7 @@ class Repetitions
     /**
      * @return array
      */
-    public function weekly()
+    public function weekdays()
     {
         return $this->weekdays;
     }
