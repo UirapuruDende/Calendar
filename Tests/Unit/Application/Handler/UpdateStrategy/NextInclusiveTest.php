@@ -16,10 +16,15 @@ use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
 use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mockery as m;
+use PHPUnit_Framework_TestCase;
 
-final class NextInclusiveTest extends \PHPUnit_Framework_TestCase
+final class NextInclusiveTest extends PHPUnit_Framework_TestCase
 {
-    public function testUpdate()
+    public function testUpdateSingle() {
+        $this->markTestSkipped();
+    }
+
+    public function testUpdateWeekly()
     {
         $pivotDate = new DateTime("now");
         $newOccurrencesCollection = $this->getNewEventOccurrencesCollection();
@@ -28,6 +33,8 @@ final class NextInclusiveTest extends \PHPUnit_Framework_TestCase
         $eventMock = m::mock(Event::class);
         $eventMock->shouldReceive("changeEndDate")->with($pivotDate);
         $eventMock->shouldReceive("occurrences")->andReturn($oldOccurrencesCollection);
+        $eventMock->shouldReceive("type->isType")->with('single')->andReturn(false);
+        $eventMock->shouldReceive("type->isType")->with('weekly')->andReturn(true);
 
         $filteredOccurrences = null;
 

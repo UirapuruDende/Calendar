@@ -358,7 +358,6 @@ class Event
         $this->changeDuration(new Duration($command->duration));
         $this->changeTitle($command->title);
 
-
         if($command->type === EventType::TYPE_SINGLE && !$this->isType($command->type)) {
             $this->changeType(new EventType($command->type));
             $this->changeRepetitions(new Repetitions([]));
@@ -366,11 +365,12 @@ class Event
 
         if($command->type === EventType::TYPE_WEEKLY) {
             if($this->isType($command->type)) {
-                $this->changeRepetitions(new Repetitions($command->repetitionDays));
+                ;
             } else {
                 $this->changeType(new EventType($command->type));
-                $this->changeRepetitions(new Repetitions([]));
             }
+
+            $this->changeRepetitions(new Repetitions($command->repetitionDays));
         }
     }
 }

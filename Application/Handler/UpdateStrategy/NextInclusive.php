@@ -20,7 +20,7 @@ class NextInclusive implements UpdateStrategyInterface
 
         if($originalEvent->type()->isType(Event\EventType::TYPE_SINGLE)) {
             $originalEvent->updateWithCommand($command);
-            $originalEvent->occurrences()->first()->updateWithCommand($command);
+//            $originalEvent->occurrences()->first()->updateWithCommand($command);
         } elseif($originalEvent->type()->isType(Event\EventType::TYPE_WEEKLY)) {
             $originalEvent->changeEndDate($command->occurrence->startDate());
             $pivot = $command->occurrence->startDate();
