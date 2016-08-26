@@ -27,10 +27,31 @@ final class NextInclusiveTest extends PHPUnit_Framework_TestCase
     public function testUpdateWeekly()
     {
         $pivotDate = new DateTime("now");
-        $newOccurrencesCollection = $this->getNewEventOccurrencesCollection();
-        $oldOccurrencesCollection = $this->getOldEventOccurrencesCollection();
+        $newOccurrencesCollection = new ArrayCollection([]);
 
         $eventMock = m::mock(Event::class);
+
+        {
+            $oldOccurrenceMock1 = m::mock(Occurrence::class);
+            $oldOccurrenceMock1->shouldReceive("endDate")->andReturn(new Datetime("yesterday +90 minutes"));
+
+            $oldOccurrenceMock2 = m::mock(Occurrence::class);
+            $oldOccurrenceMock2->shouldReceive("startDate")->andReturn($pivotDate);
+            $oldOccurrenceMock2->shouldReceive("endDate")->andReturn(new Datetime("+90 minutes"));
+            $oldOccurrenceMock2->shouldReceive("event")->andReturn($eventMock);
+            $oldOccurrenceMock2->shouldReceive("setDeletedAt")->once();
+
+            $oldOccurrenceMock3 = m::mock(Occurrence::class);
+            $oldOccurrenceMock3->shouldReceive("endDate")->andReturn(new Datetime("tomorrow +90 minutes"));
+            $oldOccurrenceMock3->shouldReceive("setDeletedAt")->once();
+
+            $oldOccurrencesCollection = new ArrayCollection([
+                $oldOccurrenceMock1,
+                $oldOccurrenceMock2,
+                $oldOccurrenceMock3
+            ]);
+        }
+
         $eventMock->shouldReceive("changeEndDate")->with($pivotDate);
         $eventMock->shouldReceive("occurrences")->andReturn($oldOccurrencesCollection);
         $eventMock->shouldReceive("type->isType")->with('single')->andReturn(false);
@@ -47,19 +68,15 @@ final class NextInclusiveTest extends PHPUnit_Framework_TestCase
         $newEventMock = m::mock(Event::class);
         $newEventMock->shouldReceive("setOccurrences")->with($newOccurrencesCollection);
 
-        $occurrenceMock = m::mock(Occurrence::class);
-        $occurrenceMock->shouldReceive("event")->andReturn($eventMock);
-        $occurrenceMock->shouldReceive("startDate")->andReturn($pivotDate);
-
         $command = new UpdateEventCommand();
         $command->type = EventType::TYPE_SINGLE;
         $command->duration = 90;
-        $command->startDate = new DateTime("-2 day");
-        $command->endDate = new DateTime("-1 day");
+        $command->startDate = new DateTime("yesterday");
+        $command->endDate = new DateTime("tomorrow");
         $command->title = "New title";
         $command->method = 'nextinclusive';
         $command->repetitionDays = [];
-        $command->occurrence = $occurrenceMock;
+        $command->occurrence = $oldOccurrenceMock2;
 
         $eventFactoryMock = m::mock(EventFactoryInterface::class);
         $eventFactoryMock->shouldReceive("createFromCommand")->andReturn($newEventMock);
@@ -77,7 +94,7 @@ final class NextInclusiveTest extends PHPUnit_Framework_TestCase
         $nextInclusive->setEventRepository($eventRepositoryMock);
         $nextInclusive->update($command);
 
-        $this->assertCount(1, $filteredOccurrences);
+        $this->assertCount(3, $filteredOccurrences);
     }
 
     public function tearDown()
@@ -85,26 +102,4 @@ final class NextInclusiveTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-    private function getOldEventOccurrencesCollection()
-    {
-        $mock1 = m::mock(Occurrence::class);
-        $mock1->shouldReceive("endDate")->andReturn(new Datetime("yesterday"));
-
-        $mock2 = m::mock(Occurrence::class);
-        $mock2->shouldReceive("endDate")->andReturn(new Datetime("now"));
-
-        $mock3 = m::mock(Occurrence::class);
-        $mock3->shouldReceive("endDate")->andReturn(new Datetime("tomorrow"));
-
-        return new ArrayCollection([
-            $mock1,
-            $mock2,
-            $mock3
-        ]);
-    }
-
-    private function getNewEventOccurrencesCollection()
-    {
-        return new ArrayCollection([]);
-    }
 }

@@ -25,11 +25,15 @@ class NextInclusive implements UpdateStrategyInterface
             $originalEvent->changeEndDate($command->occurrence->startDate());
             $pivot = $command->occurrence->startDate();
 
-            $filteredCollection = $originalEvent->occurrences()->filter(function(Occurrence $occurrence) use ($pivot) {
-                return $occurrence->endDate() < $pivot;
+            $originalOccurrences = $originalEvent->occurrences()->map(function(Occurrence $occurrence) use ($pivot) {
+                if($occurrence->endDate() >= $pivot) {
+                    $occurrence->setDeletedAt(new \DateTime());
+                }
+
+                return $occurrence;
             });
 
-            $originalEvent->setOccurrences($filteredCollection);
+            $originalEvent->setOccurrences($originalOccurrences);
 
             $newCommand = clone($command);
             $newCommand->startDate = $pivot;
