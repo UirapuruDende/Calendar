@@ -1,6 +1,8 @@
 <?php
 namespace Dende\Calendar\Domain\Calendar\Event\Occurrence;
 
+use Dende\Calendar\Domain\Calendar\Event\Duration as EventDuration;
+
 /**
  * Class Duration
  * @package Gyman\Domain
@@ -14,11 +16,15 @@ class Duration
 
     /**
      * Duration constructor.
-     * @param int $minutes
+     * @param EventDuration|int $duration
      */
-    public function __construct($minutes)
+    public function __construct($duration)
     {
-        $this->minutes = intval($minutes);
+        if($duration instanceof EventDuration) {
+            $duration = $duration->minutes();
+        }
+
+        $this->minutes = intval($duration);
     }
 
     /**

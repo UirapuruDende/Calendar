@@ -185,4 +185,13 @@ class Occurrence
     {
         return $this->modified;
     }
+
+    public function synchronizeWithEvent()
+    {
+        if($this->event()->isType(EventType::TYPE_SINGLE)) {
+            $this->changeStartDate($this->event->startDate());
+            $this->changeDuration(new Duration($this->event()->duration()));
+            $this->updateEndDate();
+        }
+    }
 }
