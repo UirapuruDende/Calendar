@@ -1,9 +1,11 @@
 <?php
 namespace Dende\Calendar\Application\Handler\UpdateStrategy;
 
+use DateTime;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class NextInclusive implements UpdateStrategyInterface
 {
@@ -23,11 +25,11 @@ class NextInclusive implements UpdateStrategyInterface
             $originalEvent->occurrences()->first()->synchronizeWithEvent();
         } elseif($originalEvent->type()->isType(Event\EventType::TYPE_WEEKLY)) {
             $originalEvent->changeEndDate($command->occurrence->startDate());
-            $pivot = $command->occurrence->startDate();
+            $pivot = $this->findPivotDate($command);
 
             $originalOccurrences = $originalEvent->occurrences()->map(function(Occurrence $occurrence) use ($pivot) {
                 if($occurrence->endDate() >= $pivot) {
-                    $occurrence->setDeletedAt(new \DateTime());
+                    $occurrence->setDeletedAt(new DateTime());
                 }
 
                 return $occurrence;
@@ -48,5 +50,25 @@ class NextInclusive implements UpdateStrategyInterface
         }
 
         $this->eventRepository->update($originalEvent);
+    }
+
+    /**
+     * @param UpdateEventCommand $command
+     * @return DateTime
+     */
+    private function findPivotDate(UpdateEventCommand $command)
+    {
+        /** @var ArrayCollection|Occurrence[] $occurrences */
+        $occurrences = $command->occurrence->event()->occurrences();
+
+        /** @var Occurrence $occurrence */
+        $clicked = $command->occurrence;
+
+        /** @var ArrayCollection $earlier */
+        $earlier = $occurrences->filter(function(Occurrence $occurrence) use ($clicked) {
+            return $clicked->startDate() > $occurrence->endDate();
+        });
+
+        return $earlier->last()->endDate();
     }
 }
