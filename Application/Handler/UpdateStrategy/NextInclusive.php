@@ -66,7 +66,7 @@ class NextInclusive implements UpdateStrategyInterface
 
         /** @var ArrayCollection $earlier */
         $earlier = $occurrences->filter(function(Occurrence $occurrence) use ($clicked) {
-            return $clicked->startDate() > $occurrence->endDate();
+            return $occurrence->endDate() <= $clicked->startDate();
         });
 
         return $earlier->last()->endDate();
