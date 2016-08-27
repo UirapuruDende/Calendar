@@ -10,6 +10,7 @@ use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
+use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mockery as m;
 use PHPUnit_Framework_TestCase;
@@ -122,8 +123,12 @@ class NextInclusiveTest extends PHPUnit_Framework_TestCase
         $eventRepositoryMock->shouldReceive("update")->with($eventMock);
         $eventRepositoryMock->shouldReceive("insert")->with($newEventMock);
 
+        $occurrenceRepositoryMock = m::mock(OccurrenceRepositoryInterface::class);
+        $occurrenceRepositoryMock->shouldReceive("update")->once()->with($oldOccurrencesCollection);
+
         $nextInclusive = new NextInclusive();
         $nextInclusive->setEventFactory($eventFactoryMock);
+        $nextInclusive->setOccurrenceRepository($occurrenceRepositoryMock);
         $nextInclusive->setOccurrenceFactory($occurrenceFactoryMock);
         $nextInclusive->setEventRepository($eventRepositoryMock);
         $nextInclusive->update($command);
