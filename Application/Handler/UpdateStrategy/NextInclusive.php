@@ -25,10 +25,10 @@ class NextInclusive implements UpdateStrategyInterface
             $originalEvent->occurrences()->first()->synchronizeWithEvent();
         } elseif($originalEvent->type()->isType(Event\EventType::TYPE_WEEKLY)) {
             $originalEvent->changeEndDate($command->occurrence->startDate());
-            $pivot = $this->findPivotDate($command);
+            $pivot = $this->findPivotDate($command->occurrence);
 
             $originalOccurrences = $originalEvent->occurrences()->map(function(Occurrence $occurrence) use ($pivot) {
-                if($occurrence->endDate() >= $pivot) {
+                if($occurrence->endDate() > $pivot) {
                     $occurrence->setDeletedAt(new DateTime());
                 }
 
@@ -56,19 +56,26 @@ class NextInclusive implements UpdateStrategyInterface
      * @param UpdateEventCommand $command
      * @return DateTime
      */
-    private function findPivotDate(UpdateEventCommand $command)
+    public function findPivotDate(Occurrence $clicked)
     {
         /** @var ArrayCollection|Occurrence[] $occurrences */
-        $occurrences = $command->occurrence->event()->occurrences();
+        $occurrences = $clicked->event()->occurrences();
 
-        /** @var Occurrence $occurrence */
-        $clicked = $command->occurrence;
-
-        /** @var ArrayCollection $earlier */
-        $earlier = $occurrences->filter(function(Occurrence $occurrence) use ($clicked) {
+        /** @var ArrayCollection $beforeClicked */
+        $beforeClicked = $occurrences->filter(function(Occurrence $occurrence) use ($clicked) {
             return $occurrence->endDate() <= $clicked->startDate();
         });
 
-        return $earlier->last()->endDate();
+        $iterator = $beforeClicked->getIterator();
+
+        $iterator->uasort(function(Occurrence $a, Occurrence $b){
+            return $a->startDate() > $b->startDate();
+        });
+
+        if($latestOccurrence = end($iterator)) {
+            return $latestOccurrence->endDate();
+        } else {
+            return $clicked->endDate();
+        }
     }
 }

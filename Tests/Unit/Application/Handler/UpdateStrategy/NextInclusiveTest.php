@@ -17,10 +17,40 @@ use PHPUnit_Framework_TestCase;
 
 class NextInclusiveTest extends PHPUnit_Framework_TestCase
 {
-    public function testUpdateSingle() {
-        $pivotDate = new DateTime("now");
-        $newOccurrencesCollection = new ArrayCollection([]);
+    public function testFindPivotDate()
+    {
+        $eventMock = m::mock(Event::class);
 
+        {
+            $occurrence1 = new Occurrence(null, new DateTime("2016-09-01 12:00:00"), new Occurrence\Duration(60), $eventMock);
+            $occurrence2 = new Occurrence(null, new DateTime("2016-09-02 12:00:00"), new Occurrence\Duration(60), $eventMock);
+            $occurrence3 = new Occurrence(null, new DateTime("2016-09-03 12:00:00"), new Occurrence\Duration(60), $eventMock);
+            $occurrence4 = new Occurrence(null, new DateTime("2016-09-04 12:00:00"), new Occurrence\Duration(60), $eventMock);
+            $occurrence5 = new Occurrence(null, new DateTime("2016-09-05 12:00:00"), new Occurrence\Duration(60), $eventMock);
+        }
+
+        $occurrences = [
+            $occurrence5,
+            $occurrence2,
+            $occurrence1,
+            $occurrence4,
+            $occurrence3,
+        ];
+
+        $occurrencesCollectionMock = new ArrayCollection($occurrences);
+
+        $eventMock->shouldReceive("occurrences")->times(5)->andReturn($occurrencesCollectionMock);
+
+        $nextInclusive = new NextInclusive();
+
+        $this->assertEquals($nextInclusive->findPivotDate($occurrence5), $occurrence4->endDate());
+        $this->assertEquals($nextInclusive->findPivotDate($occurrence4), $occurrence3->endDate());
+        $this->assertEquals($nextInclusive->findPivotDate($occurrence3), $occurrence2->endDate());
+        $this->assertEquals($nextInclusive->findPivotDate($occurrence2), $occurrence1->endDate());
+        $this->assertEquals($nextInclusive->findPivotDate($occurrence1), $occurrence1->endDate());
+    }
+
+    public function testUpdateSingle() {
         $eventMock = m::mock(Event::class);
 
         $oldOccurrenceMock = m::mock(Occurrence::class);
