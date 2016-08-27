@@ -38,10 +38,10 @@ interface OccurrenceRepositoryInterface
     public function findAll();
 
     /**
-     * @param $occurrence
-     * @return mixed
+     * @param Occurrence|Occurrence[] $occurrence
+     * @return null
      */
-    public function update(Occurrence $occurrence);
+    public function update($occurrence);
 
     /**
      * @param Event $event

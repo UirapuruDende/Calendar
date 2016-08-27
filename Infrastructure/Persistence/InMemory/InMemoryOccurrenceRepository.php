@@ -129,7 +129,7 @@ final class InMemoryOccurrenceRepository implements OccurrenceRepositoryInterfac
     /**
      * @param Occurrence $occurrence
      */
-    public function update(Occurrence $occurrence)
+    public function update($occurrence)
     {
         if (!isset($this->occurrences[$occurrence->id()])) {
             throw new Exception(sprintf('Occurrence with id %s is not set, cannot update!', $occurrence->id()));

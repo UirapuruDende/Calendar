@@ -44,6 +44,7 @@ class NextInclusive implements UpdateStrategyInterface
             $newEvent->setOccurrences($newOccurrences);
 
             $this->eventRepository->insert($newEvent);
+            $this->occurrenceRepository->update($originalEvent->occurrences());
         }
 
         $this->eventRepository->update($originalEvent);
