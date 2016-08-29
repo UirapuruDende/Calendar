@@ -35,6 +35,19 @@ class NextInclusive implements UpdateStrategyInterface
                 return $occurrence;
             });
 
+            /** @var Event $nextEvent */
+            $nextEvent = $originalEvent->next();
+
+            while(!is_null($nextEvent)) {
+                $nextEvent->occurrences()->map(function(Occurrence $occurrence) {
+                    $occurrence->setDeletedAt(new DateTime());
+                    return $occurrence;
+                });
+                $nextEvent->setDeletedAt(new DateTime());
+                $nextEvent->unsetPrevious();
+                $nextEvent = $nextEvent->next();
+            }
+
             $originalEvent->setOccurrences($originalOccurrences);
 
             $newCommand = clone($command);
@@ -44,6 +57,8 @@ class NextInclusive implements UpdateStrategyInterface
             $newEvent = $this->eventFactory->createFromCommand($newCommand);
             $newOccurrences = $this->occurrenceFactory->generateCollectionFromEvent($newEvent);
             $newEvent->setOccurrences($newOccurrences);
+
+            $originalEvent->setNext($newEvent);
 
             $this->eventRepository->insert($newEvent);
             $this->occurrenceRepository->update($originalEvent->occurrences());

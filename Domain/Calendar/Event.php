@@ -77,6 +77,11 @@ class Event
     protected $previousEvent;
 
     /**
+     * @var Event
+     */
+    protected $nextEvent;
+
+    /**
      * Event constructor.
      * @param string $id
      * @param Calendar $calendar
@@ -89,7 +94,7 @@ class Event
      * @param ArrayCollection|Occurrence[] $occurrences
      * @throws \Exception
      */
-    public function __construct($id, Calendar $calendar, EventType $type, DateTime $startDate, DateTime $endDate, $title, Repetitions $repetitions, Duration $duration, Event $previousEvent=null)
+    public function __construct($id, Calendar $calendar, EventType $type, DateTime $startDate, DateTime $endDate, $title, Repetitions $repetitions, Duration $duration, Event $previousEvent = null, Event $nextEvent = null )
     {
         if (Carbon::instance($startDate)->gt(Carbon::instance($endDate))) {
             throw new \Exception(sprintf(
@@ -110,6 +115,7 @@ class Event
         $this->repetitions = $repetitions;
         $this->duration = $duration;
         $this->previousEvent = $previousEvent;
+        $this->nextEvent = $nextEvent;
     }
 
     /**
@@ -343,6 +349,17 @@ class Event
         return $this->previousEvent;
     }
 
+    /**
+     * @return Event
+     */
+    public function next()
+    {
+        return $this->nextEvent;
+    }
+
+    /**
+     * @param UpdateEventCommand $command
+     */
     public function updateWithCommand(UpdateEventCommand $command)
     {
         if($command->calendar instanceof Calendar && $this->calendar !== $command->calendar) {
@@ -372,5 +389,19 @@ class Event
 
             $this->changeRepetitions(new Repetitions($command->repetitionDays));
         }
+    }
+
+    /**
+     * @param Event $event
+     * @throws Exception
+     */
+    public function setNext(Event $event)
+    {
+        $this->nextEvent = $event;
+    }
+
+    public function unsetPrevious()
+    {
+        $this->previousEvent = null;
     }
 }
