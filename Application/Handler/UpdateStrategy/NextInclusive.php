@@ -6,6 +6,7 @@ use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints\Date;
 
 class NextInclusive implements UpdateStrategyInterface
 {
@@ -22,7 +23,21 @@ class NextInclusive implements UpdateStrategyInterface
 
         if($originalEvent->type()->isType(Event\EventType::TYPE_SINGLE)) {
             $originalEvent->updateWithCommand($command);
-            $originalEvent->occurrences()->first()->synchronizeWithEvent();
+
+            /** @var Occurrence $occurrence */
+            $occurrence = $originalEvent->occurrences()->first();
+
+            if($command->type === Event\EventType::TYPE_SINGLE) {
+                $occurrence->synchronizeWithEvent();
+                $this->occurrenceRepository->update($occurrence);
+            } elseif ($command->type === Event\EventType::TYPE_WEEKLY) {
+                $this->occurrenceRepository->remove($occurrence);
+
+                $occurrences = $this->occurrenceFactory->generateCollectionFromEvent($originalEvent);
+                $originalEvent->setOccurrences($occurrences);
+                $this->occurrenceRepository->insert($occurrences);
+            }
+
         } elseif($originalEvent->type()->isType(Event\EventType::TYPE_WEEKLY)) {
             $originalEvent->changeEndDate($command->occurrence->startDate());
             $pivot = $this->findPivotDate($command->occurrence);

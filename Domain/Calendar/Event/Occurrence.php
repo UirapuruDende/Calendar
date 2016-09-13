@@ -190,7 +190,7 @@ class Occurrence
     {
         if($this->event()->isType(EventType::TYPE_SINGLE)) {
             $this->changeStartDate($this->event->startDate());
-            $this->changeDuration(new Duration($this->event()->duration()));
+            $this->changeDuration(new OccurrenceDuration($this->event()->duration()));
             $this->updateEndDate();
         }
     }
