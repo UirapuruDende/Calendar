@@ -6,7 +6,6 @@ use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Validator\Constraints\Date;
 
 class NextInclusive implements UpdateStrategyInterface
 {
