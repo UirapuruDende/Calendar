@@ -101,6 +101,10 @@ final class SingleTest extends \PHPUnit_Framework_TestCase
         $single->update($command);
     }
 
+    public function testRemoveSingle() {
+        $this->markTestIncomplete();
+    }
+
     public function tearDown()
     {
         m::close();

@@ -122,7 +122,12 @@ final class UpdateEventHandler
      */
     public function handle(UpdateEventCommandInterface $command)
     {
-        if (is_null($command->calendar)) {
+        /**
+         * @todo @deprecated
+         * remove it - if calendar is null, it would be the same as in the beginning
+         * update only if not null
+         */
+        if ($command instanceof UpdateEventCommand && is_null($command->calendar)) {
             throw new Exception("Calendar is null and it has to be set!");
         }
 

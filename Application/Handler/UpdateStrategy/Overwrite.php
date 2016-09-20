@@ -1,7 +1,9 @@
 <?php
 namespace Dende\Calendar\Application\Handler\UpdateStrategy;
 
+use Dende\Calendar\Application\Command\RemoveEventCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
+use Dende\Calendar\Application\Command\UpdateEventCommandInterface;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
@@ -21,10 +23,10 @@ final class Overwrite implements UpdateStrategyInterface
 
     /**
      * @todo add fabrics for value objects or update commands
-     * @param UpdateEventCommand $command
+     * @param UpdateEventCommandInterface|UpdateEventCommand|RemoveEventCommand $command
      * @return null
      */
-    public function update(UpdateEventCommand $command)
+    public function update(UpdateEventCommandInterface $command)
     {
         /** @var Event $event */
         $event = $command->occurrence->event();
