@@ -2,7 +2,9 @@
 namespace Dende\Calendar\Application\Handler;
 
 use Carbon\Carbon;
+use Dende\Calendar\Application\Command\RemoveEventCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
+use Dende\Calendar\Application\Command\UpdateEventCommandInterface;
 use Dende\Calendar\Application\Factory\EventFactory;
 use Dende\Calendar\Application\Factory\EventFactoryInterface;
 use Dende\Calendar\Application\Factory\OccurrenceFactory;
@@ -116,9 +118,9 @@ final class UpdateEventHandler
     }
 
     /**
-     * @param UpdateEventCommand $command
+     * @param UpdateEventCommand|RemoveEventCommand $command
      */
-    public function handle(UpdateEventCommand $command)
+    public function handle(UpdateEventCommandInterface $command)
     {
         if (is_null($command->calendar)) {
             throw new Exception("Calendar is null and it has to be set!");

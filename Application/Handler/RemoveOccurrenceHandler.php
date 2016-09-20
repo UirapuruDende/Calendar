@@ -8,6 +8,7 @@ use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
 /**
  * Class RemoveOccurrenceHandler
  * @package Dende\Calendar\Application\Handler
+ * @deprecated
  */
 class RemoveOccurrenceHandler
 {

@@ -13,6 +13,7 @@ use Exception;
 /**
  * Class RemoveEventHandler
  * @package Dende\Calendar\Application\Handler
+ * @deprecated
  */
 class RemoveEventHandler
 {
