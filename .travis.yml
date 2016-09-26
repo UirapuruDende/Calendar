@@ -10,4 +10,4 @@ install:
 
 script:
   - ./bin/phpunit
-  - ./bin/php-cs-fixer fix
+  - ./bin/php-cs-fixer fix --dry-run
