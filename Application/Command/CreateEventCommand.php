@@ -6,8 +6,7 @@ use DateTime;
 use Dende\Calendar\Domain\Calendar;
 
 /**
- * Class CreateEventCommand
- * @package Gyman\Domain\Command
+ * Class CreateEventCommand.
  */
 final class CreateEventCommand implements EventCommandInterface
 {

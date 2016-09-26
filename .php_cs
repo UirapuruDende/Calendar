@@ -95,4 +95,8 @@ return Symfony\CS\Config\Config::create()
 //    'strict_param',
     ])
     ->setUsingCache(true)
-    ->finder(Symfony\CS\Finder\DefaultFinder::create()->in(__DIR__."/"));
+    ->finder(Symfony\CS\Finder\DefaultFinder::create()
+        ->exclude('vendor')
+        ->exclude('bin')
+        ->in(__DIR__."/")
+    );

@@ -12,14 +12,12 @@ use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
 use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
 
 /**
- * Interface UpdateStrategyInterface
- * @package Dende\Calendar\Application\Handler\UpdateStrategy
+ * Interface UpdateStrategyInterface.
  */
 interface UpdateStrategyInterface
 {
     /**
      * @param UpdateEventCommandInterface|UpdateEventCommand|RemoveEventCommand $command
-     * @return null
      */
     public function update(UpdateEventCommandInterface $command);
 

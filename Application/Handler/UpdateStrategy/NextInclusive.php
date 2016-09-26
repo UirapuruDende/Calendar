@@ -15,20 +15,19 @@ class NextInclusive implements UpdateStrategyInterface
 
     /**
      * @param UpdateEventCommandInterface|UpdateEventCommand|RemoveEventCommand $command
-     * @return null
      */
     public function update(UpdateEventCommandInterface $command)
     {
         /** @var Event $originalEvent */
         $originalEvent = $command->occurrence->event();
 
-        if($originalEvent->type()->isType(Event\EventType::TYPE_SINGLE)) {
+        if ($originalEvent->type()->isType(Event\EventType::TYPE_SINGLE)) {
             $originalEvent->updateWithCommand($command);
 
             /** @var Occurrence $occurrence */
             $occurrence = $originalEvent->occurrences()->first();
 
-            if($command->type === Event\EventType::TYPE_SINGLE) {
+            if ($command->type === Event\EventType::TYPE_SINGLE) {
                 throw new \Exception('This strategy is for series types events! Use SingleStrategy!');
             } elseif ($command->type === Event\EventType::TYPE_WEEKLY) {
                 $this->occurrenceRepository->remove($occurrence);
@@ -37,13 +36,12 @@ class NextInclusive implements UpdateStrategyInterface
                 $originalEvent->setOccurrences($occurrences);
                 $this->occurrenceRepository->insert($occurrences);
             }
-
-        } elseif($originalEvent->type()->isType(Event\EventType::TYPE_WEEKLY)) {
+        } elseif ($originalEvent->type()->isType(Event\EventType::TYPE_WEEKLY)) {
             $originalEvent->changeEndDate($command->occurrence->startDate());
             $pivot = $this->findPivotDate($command->occurrence);
 
-            $originalOccurrences = $originalEvent->occurrences()->map(function(Occurrence $occurrence) use ($pivot) {
-                if($occurrence->endDate() > $pivot) {
+            $originalOccurrences = $originalEvent->occurrences()->map(function (Occurrence $occurrence) use ($pivot) {
+                if ($occurrence->endDate() > $pivot) {
                     $occurrence->setDeletedAt(new DateTime());
                 }
 
@@ -53,9 +51,10 @@ class NextInclusive implements UpdateStrategyInterface
             /** @var Event $nextEvent */
             $nextEvent = $originalEvent->next();
 
-            while(!is_null($nextEvent)) {
-                $nextEvent->occurrences()->map(function(Occurrence $occurrence) {
+            while (!is_null($nextEvent)) {
+                $nextEvent->occurrences()->map(function (Occurrence $occurrence) {
                     $occurrence->setDeletedAt(new DateTime());
+
                     return $occurrence;
                 });
                 $nextEvent->setDeletedAt(new DateTime());
@@ -65,8 +64,8 @@ class NextInclusive implements UpdateStrategyInterface
 
             $originalEvent->setOccurrences($originalOccurrences);
 
-            if($command instanceof UpdateEventCommand) {
-                $newCommand = clone($command);
+            if ($command instanceof UpdateEventCommand) {
+                $newCommand = clone $command;
                 $newCommand->startDate = $pivot;
 
                 /** @var Event $newEvent */
@@ -86,6 +85,7 @@ class NextInclusive implements UpdateStrategyInterface
 
     /**
      * @param UpdateEventCommand $command
+     *
      * @return DateTime
      */
     public function findPivotDate(Occurrence $clicked)
@@ -94,21 +94,20 @@ class NextInclusive implements UpdateStrategyInterface
         $occurrences = $clicked->event()->occurrences();
 
         /** @var ArrayCollection $beforeClicked */
-        $beforeClicked = $occurrences->filter(function(Occurrence $occurrence) use ($clicked) {
+        $beforeClicked = $occurrences->filter(function (Occurrence $occurrence) use ($clicked) {
             return $occurrence->endDate() <= $clicked->startDate();
         });
 
         $iterator = $beforeClicked->getIterator();
 
-        $iterator->uasort(function(Occurrence $a, Occurrence $b){
+        $iterator->uasort(function (Occurrence $a, Occurrence $b) {
             return $a->startDate() > $b->startDate();
         });
 
-        if($latestOccurrence = end($iterator)) {
+        if ($latestOccurrence = end($iterator)) {
             return $latestOccurrence->endDate();
         } else {
             return $clicked->endDate();
         }
     }
-
 }

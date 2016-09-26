@@ -27,12 +27,12 @@ class InMemoryOccurrenceRepositoryTestCase extends \PHPUnit_Framework_TestCase
 //            new Duration(90),
 //            new ArrayCollection()
 //        );
-//
+
 //        $event->resetAllOccurrences();
-//
+
 //        $totalOccurences = $event->occurrences();
 //        $occurence = $event->getOccurenceByDate(new \DateTime('2015-09-01 12:30:00'));
-//
+
 //        $this->assertNotNull($occurence);
 //        $this->assertCount(7, $totalOccurences);
 //        $this->assertInstanceOf('Dende\Calendar\Model\Occurrence', $occurence);
@@ -54,12 +54,12 @@ class InMemoryOccurrenceRepositoryTestCase extends \PHPUnit_Framework_TestCase
 //            new Duration(90),
 //            new ArrayCollection()
 //        );
-//
+
 //        $event->resetAllOccurrences();
-//
+
 //        $totalOccurences = $event->occurrences();
 //        $occurence = $event->getOccurenceByDate(new \DateTime('2015-09-01 12:30:00'));
-//
+
 //        $this->assertNotNull($occurence);
 //        $this->assertCount(1, $totalOccurences);
 //        $this->assertInstanceOf('Dende\Calendar\Model\Occurrence', $occurence);
@@ -87,12 +87,12 @@ class InMemoryOccurrenceRepositoryTestCase extends \PHPUnit_Framework_TestCase
 //            new Duration(90),
 //            new ArrayCollection()
 //        );
-//
+
 //        $event->resetAllOccurrences();
-//
+
 //        $totalOccurences = $event->occurrences();
 //        $occurence = $event->getOccurenceByDate(new \DateTime('2015-09-01 12:30:00'));
-//
+
 //        $this->assertNull($occurence);
 //        $this->assertCount(13, $totalOccurences);
 //    }
@@ -113,12 +113,12 @@ class InMemoryOccurrenceRepositoryTestCase extends \PHPUnit_Framework_TestCase
 //            new Duration(90),
 //            new ArrayCollection()
 //        );
-//
+
 //        $event->resetAllOccurrences();
-//
+
 //        $totalOccurences = $event->occurrences();
 //        $occurence = $event->getOccurenceByDate(new \DateTime('yesterday'));
-//
+
 //        $this->assertNull($occurence);
 //        $this->assertCount(1, $totalOccurences);
 //    }
@@ -139,12 +139,12 @@ class InMemoryOccurrenceRepositoryTestCase extends \PHPUnit_Framework_TestCase
 //            new Duration(24 * 60),
 //            new ArrayCollection()
 //        );
-//
+
 //        $event->resetAllOccurrences();
-//
+
 //        $totalOccurences = $event->occurrences();
 //        $occurence = $event->getCurrentOccurrence();
-//
+
 //        $this->assertNotNull($occurence);
 //        $this->assertCount(1, $totalOccurences);
 //        $this->assertDatesEqual($occurence->startDate(), 'now');
@@ -175,12 +175,12 @@ class InMemoryOccurrenceRepositoryTestCase extends \PHPUnit_Framework_TestCase
 //            new Duration(24 * 60),
 //            new ArrayCollection()
 //        );
-//
+
 //        $event->resetAllOccurrences();
-//
+
 //        $totalOccurences = $event->occurrences();
 //        $occurence = $event->getCurrentOccurrence();
-//
+
 //        $this->assertNotNull($occurence);
 //        $this->assertCount(3, $totalOccurences);
 //    }
@@ -201,11 +201,11 @@ class InMemoryOccurrenceRepositoryTestCase extends \PHPUnit_Framework_TestCase
 //            new Duration(60),
 //            new ArrayCollection()
 //        );
-//
+
 //        $event->resetAllOccurrences();
-//
+
 //        $totalOccurences = $event->occurrences();
-//
+
 //        $this->assertTrue($event->isOngoing());
 //        $this->assertCount(1, $totalOccurences);
 //    }
@@ -234,14 +234,14 @@ class InMemoryOccurrenceRepositoryTestCase extends \PHPUnit_Framework_TestCase
 //            new Duration(10),
 //            new ArrayCollection()
 //        );
-//
+
 //        $event->resetAllOccurrences();
-//
+
 //        $totalOccurences = $event->occurrences();
-//
+
 //        $this->assertTrue($event->isOngoing());
 //        $this->assertCount(1, $totalOccurences);
-//
+
 //        $event = new Event(
 //            0,
 //            new Calendar(
@@ -264,11 +264,11 @@ class InMemoryOccurrenceRepositoryTestCase extends \PHPUnit_Framework_TestCase
 //            new Duration(10),
 //            new ArrayCollection()
 //        );
-//
+
 //        $event->resetAllOccurrences();
-//
+
 //        $totalOccurences = $event->occurrences();
-//
+
 //        $this->assertFalse($event->isOngoing());
 //        $this->assertCount(1, $totalOccurences);
 //    }

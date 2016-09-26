@@ -14,8 +14,7 @@ use Exception;
 use Mockery as m;
 
 /**
- * Class EventTest
- * @package Gyman\Domain\Tests\Unit\Model
+ * Class EventTest.
  */
 final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -41,8 +40,8 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
         $command = new UpdateEventCommand();
         $command->calendar = m::mock(Calendar::class);
         $command->method = UpdateEventHandler::MODE_SINGLE;
-        $command->startDate = new DateTime("+1 hour");
-        $command->endDate = new DateTime("+1 year +2 hour");
+        $command->startDate = new DateTime('+1 hour');
+        $command->endDate = new DateTime('+1 year +2 hour');
         $command->duration = 60;
         $command->type = Calendar\Event\EventType::TYPE_SINGLE;
 
@@ -64,7 +63,7 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
 
         $handler->handle($command);
 
-        $this->assertEquals($command->endDate, new DateTime("+2 hour"), null, 2); // 1 second delta is allowed
+        $this->assertEquals($command->endDate, new DateTime('+2 hour'), null, 2); // 1 second delta is allowed
     }
 
     public function testHandleUpdateCommandWeekly()
@@ -72,8 +71,8 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
         $command = new UpdateEventCommand();
         $command->calendar = m::mock(Calendar::class);
         $command->method = UpdateEventHandler::MODE_SINGLE;
-        $command->startDate = new DateTime("+1 hour");
-        $command->endDate = new DateTime("+1 year +2 hour");
+        $command->startDate = new DateTime('+1 hour');
+        $command->endDate = new DateTime('+1 year +2 hour');
         $command->duration = 60;
         $command->type = Calendar\Event\EventType::TYPE_WEEKLY;
 
@@ -95,7 +94,7 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
 
         $handler->handle($command);
 
-        $this->assertEquals($command->endDate, new DateTime("+1 year +2 hour"));
+        $this->assertEquals($command->endDate, new DateTime('+1 year +2 hour'));
     }
 
     /**
@@ -132,8 +131,8 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
         $command = new UpdateEventCommand();
         $command->method = 'weird_mode';
         $command->calendar = m::mock(Calendar::class);
-        $command->startDate = new DateTime("+1 hour");
-        $command->endDate = new DateTime("+2 hour");
+        $command->startDate = new DateTime('+1 hour');
+        $command->endDate = new DateTime('+2 hour');
 
         $eventRepositoryMock = m::mock(EventRepositoryInterface::class);
         $occurrenceRepositoryMock = m::mock(OccurrenceRepositoryInterface::class);
@@ -155,8 +154,8 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
         $command = new UpdateEventCommand();
         $command->method = UpdateEventHandler::MODE_SINGLE;
         $command->calendar = m::mock(Calendar::class);
-        $command->startDate = new DateTime("+1 hour");
-        $command->endDate = new DateTime("+2 hour");
+        $command->startDate = new DateTime('+1 hour');
+        $command->endDate = new DateTime('+2 hour');
 
         $eventRepositoryMock = m::mock(EventRepositoryInterface::class);
         $occurrenceRepositoryMock = m::mock(OccurrenceRepositoryInterface::class);

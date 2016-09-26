@@ -16,8 +16,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Exception;
 
 /**
- * Class Event
- * @package Gyman\Domain\Model
+ * Class Event.
  */
 class Event
 {
@@ -83,24 +82,26 @@ class Event
 
     /**
      * Event constructor.
-     * @param string $id
-     * @param Calendar $calendar
-     * @param EventType $type
-     * @param DateTime $startDate
-     * @param DateTime $endDate
-     * @param string $title
-     * @param Repetitions $repetitions
-     * @param Duration $duration
+     *
+     * @param string                       $id
+     * @param Calendar                     $calendar
+     * @param EventType                    $type
+     * @param DateTime                     $startDate
+     * @param DateTime                     $endDate
+     * @param string                       $title
+     * @param Repetitions                  $repetitions
+     * @param Duration                     $duration
      * @param ArrayCollection|Occurrence[] $occurrences
+     *
      * @throws \Exception
      */
-    public function __construct($id, Calendar $calendar, EventType $type, DateTime $startDate, DateTime $endDate, $title, Repetitions $repetitions, Duration $duration, Event $previousEvent = null, Event $nextEvent = null )
+    public function __construct($id, Calendar $calendar, EventType $type, DateTime $startDate, DateTime $endDate, $title, Repetitions $repetitions, Duration $duration, Event $previousEvent = null, Event $nextEvent = null)
     {
         if (Carbon::instance($startDate)->gt(Carbon::instance($endDate))) {
             throw new \Exception(sprintf(
                 "End date '%s' cannot be before start date '%s'",
-                $endDate->format("Y-m-d H:i:s"),
-                $startDate->format("Y-m-d H:i:s")
+                $endDate->format('Y-m-d H:i:s'),
+                $startDate->format('Y-m-d H:i:s')
             ));
         }
 
@@ -184,6 +185,7 @@ class Event
 
     /**
      * @param bool $force
+     *
      * @return \DateTime[]|ArrayCollection
      */
     public function calculateOccurrencesDates($force = false)
@@ -203,7 +205,7 @@ class Event
                     }
                 }
             } else {
-                throw new Exception("Invalid event type!");
+                throw new Exception('Invalid event type!');
             }
 
             $this->occurrencesDates = $occurrences;
@@ -294,6 +296,7 @@ class Event
 
     /**
      * @param $type
+     *
      * @return bool
      */
     public function isType($type)
@@ -312,6 +315,7 @@ class Event
 
     /**
      * @param EventType $type
+     *
      * @throws Exception
      */
     public function changeType(EventType $type)
@@ -333,8 +337,8 @@ class Event
      */
     public function removeOccurrence(Occurrence $occurrenceToRemove)
     {
-        foreach($this->occurrences() as $key => $occurrence) {
-            if($occurrence->id() === $occurrenceToRemove->id()) {
+        foreach ($this->occurrences() as $key => $occurrence) {
+            if ($occurrence->id() === $occurrenceToRemove->id()) {
                 $this->occurrences->remove($key);
                 break;
             }
@@ -362,10 +366,10 @@ class Event
      */
     public function updateWithCommand(UpdateEventCommand $command)
     {
-        if($command->calendar instanceof Calendar && $this->calendar !== $command->calendar) {
+        if ($command->calendar instanceof Calendar && $this->calendar !== $command->calendar) {
             $this->calendar = $command->calendar;
             $eventsCollection = $this->calendar->events();
-            if(!$eventsCollection->contains($this)){
+            if (!$eventsCollection->contains($this)) {
                 $eventsCollection->add($this);
             }
         }
@@ -375,14 +379,13 @@ class Event
         $this->changeDuration(new Duration($command->duration));
         $this->changeTitle($command->title);
 
-        if($command->type === EventType::TYPE_SINGLE && !$this->isType($command->type)) {
+        if ($command->type === EventType::TYPE_SINGLE && !$this->isType($command->type)) {
             $this->changeType(new EventType($command->type));
             $this->changeRepetitions(new Repetitions([]));
         }
 
-        if($command->type === EventType::TYPE_WEEKLY) {
-            if($this->isType($command->type)) {
-                ;
+        if ($command->type === EventType::TYPE_WEEKLY) {
+            if ($this->isType($command->type)) {
             } else {
                 $this->changeType(new EventType($command->type));
             }
@@ -393,6 +396,7 @@ class Event
 
     /**
      * @param Event $event
+     *
      * @throws Exception
      */
     public function setNext(Event $event)

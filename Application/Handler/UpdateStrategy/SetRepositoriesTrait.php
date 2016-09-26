@@ -5,8 +5,7 @@ use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
 use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
 
 /**
- * Class SetRepositoriesTrait
- * @package Dende\Calendar\Application\Handler\UpdateStrategy
+ * Class SetRepositoriesTrait.
  */
 trait SetRepositoriesTrait
 {

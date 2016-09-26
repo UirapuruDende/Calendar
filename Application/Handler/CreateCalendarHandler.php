@@ -11,8 +11,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 
 /**
- * Class NewCalendarCreationHandler
- * @package Dende\CalendarBundle\Service
+ * Class NewCalendarCreationHandler.
  */
 class CreateCalendarHandler
 {
@@ -33,7 +32,8 @@ class CreateCalendarHandler
 
     /**
      * NewCalendarCreationHandler constructor.
-     * @param CalendarFactory $calendarFactory
+     *
+     * @param CalendarFactory    $calendarFactory
      * @param CalendarRepository $calendarRepository
      */
     public function __construct(CalendarFactoryInterface $calendarFactory, CalendarRepositoryInterface $calendarRepository, EventDispatcherInterface $eventDispatcher)
@@ -47,12 +47,12 @@ class CreateCalendarHandler
      * @param Form $form
      * @param $command
      */
-    public function handleForm(Form $form, $command){
-        $newCalendarName = $form->get("new_calendar_name")->getData();
+    public function handleForm(Form $form, $command)
+    {
+        $newCalendarName = $form->get('new_calendar_name')->getData();
 
-        if(!is_null($newCalendarName))
-        {
-            $newCalendar = $this->calendarFactory->createFromArray(["title" => $newCalendarName]);
+        if (!is_null($newCalendarName)) {
+            $newCalendar = $this->calendarFactory->createFromArray(['title' => $newCalendarName]);
             $this->calendarRepository->insert($newCalendar);
             $this->eventDispatcher->dispatch(
                 Events::CALENDAR_AFTER_CREATION,

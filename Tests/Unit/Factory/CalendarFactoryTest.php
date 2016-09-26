@@ -8,14 +8,15 @@ use Mockery as m;
 
 class CalendarFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCreate() {
+    public function testCreate()
+    {
         $idGenerator = m::mock(IdGeneratorInterface::class);
-        $idGenerator->shouldReceive("generateId")->andReturn("test");
+        $idGenerator->shouldReceive('generateId')->andReturn('test');
 
         $factory = new CalendarFactory($idGenerator);
         $calendar = $factory->create();
 
         $this->assertInstanceOf(Calendar::class, $calendar);
-        $this->assertEquals("test", $calendar->id());
+        $this->assertEquals('test', $calendar->id());
     }
 }

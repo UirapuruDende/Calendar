@@ -2,8 +2,7 @@
 namespace Dende\Calendar\Domain\Calendar\Event;
 
 /**
- * Class Repetitions
- * @package Gyman\Domain\Model
+ * Class Repetitions.
  */
 class Repetitions
 {
@@ -35,6 +34,7 @@ class Repetitions
 
     /**
      * Repetitions constructor.
+     *
      * @param array $weekdays
      */
     public function __construct(array $weekdays)
@@ -52,6 +52,7 @@ class Repetitions
 
     /**
      * @param int[] $repetitions
+     *
      * @return bool
      */
     public function sameDays($repetitions)

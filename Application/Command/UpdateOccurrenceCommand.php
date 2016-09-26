@@ -6,8 +6,7 @@ use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\Duration;
 
 /**
- * Class UpdateOccurrenceCommand
- * @package Dende\Calendar\Application\Command
+ * Class UpdateOccurrenceCommand.
  */
 final class UpdateOccurrenceCommand
 {

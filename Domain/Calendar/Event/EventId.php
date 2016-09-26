@@ -2,8 +2,7 @@
 namespace Dende\Calendar\Domain\Calendar\Event;
 
 /**
- * Class EventId
- * @package Dende\Calendar\Domain\Calendar\Event
+ * Class EventId.
  */
 final class EventId
 {
@@ -14,6 +13,7 @@ final class EventId
 
     /**
      * EventId constructor.
+     *
      * @param $id
      * @codeCoverageIgnore
      */

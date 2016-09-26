@@ -27,7 +27,6 @@ class InMemoryEventRepository implements EventRepositoryInterface
 
     /**
      * @param Event $event
-     * @return null
      */
     public function insert(Event $event)
     {
@@ -36,6 +35,7 @@ class InMemoryEventRepository implements EventRepositoryInterface
 
     /**
      * @param InMemoryEventSpecificationInterface $specification
+     *
      * @return array
      */
     public function query(InMemoryEventSpecificationInterface $specification)
@@ -49,6 +49,7 @@ class InMemoryEventRepository implements EventRepositoryInterface
 
     /**
      * @param callable $callback
+     *
      * @return array
      */
     private function filterEvents(callable $callback)
@@ -66,6 +67,7 @@ class InMemoryEventRepository implements EventRepositoryInterface
      * @param $startDate
      * @param $endDate
      * @param $calendar
+     *
      * @return array
      */
     public function findAllByCalendarInDateRange(DateTime $startDate, DateTime $endDate, Calendar $calendar)
@@ -78,6 +80,7 @@ class InMemoryEventRepository implements EventRepositoryInterface
     /**
      * @param $title
      * @param Calendar|null $calendar
+     *
      * @return array
      */
     public function findOneByTitle($title, Calendar $calendar = null)
@@ -107,4 +110,3 @@ class InMemoryEventRepository implements EventRepositoryInterface
         unset($this->events[$event->id()]);
     }
 }
-

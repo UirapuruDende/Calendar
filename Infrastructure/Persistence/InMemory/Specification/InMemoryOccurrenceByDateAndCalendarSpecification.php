@@ -20,6 +20,7 @@ final class InMemoryOccurrenceByDateAndCalendarSpecification implements InMemory
 
     /**
      * InMemoryEventByWeekSpecificationInterface constructor.
+     *
      * @param \DateTime $rangeStart
      * @param \DateTime $rangeEnd
      */
@@ -32,7 +33,9 @@ final class InMemoryOccurrenceByDateAndCalendarSpecification implements InMemory
 
     /**
      * @param Occurrence $occurrence
+     *
      * @return bool
+     *
      * @internal param Event $event
      */
     public function specifies(Occurrence $occurrence)

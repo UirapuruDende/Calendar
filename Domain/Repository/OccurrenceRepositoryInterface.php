@@ -8,19 +8,20 @@ use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * Interface OccurrenceRepositoryInterface
- * @package Gyman\Domain\Repository
+ * Interface OccurrenceRepositoryInterface.
  */
 interface OccurrenceRepositoryInterface
 {
     /**
      * @param $occurrence
+     *
      * @return mixed
      */
     public function insert($occurrence);
 
     /**
      * @param Event $event
+     *
      * @return ArrayCollection|Occurrence[]
      */
     public function findAllByEvent(Event $event);
@@ -28,6 +29,7 @@ interface OccurrenceRepositoryInterface
     /**
      * @param DateTime $date
      * @param Calendar $calendar
+     *
      * @return mixed
      */
     public function findOneByDateAndCalendar(DateTime $date, Calendar $calendar);
@@ -39,25 +41,25 @@ interface OccurrenceRepositoryInterface
 
     /**
      * @param Occurrence|Occurrence[] $occurrence
-     * @return null
      */
     public function update($occurrence);
 
     /**
      * @param Event $event
+     *
      * @return Occurrence[]
      */
     public function findAllByEventUnmodified(Event $event);
 
     /**
      * @param Occurrence|Occurrence[]|ArrayCollection $occurrences
+     *
      * @throws \Exception
      */
     public function remove($occurrences);
 
     /**
      * @param Event $event
-     * @return void
      */
     public function removeAllForEvent(Event $event);
 }

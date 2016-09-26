@@ -2,8 +2,7 @@
 namespace Dende\Calendar\Application\Generator;
 
 /**
- * Interface IdGeneratorInterface
- * @package Dende\Calendar\Application\Generator
+ * Interface IdGeneratorInterface.
  */
 interface IdGeneratorInterface
 {

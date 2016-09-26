@@ -5,8 +5,8 @@ use Dende\Calendar\Application\Generator\IdGeneratorInterface;
 use Dende\Calendar\Domain\Calendar;
 
 /**
- * Class CalendarFactory
- * @package Dende\Calendar\Application\Factory
+ * Class CalendarFactory.
+ *
  * @todo change 'title' to name, because calendar has 'name' field
  */
 class CalendarFactory implements CalendarFactoryInterface
@@ -18,6 +18,7 @@ class CalendarFactory implements CalendarFactoryInterface
 
     /**
      * CalendarFactory constructor.
+     *
      * @param $idGenerator
      */
     public function __construct(IdGeneratorInterface $idGenerator)
@@ -27,13 +28,14 @@ class CalendarFactory implements CalendarFactoryInterface
 
     /**
      * @param $params
+     *
      * @return Calendar
      */
     public function createFromArray($array)
     {
         $template = [
-            'id'                     => $this->idGenerator->generateId(),
-            'title'                  => '',
+            'id'    => $this->idGenerator->generateId(),
+            'title' => '',
         ];
 
         $array = array_merge($template, $array);

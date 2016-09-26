@@ -1,10 +1,10 @@
 <?php
 namespace Dende\Calendar\Application\Generator\InMemory;
+
 use Dende\Calendar\Application\Generator\IdGeneratorInterface;
 
 /**
- * Class IdGenerator
- * @package Dende\CalendarBundle\Service
+ * Class IdGenerator.
  */
 final class IdGenerator implements IdGeneratorInterface
 {

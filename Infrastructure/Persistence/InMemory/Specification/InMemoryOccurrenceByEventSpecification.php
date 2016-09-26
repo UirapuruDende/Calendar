@@ -6,8 +6,7 @@ use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Repository\Specification\InMemoryOccurrenceSpecificationInterface;
 
 /**
- * Class InMemoryOccurrenceByEventSpecification
- * @package Dende\Calendar\Infrastructure\Persistence\InMemory\Specification
+ * Class InMemoryOccurrenceByEventSpecification.
  */
 final class InMemoryOccurrenceByEventSpecification implements InMemoryOccurrenceSpecificationInterface
 {
@@ -23,6 +22,7 @@ final class InMemoryOccurrenceByEventSpecification implements InMemoryOccurrence
 
     /**
      * InMemoryOccurrenceByEventSpecification constructor.
+     *
      * @param Event $event
      */
     public function __construct(Event $event, $onlyUnmodified = false)
@@ -33,6 +33,7 @@ final class InMemoryOccurrenceByEventSpecification implements InMemoryOccurrence
 
     /**
      * @param Occurrence $occurrence
+     *
      * @return bool
      */
     public function specifies(Occurrence $occurrence)

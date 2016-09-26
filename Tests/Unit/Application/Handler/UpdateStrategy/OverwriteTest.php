@@ -6,7 +6,6 @@ use Dende\Calendar\Application\Command\RemoveEventCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
 use Dende\Calendar\Application\Handler\UpdateStrategy\Overwrite;
-use Dende\Calendar\Application\Handler\UpdateStrategy\Single;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
@@ -20,7 +19,7 @@ final class OverwriteTest extends \PHPUnit_Framework_TestCase
 {
     public function testUpdate()
     {
-        $startDate = new DateTime("-2 day");
+        $startDate = new DateTime('-2 day');
 
         $calendarMock1 = m::mock(Calendar::class);
 
@@ -30,35 +29,35 @@ final class OverwriteTest extends \PHPUnit_Framework_TestCase
         $oldOccurrenceCollectionMock = new ArrayCollection([$oldOccurrenceMock]);
 
         $eventMock = m::mock(Event::class);
-        $eventMock->shouldReceive("occurrences")->once()->andReturn($oldOccurrenceCollectionMock);
-        $eventMock->shouldReceive("setOccurrences")->once()->with($newOccurrenceCollectionMock);
+        $eventMock->shouldReceive('occurrences')->once()->andReturn($oldOccurrenceCollectionMock);
+        $eventMock->shouldReceive('setOccurrences')->once()->with($newOccurrenceCollectionMock);
 
-        $oldOccurrenceMock->shouldReceive("event")->once()->andReturn($eventMock);
+        $oldOccurrenceMock->shouldReceive('event')->once()->andReturn($eventMock);
 
         createCommand: {
             $command = new UpdateEventCommand();
             $command->type = EventType::TYPE_SINGLE;
             $command->duration = 90;
             $command->startDate = $startDate;
-            $command->endDate = new DateTime("-1 day");
-            $command->title = "New title";
+            $command->endDate = new DateTime('-1 day');
+            $command->title = 'New title';
             $command->method = 'overwrite';
             $command->repetitionDays = [];
             $command->occurrence = $oldOccurrenceMock;
             $command->calendar = $calendarMock1;
         }
 
-        $eventMock->shouldReceive("updateWithCommand")->once()->with($command);
+        $eventMock->shouldReceive('updateWithCommand')->once()->with($command);
 
         $eventRepositoryMock = m::mock(EventRepositoryInterface::class);
-        $eventRepositoryMock->shouldReceive("update")->once()->with($eventMock);
+        $eventRepositoryMock->shouldReceive('update')->once()->with($eventMock);
 
         $occurrenceRepositoryMock = m::mock(OccurrenceRepositoryInterface::class);
-        $occurrenceRepositoryMock->shouldReceive("remove")->once()->with($oldOccurrenceCollectionMock);
-        $occurrenceRepositoryMock->shouldReceive("insert")->once()->with($newOccurrenceCollectionMock);
+        $occurrenceRepositoryMock->shouldReceive('remove')->once()->with($oldOccurrenceCollectionMock);
+        $occurrenceRepositoryMock->shouldReceive('insert')->once()->with($newOccurrenceCollectionMock);
 
         $occurrenceFactoryMock = m::mock(OccurrenceFactoryInterface::class);
-        $occurrenceFactoryMock->shouldReceive("generateCollectionFromEvent")->once()->with($eventMock)->andReturn($newOccurrenceCollectionMock);
+        $occurrenceFactoryMock->shouldReceive('generateCollectionFromEvent')->once()->with($eventMock)->andReturn($newOccurrenceCollectionMock);
 
         $overwrite = new Overwrite();
         $overwrite->setOccurrenceFactory($occurrenceFactoryMock);
@@ -73,9 +72,9 @@ final class OverwriteTest extends \PHPUnit_Framework_TestCase
         $occurrencesCollectionMock = new ArrayCollection([$occurrenceMock]);
 
         $eventMock = m::mock(Event::class);
-        $eventMock->shouldReceive("occurrences")->once()->andReturn($occurrencesCollectionMock);
+        $eventMock->shouldReceive('occurrences')->once()->andReturn($occurrencesCollectionMock);
 
-        $occurrenceMock->shouldReceive("event")->once()->andReturn($eventMock);
+        $occurrenceMock->shouldReceive('event')->once()->andReturn($eventMock);
 
         createCommand: {
             $command = new RemoveEventCommand();
@@ -84,10 +83,10 @@ final class OverwriteTest extends \PHPUnit_Framework_TestCase
         }
 
         $eventRepositoryMock = m::mock(EventRepositoryInterface::class);
-        $eventRepositoryMock->shouldReceive("remove")->once()->with($eventMock);
+        $eventRepositoryMock->shouldReceive('remove')->once()->with($eventMock);
 
         $occurrenceRepositoryMock = m::mock(OccurrenceRepositoryInterface::class);
-        $occurrenceRepositoryMock->shouldReceive("remove")->once()->with($occurrencesCollectionMock);
+        $occurrenceRepositoryMock->shouldReceive('remove')->once()->with($occurrencesCollectionMock);
 
         $overwrite = new Overwrite();
         $overwrite->setEventRepository($eventRepositoryMock);

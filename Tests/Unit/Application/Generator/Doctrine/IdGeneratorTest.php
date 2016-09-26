@@ -8,16 +8,17 @@ use Mockery as m;
 
 class IdGeneratorTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGenerate() {
+    public function testGenerate()
+    {
         $connection = m::mock(Connection::class);
-        $connection->shouldReceive("getDatabasePlatform->getGuidExpression");
-        $connection->shouldReceive("query->fetchColumn")->andReturn("test");
+        $connection->shouldReceive('getDatabasePlatform->getGuidExpression');
+        $connection->shouldReceive('query->fetchColumn')->andReturn('test');
 
         $em = m::mock(EntityManager::class);
-        $em->shouldReceive("getConnection")->andReturn($connection);
+        $em->shouldReceive('getConnection')->andReturn($connection);
 
         $generator = new IdGenerator($em);
 
-        $this->assertEquals("test", $generator->generateId());
+        $this->assertEquals('test', $generator->generateId());
     }
 }

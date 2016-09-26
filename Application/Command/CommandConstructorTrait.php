@@ -2,8 +2,7 @@
 namespace Dende\Calendar\Application\Command;
 
 /**
- * Class CommandConstructorTrait
- * @package Dende\Calendar\Application\Command
+ * Class CommandConstructorTrait.
  */
 trait CommandConstructorTrait
 {

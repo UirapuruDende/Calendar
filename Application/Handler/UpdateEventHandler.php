@@ -16,21 +16,7 @@ use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
 use Exception;
 
 /**
- * Class CreateEventHandler
- * @package Gyman\Domain\Handler
- *
- * Updating modes
- * Single:          Mode for changing only one occurrence
- * All Inclusive:   Mode for changing all occurrences (with modified also) and event
- * All Exclusive:   Mode for changing all occurrences (only unmodified) and event
- * Next Inclusive:  Mode for changing all occurrences after updated one (including it) (with modified also) and event
- * Next Exclusive:  Mode for changing all occurrences after updated one (including it) (only unmodified) and event
- *
- * If we choose to modify Next* occurrences, than algorithm changes event as a base, next occurrences are modified but
- * the flag 'modified' stays untouched and all the past occurrences are set as modified and some history of change
- * is attached to them (serialized event data) so it's easy to reset it. It's easier to mantain next occurrences when
- * they stay "unmodified" comparing to event.
- *
+ * Class CreateEventHandler.
  */
 final class UpdateEventHandler
 {
@@ -80,6 +66,7 @@ final class UpdateEventHandler
 
     /**
      * CreateEventHandler constructor.
+     *
      * @param EventRepositoryInterface $eventRepository
      */
     public function __construct(
@@ -87,8 +74,7 @@ final class UpdateEventHandler
         OccurrenceRepositoryInterface $occurrenceRepository,
         EventFactoryInterface $eventFactory,
         OccurrenceFactoryInterface $occurrenceFactory
-    )
-    {
+    ) {
         $this->eventRepository = $eventRepository;
         $this->occurrenceRepository = $occurrenceRepository;
         $this->eventFactory = $eventFactory;
@@ -122,13 +108,13 @@ final class UpdateEventHandler
      */
     public function handle(UpdateEventCommandInterface $command)
     {
-        /**
+        /*
          * @todo @deprecated
          * remove it - if calendar is null, it would be the same as in the beginning
          * update only if not null
          */
         if ($command instanceof UpdateEventCommand && is_null($command->calendar)) {
-            throw new Exception("Calendar is null and it has to be set!");
+            throw new Exception('Calendar is null and it has to be set!');
         }
 
         if (!in_array($command->method, self::$availableModes)) {
@@ -146,7 +132,7 @@ final class UpdateEventHandler
             ));
         }
 
-        if($command->type === EventType::TYPE_SINGLE) {
+        if ($command->type === EventType::TYPE_SINGLE) {
             /** @var Carbon $date */
             $date = Carbon::instance($command->startDate)
                 ->addMinutes($command->duration);

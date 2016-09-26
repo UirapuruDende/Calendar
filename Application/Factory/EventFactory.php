@@ -14,8 +14,7 @@ use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * Class EventFactory
- * @package Gyman\Domain
+ * Class EventFactory.
  */
 class EventFactory implements EventFactoryInterface
 {
@@ -26,6 +25,7 @@ class EventFactory implements EventFactoryInterface
 
     /**
      * EventFactory constructor.
+     *
      * @param IdGeneratorInterface $idGenerator
      */
     public function __construct(IdGeneratorInterface $idGenerator)
@@ -35,21 +35,22 @@ class EventFactory implements EventFactoryInterface
 
     /**
      * @param array $array
+     *
      * @return Event
      */
     public function createFromArray(array $array = [])
     {
         $template = [
-            'id'                     => $this->idGenerator->generateId(),
-            'title'                  => '',
-            'repetitions'            => new Repetitions([]),
-            'type'                   => new EventType(),
-            'occurrences'            => new ArrayCollection(),
-            'calendar'               => new Calendar(null, ''),
-            'duration'               => new Duration(0),
-            'startDate'              => new DateTime('now'),
-            'endDate'                => new DateTime('now'),
-            'previousEvent'         => null
+            'id'            => $this->idGenerator->generateId(),
+            'title'         => '',
+            'repetitions'   => new Repetitions([]),
+            'type'          => new EventType(),
+            'occurrences'   => new ArrayCollection(),
+            'calendar'      => new Calendar(null, ''),
+            'duration'      => new Duration(0),
+            'startDate'     => new DateTime('now'),
+            'endDate'       => new DateTime('now'),
+            'previousEvent' => null,
         ];
 
         $array = array_merge($template, $array);
@@ -77,6 +78,7 @@ class EventFactory implements EventFactoryInterface
 
     /**
      * @param CreateEventCommand|UpdateEventCommand $command
+     *
      * @return Event
      */
     public function createFromCommand(EventCommandInterface $command)
@@ -89,7 +91,7 @@ class EventFactory implements EventFactoryInterface
             'startDate'     => $command->startDate,
             'endDate'       => $command->endDate,
             'duration'      => new Duration($command->duration),
-            'previousEvent' => isset($command->occurrence) ? $command->occurrence->event() : null
+            'previousEvent' => isset($command->occurrence) ? $command->occurrence->event() : null,
         ]);
     }
 }

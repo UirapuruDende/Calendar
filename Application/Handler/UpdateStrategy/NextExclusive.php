@@ -10,7 +10,6 @@ class NextExclusive implements UpdateStrategyInterface
 
     /**
      * @param UpdateEventCommandInterface|UpdateEventCommand|RemoveEventCommand $command
-     * @return null
      */
     public function update(UpdateEventCommandInterface $command)
     {

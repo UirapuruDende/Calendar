@@ -1,22 +1,20 @@
 <?php
 namespace Dende\Calendar\Domain\Repository;
+
 use Dende\Calendar\Domain\Calendar;
 
 /**
- * Interface CalendarRepositoryInterface
- * @package Dende\Calendar\Domain\Repository
+ * Interface CalendarRepositoryInterface.
  */
 interface CalendarRepositoryInterface
 {
     /**
      * @param Calendar $calendar
-     * @return void
      */
     public function insert(Calendar $calendar);
 
     /**
      * @param Calendar $calendar
-     * @return void
      */
     public function update(Calendar $calendar);
 
@@ -27,7 +25,6 @@ interface CalendarRepositoryInterface
 
     /**
      * @param Calendar $calendar
-     * @return void
      */
     public function remove(Calendar $calendar);
 }

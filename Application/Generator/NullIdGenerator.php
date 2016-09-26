@@ -2,8 +2,7 @@
 namespace Dende\Calendar\Application\Generator;
 
 /**
- * Class NullIdGenerator
- * @package Dende\Calendar\Application\Generator
+ * Class NullIdGenerator.
  */
 class NullIdGenerator implements IdGeneratorInterface
 {
@@ -12,6 +11,6 @@ class NullIdGenerator implements IdGeneratorInterface
      */
     public function generateId()
     {
-        return null;
+        return;
     }
 }

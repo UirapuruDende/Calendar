@@ -6,8 +6,7 @@ use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Repository\Specification\InMemoryOccurrenceSpecificationInterface;
 
 /**
- * Class InMemoryOccurrenceByWeekSpecification
- * @package Dende\Calendar\Infrastructure\Persistence\InMemory\Specification
+ * Class InMemoryOccurrenceByWeekSpecification.
  */
 final class InMemoryOccurrenceByWeekSpecification implements InMemoryOccurrenceSpecificationInterface
 {
@@ -23,13 +22,14 @@ final class InMemoryOccurrenceByWeekSpecification implements InMemoryOccurrenceS
 
     /**
      * InMemoryEventByWeekSpecificationInterface constructor.
+     *
      * @param \DateTime $rangeStart
      * @param \DateTime $rangeEnd
      */
     public function __construct($year, $weekNumber)
     {
         $weekStart = Carbon::instance(new \DateTime(sprintf('%d-W%d-1', $year, $weekNumber)));
-        $weekEnd = clone($weekStart);
+        $weekEnd = clone $weekStart;
         $weekEnd->addDays(7);
 
         $this->rangeStart = $weekStart;
@@ -38,7 +38,9 @@ final class InMemoryOccurrenceByWeekSpecification implements InMemoryOccurrenceS
 
     /**
      * @param Occurrence $occurrence
+     *
      * @return bool
+     *
      * @internal param Event $event
      */
     public function specifies(Occurrence $occurrence)

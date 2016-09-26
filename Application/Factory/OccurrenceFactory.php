@@ -9,8 +9,7 @@ use Dende\Calendar\Domain\Calendar\Event\Occurrence\Duration as OccurrenceDurati
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * Class OccurrenceFactory
- * @package Gyman\Domain\Factory
+ * Class OccurrenceFactory.
  */
 class OccurrenceFactory implements OccurrenceFactoryInterface
 {
@@ -21,6 +20,7 @@ class OccurrenceFactory implements OccurrenceFactoryInterface
 
     /**
      * EventFactory constructor.
+     *
      * @param IdGeneratorInterface $idGenerator
      */
     public function __construct(IdGeneratorInterface $idGenerator)
@@ -30,15 +30,16 @@ class OccurrenceFactory implements OccurrenceFactoryInterface
 
     /**
      * @param array $array
+     *
      * @return Occurrence
      */
     public function createFromArray($array = [])
     {
         $template = [
-            'id'             => $this->idGenerator->generateId(),
-            'startDate'      => new DateTime('now'),
-            'duration'       => new OccurrenceDuration(90),
-            'event'          => null,
+            'id'        => $this->idGenerator->generateId(),
+            'startDate' => new DateTime('now'),
+            'duration'  => new OccurrenceDuration(90),
+            'event'     => null,
         ];
 
         $array = array_merge($template, $array);
@@ -53,6 +54,7 @@ class OccurrenceFactory implements OccurrenceFactoryInterface
 
     /**
      * @param Event $event
+     *
      * @return ArrayCollection|Occurrence[]
      */
     public function generateCollectionFromEvent(Event $event)

@@ -4,14 +4,14 @@ namespace Dende\Calendar\Domain\Repository\Specification;
 use Dende\Calendar\Domain\Calendar\Event;
 
 /**
- * Interface InMemoryEventSpecificationInterface
- * @package Gyman\Infrastructure\Persistence\InMemory
+ * Interface InMemoryEventSpecificationInterface.
  */
 interface InMemoryEventSpecificationInterface
 {
     /**
      * @param Event $event
-     * @return boolean
+     *
+     * @return bool
      */
     public function specifies(Event $event);
 }

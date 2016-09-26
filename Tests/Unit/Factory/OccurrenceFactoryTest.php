@@ -10,11 +10,9 @@ use Dende\Calendar\Domain\Calendar\Event\Duration;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Tests\AssertDatesEqualTrait;
-use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * Class EventTest
- * @package Gyman\Domain\Tests\Unit\Model
+ * Class EventTest.
  */
 class OccurrenceFactoryTest extends \PHPUnit_Framework_TestCase
 {

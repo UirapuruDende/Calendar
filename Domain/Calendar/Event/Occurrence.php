@@ -4,13 +4,12 @@ namespace Dende\Calendar\Domain\Calendar\Event;
 use Carbon\Carbon;
 use DateTime;
 use Dende\Calendar\Domain\Calendar\Event;
-use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\Duration as OccurrenceDuration;
+use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 use Dende\Calendar\Domain\SoftDeleteable;
 
 /**
- * Class Occurrence
- * @package Gyman\Domain\Model
+ * Class Occurrence.
  */
 class Occurrence
 {
@@ -48,10 +47,11 @@ class Occurrence
 
     /**
      * Occurrence constructor.
-     * @param string $id
-     * @param DateTime $startDate
+     *
+     * @param string             $id
+     * @param DateTime           $startDate
      * @param OccurrenceDuration $duration
-     * @param Event $event
+     * @param Event              $event
      */
     public function __construct($id, DateTime $startDate, OccurrenceDuration $duration, Event $event)
     {
@@ -100,7 +100,7 @@ class Occurrence
 
     protected function updateEndDate()
     {
-        $endDate = clone($this->startDate());
+        $endDate = clone $this->startDate();
         $diff = new \DateInterval(sprintf('PT%dM', abs($this->duration()->minutes())));
         $endDate->add($diff);
 
@@ -173,7 +173,7 @@ class Occurrence
     public function changeDuration(OccurrenceDuration $duration)
     {
         $this->duration = $duration;
-        if($this->event()->isType(EventType::TYPE_WEEKLY)) {
+        if ($this->event()->isType(EventType::TYPE_WEEKLY)) {
             $this->setAsModified();
         }
     }
@@ -190,7 +190,7 @@ class Occurrence
 
     public function synchronizeWithEvent()
     {
-        if($this->event()->isType(EventType::TYPE_SINGLE)) {
+        if ($this->event()->isType(EventType::TYPE_SINGLE)) {
             $this->changeStartDate($this->event->startDate());
         }
 

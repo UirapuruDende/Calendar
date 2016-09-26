@@ -5,14 +5,13 @@ use Dende\Calendar\Application\Command\RemoveEventCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommandInterface;
 use Dende\Calendar\Domain\Calendar\Event;
+use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\Duration as OccurrenceDuration;
-use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * Class Single
- * @package Dende\Calendar\Application\Handler\UpdateStrategy
+ * Class Single.
  */
 final class Single implements UpdateStrategyInterface
 {
@@ -20,8 +19,8 @@ final class Single implements UpdateStrategyInterface
 
     /**
      * @todo: crate and update to DurationFactory
+     *
      * @param UpdateEventCommandInterface|UpdateEventCommand|RemoveEventCommand $command
-     * @return null
      */
     public function update(UpdateEventCommandInterface $command)
     {
@@ -29,13 +28,12 @@ final class Single implements UpdateStrategyInterface
 
         $event = $occurrence->event();
 
-        if($command instanceof RemoveEventCommand) {
+        if ($command instanceof RemoveEventCommand) {
             if ($event->isType(EventType::TYPE_SINGLE)) {
                 $this->eventRepository->remove($event);
             }
             $this->occurrenceRepository->remove($occurrence);
-        } else if($command instanceof UpdateEventCommand) {
-
+        } elseif ($command instanceof UpdateEventCommand) {
             if ($event->isType(EventType::TYPE_SINGLE)) {
                 $event->updateWithCommand($command);
                 $occurrence->synchronizeWithEvent();
@@ -50,9 +48,7 @@ final class Single implements UpdateStrategyInterface
                 } else {
                     $this->occurrenceRepository->update($occurrence);
                 }
-
-            } else if ($event->isType(EventType::TYPE_WEEKLY)) {
-
+            } elseif ($event->isType(EventType::TYPE_WEEKLY)) {
                 switch ($command->type) {
                     case EventType::TYPE_SINGLE:
                         $command->startDate = $occurrence->startDate();

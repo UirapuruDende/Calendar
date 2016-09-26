@@ -6,8 +6,7 @@ use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Repository\Specification\InMemoryEventSpecificationInterface;
 
 /**
- * Class InMemoryEventsByTitleSpecification
- * @package Dende\Calendar\Infrastructure\Persistence\InMemory\Specification
+ * Class InMemoryEventsByTitleSpecification.
  */
 final class InMemoryEventsByTitleSpecification implements InMemoryEventSpecificationInterface
 {
@@ -23,7 +22,8 @@ final class InMemoryEventsByTitleSpecification implements InMemoryEventSpecifica
 
     /**
      * InMemoryEventsByTitleSpecification constructor.
-     * @param string $title
+     *
+     * @param string   $title
      * @param Calendar $calendar
      */
     public function __construct($title, Calendar $calendar = null)
@@ -34,7 +34,8 @@ final class InMemoryEventsByTitleSpecification implements InMemoryEventSpecifica
 
     /**
      * @param Event $event
-     * @return boolean
+     *
+     * @return bool
      */
     public function specifies(Event $event)
     {

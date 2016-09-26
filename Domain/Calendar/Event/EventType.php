@@ -4,8 +4,7 @@ namespace Dende\Calendar\Domain\Calendar\Event;
 use Exception;
 
 /**
- * Class EventType
- * @package Gyman\Domain\Model
+ * Class EventType.
  */
 final class EventType
 {
@@ -27,6 +26,7 @@ final class EventType
 
     /**
      * EventType constructor.
+     *
      * @param $type
      */
     public function __construct($type = self::TYPE_SINGLE)

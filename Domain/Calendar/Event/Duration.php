@@ -2,8 +2,7 @@
 namespace Dende\Calendar\Domain\Calendar\Event;
 
 /**
- * Class Duration
- * @package Gyman\Domain\Model
+ * Class Duration.
  */
 class Duration
 {
@@ -14,6 +13,7 @@ class Duration
 
     /**
      * Duration constructor.
+     *
      * @param int $minutes
      */
     public function __construct($minutes)

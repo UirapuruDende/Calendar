@@ -13,8 +13,7 @@ use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Mockery as m;
 
 /**
- * Class EventTest
- * @package Gyman\Domain\Tests\Unit\Model
+ * Class EventTest.
  */
 class FindCurrentEventTest extends \PHPUnit_Framework_TestCase
 {

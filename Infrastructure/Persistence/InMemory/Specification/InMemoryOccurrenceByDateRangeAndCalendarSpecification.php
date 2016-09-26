@@ -7,8 +7,7 @@ use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Repository\Specification\InMemoryOccurrenceSpecificationInterface;
 
 /**
- * Class InMemoryOccurrenceByDateRateAndCalendarSpecification
- * @package Dende\Calendar\Infrastructure\Persistence\InMemory\Specification
+ * Class InMemoryOccurrenceByDateRateAndCalendarSpecification.
  */
 final class InMemoryOccurrenceByDateRangeAndCalendarSpecification implements InMemoryOccurrenceSpecificationInterface
 {
@@ -29,6 +28,7 @@ final class InMemoryOccurrenceByDateRangeAndCalendarSpecification implements InM
 
     /**
      * InMemoryEventByWeekSpecificationInterface constructor.
+     *
      * @param \DateTime $rangeStart
      * @param \DateTime $rangeEnd
      */
@@ -48,7 +48,9 @@ final class InMemoryOccurrenceByDateRangeAndCalendarSpecification implements InM
 
     /**
      * @param Occurrence $occurrence
+     *
      * @return bool
+     *
      * @internal param Event $event
      */
     public function specifies(Occurrence $occurrence)

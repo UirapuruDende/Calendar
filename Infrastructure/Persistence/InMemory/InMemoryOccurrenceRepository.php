@@ -15,8 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mockery\CountValidator\Exception;
 
 /**
- * Class InMemoryOccurrenceRepository
- * @package Gyman\Domain\Repository
+ * Class InMemoryOccurrenceRepository.
  */
 final class InMemoryOccurrenceRepository implements OccurrenceRepositoryInterface
 {
@@ -35,7 +34,6 @@ final class InMemoryOccurrenceRepository implements OccurrenceRepositoryInterfac
 
     /**
      * @param Occurrence $occurrence
-     * @return null
      */
     public function insert($occurrence)
     {
@@ -44,17 +42,17 @@ final class InMemoryOccurrenceRepository implements OccurrenceRepositoryInterfac
 
     /**
      * @param Occurrence[] $occurrences
-     * @return null
      */
     public function insertCollection($occurrences)
     {
-        foreach($occurrences as $occurrence) {
+        foreach ($occurrences as $occurrence) {
             $this->occurrences[$occurrence->id()] = $occurrence;
         }
     }
 
     /**
      * @param $event
+     *
      * @return ArrayCollection|Occurrence[]
      */
     public function findAllByEvent(Event $event)
@@ -66,6 +64,7 @@ final class InMemoryOccurrenceRepository implements OccurrenceRepositoryInterfac
 
     /**
      * @param InMemoryOccurrenceSpecificationInterface $specification
+     *
      * @return ArrayCollection|Occurrence[]
      */
     public function query(InMemoryOccurrenceSpecificationInterface $specification)
@@ -93,6 +92,7 @@ final class InMemoryOccurrenceRepository implements OccurrenceRepositoryInterfac
     /**
      * @param DateTime $date
      * @param Calendar $calendar
+     *
      * @return Occurrence[]|ArrayCollection
      */
     public function findOneByDateAndCalendar(DateTime $date, Calendar $calendar)
@@ -106,6 +106,7 @@ final class InMemoryOccurrenceRepository implements OccurrenceRepositoryInterfac
      * @param DateTime $startDate
      * @param DateTime $endDate
      * @param Calendar $calendar
+     *
      * @return Occurrence[]|ArrayCollection
      */
     public function findAllByCalendarInDateRange(DateTime $startDate, DateTime $endDate, Calendar $calendar)
@@ -117,6 +118,7 @@ final class InMemoryOccurrenceRepository implements OccurrenceRepositoryInterfac
 
     /**
      * @param $calendar
+     *
      * @return Occurrence[]|ArrayCollection
      */
     public function findAllByCalendar($calendar)
@@ -158,12 +160,11 @@ final class InMemoryOccurrenceRepository implements OccurrenceRepositoryInterfac
 
     /**
      * @param Event $event
-     * @return void
      */
     public function removeAllForEvent(Event $event)
     {
-        foreach($this->occurrences as $occurrence) {
-            if($occurrence->event() === $event) {
+        foreach ($this->occurrences as $occurrence) {
+            if ($occurrence->event() === $event) {
                 $this->remove($occurrence);
             }
         }

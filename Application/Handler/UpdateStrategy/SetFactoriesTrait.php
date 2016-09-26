@@ -10,7 +10,7 @@ trait SetFactoriesTrait
     /** @var EventFactoryInterface */
     private $eventFactory;
 
-    /** @var  OccurrenceFactoryInterface */
+    /** @var OccurrenceFactoryInterface */
     private $occurrenceFactory;
 
     /**

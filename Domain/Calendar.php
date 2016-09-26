@@ -1,14 +1,11 @@
 <?php
 namespace Dende\Calendar\Domain;
 
-use DateTime;
-use Dende\Calendar\Domain\Calendar\CalendarId;
 use Dende\Calendar\Domain\Calendar\Event;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * Class Calendar
- * @package Gyman\Domain\Domain
+ * Class Calendar.
  */
 class Calendar
 {

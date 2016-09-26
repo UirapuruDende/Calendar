@@ -13,8 +13,7 @@ use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
 use Exception;
 
 /**
- * Class CreateEventHandler
- * @package Gyman\Domain\Handler
+ * Class CreateEventHandler.
  */
 final class CreateEventHandler
 {
@@ -40,10 +39,11 @@ final class CreateEventHandler
 
     /**
      * CreateEventHandler constructor.
-     * @param EventRepositoryInterface $eventRepository
+     *
+     * @param EventRepositoryInterface      $eventRepository
      * @param OccurrenceRepositoryInterface $occurrenceRepository
-     * @param EventFactory $eventFactory
-     * @param OccurrenceFactory $occurrenceFactory
+     * @param EventFactory                  $eventFactory
+     * @param OccurrenceFactory             $occurrenceFactory
      */
     public function __construct(EventRepositoryInterface $eventRepository, OccurrenceRepositoryInterface $occurrenceRepository, EventFactoryInterface $eventFactory, OccurrenceFactoryInterface $occurrenceFactory)
     {
@@ -59,10 +59,10 @@ final class CreateEventHandler
     public function handle(CreateEventCommand $command)
     {
         if (is_null($command->calendar)) {
-            throw new Exception("Calendar is null and it has to be set!");
+            throw new Exception('Calendar is null and it has to be set!');
         }
 
-        if($command->type === EventType::TYPE_SINGLE) {
+        if ($command->type === EventType::TYPE_SINGLE) {
             /** @var Carbon $date */
             $date = Carbon::instance($command->startDate)
                 ->addMinutes($command->duration);

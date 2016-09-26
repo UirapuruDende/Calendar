@@ -8,8 +8,7 @@ use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
 
 /**
- * Class FindCurrentEvent
- * @package Dende\Calendar\Application\Service
+ * Class FindCurrentEvent.
  */
 final class FindCurrentEvent
 {
@@ -20,6 +19,7 @@ final class FindCurrentEvent
 
     /**
      * FindCurrentEvent constructor.
+     *
      * @param OccurrenceRepositoryInterface $occurrenceRepository
      */
     public function __construct(OccurrenceRepositoryInterface $occurrenceRepository)
@@ -29,6 +29,7 @@ final class FindCurrentEvent
 
     /**
      * @param Calendar $calendar
+     *
      * @return Event
      */
     public function getCurrentEvent(Calendar $calendar)

@@ -2,19 +2,11 @@
 namespace Dende\Calendar\Application\Handler;
 
 use Dende\Calendar\Application\Command\UpdateEventCommand;
-use Dende\Calendar\Application\Factory\EventFactory;
-use Dende\Calendar\Application\Factory\OccurrenceFactory;
-use Dende\Calendar\Application\Handler\UpdateStrategy\UpdateStrategyInterface;
 use Dende\Calendar\Domain\Calendar;
-use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Repository\CalendarRepositoryInterface;
-use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
-use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
-use Exception;
 
 /**
- * Class RemoveEventHandler
- * @package Dende\Calendar\Application\Handler
+ * Class RemoveEventHandler.
  */
 final class RemoveCalendarHandler
 {
@@ -27,7 +19,6 @@ final class RemoveCalendarHandler
      * @var CalendarRepositoryInterface
      */
     private $calendarRepository;
-
 
     /**
      * @param UpdateEventCommand $command

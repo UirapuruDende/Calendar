@@ -7,7 +7,6 @@ use Dende\Calendar\Application\Generator\InMemory\IdGenerator;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Duration as EventDuration;
-use Dende\Calendar\Domain\Calendar\Event\Occurrence\Duration as OccurrenceDuration;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryEventRepository;
@@ -15,11 +14,9 @@ use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryOccurrenceReposit
 use Dende\Calendar\Infrastructure\Persistence\InMemory\Specification\InMemoryEventByWeekSpecification;
 use Dende\Calendar\Infrastructure\Persistence\InMemory\Specification\InMemoryOccurrenceByWeekSpecification;
 use Dende\Calendar\Tests\AssertDatesEqualTrait;
-use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * Class EventTest
- * @package Gyman\Domain\Tests\Unit\Model
+ * Class EventTest.
  */
 class CalendarTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,7 +27,8 @@ class CalendarTest extends \PHPUnit_Framework_TestCase
      */
     private $occurrenceFactory;
 
-    public function setUp(){
+    public function setUp()
+    {
         $this->occurrenceFactory = new OccurrenceFactory(new IdGenerator());
     }
 

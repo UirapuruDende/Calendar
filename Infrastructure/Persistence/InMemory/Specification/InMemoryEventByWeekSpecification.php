@@ -6,8 +6,7 @@ use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Repository\Specification\InMemoryEventSpecificationInterface;
 
 /**
- * Class InMemoryEventByWeekSpecification
- * @package Dende\Calendar\Infrastructure\Persistence\InMemory\Specification
+ * Class InMemoryEventByWeekSpecification.
  */
 final class InMemoryEventByWeekSpecification implements InMemoryEventSpecificationInterface
 {
@@ -23,13 +22,14 @@ final class InMemoryEventByWeekSpecification implements InMemoryEventSpecificati
 
     /**
      * InMemoryEventByWeekSpecificationInterface constructor.
+     *
      * @param \DateTime $rangeStart
      * @param \DateTime $rangeEnd
      */
     public function __construct($year, $weekNumber)
     {
         $weekStart = Carbon::instance(new \DateTime(sprintf('%d-W%d-1', $year, $weekNumber)));
-        $weekEnd = clone($weekStart);
+        $weekEnd = clone $weekStart;
         $weekEnd->addDays(7);
 
         $this->rangeStart = $weekStart;
@@ -38,7 +38,8 @@ final class InMemoryEventByWeekSpecification implements InMemoryEventSpecificati
 
     /**
      * @param Event $event
-     * @return boolean
+     *
+     * @return bool
      */
     public function specifies(Event $event)
     {
