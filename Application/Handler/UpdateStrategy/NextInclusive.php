@@ -2,7 +2,9 @@
 namespace Dende\Calendar\Application\Handler\UpdateStrategy;
 
 use DateTime;
+use Dende\Calendar\Application\Command\RemoveEventCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
+use Dende\Calendar\Application\Command\UpdateEventCommandInterface;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -12,10 +14,10 @@ class NextInclusive implements UpdateStrategyInterface
     use SetRepositoriesTrait, SetFactoriesTrait;
 
     /**
-     * @param UpdateEventCommand $command
+     * @param UpdateEventCommandInterface|UpdateEventCommand|RemoveEventCommand $command
      * @return null
      */
-    public function update(UpdateEventCommand $command)
+    public function update(UpdateEventCommandInterface $command)
     {
         /** @var Event $originalEvent */
         $originalEvent = $command->occurrence->event();
@@ -27,8 +29,7 @@ class NextInclusive implements UpdateStrategyInterface
             $occurrence = $originalEvent->occurrences()->first();
 
             if($command->type === Event\EventType::TYPE_SINGLE) {
-                $occurrence->synchronizeWithEvent();
-                $this->occurrenceRepository->update($occurrence);
+                throw new \Exception('This strategy is for series types events! Use SingleStrategy!');
             } elseif ($command->type === Event\EventType::TYPE_WEEKLY) {
                 $this->occurrenceRepository->remove($occurrence);
 
@@ -64,17 +65,19 @@ class NextInclusive implements UpdateStrategyInterface
 
             $originalEvent->setOccurrences($originalOccurrences);
 
-            $newCommand = clone($command);
-            $newCommand->startDate = $pivot;
+            if($command instanceof UpdateEventCommand) {
+                $newCommand = clone($command);
+                $newCommand->startDate = $pivot;
 
-            /** @var Event $newEvent */
-            $newEvent = $this->eventFactory->createFromCommand($newCommand);
-            $newOccurrences = $this->occurrenceFactory->generateCollectionFromEvent($newEvent);
-            $newEvent->setOccurrences($newOccurrences);
+                /** @var Event $newEvent */
+                $newEvent = $this->eventFactory->createFromCommand($newCommand);
+                $newOccurrences = $this->occurrenceFactory->generateCollectionFromEvent($newEvent);
+                $newEvent->setOccurrences($newOccurrences);
 
-            $originalEvent->setNext($newEvent);
+                $originalEvent->setNext($newEvent);
+                $this->eventRepository->insert($newEvent);
+            }
 
-            $this->eventRepository->insert($newEvent);
             $this->occurrenceRepository->update($originalEvent->occurrences());
         }
 
@@ -107,4 +110,5 @@ class NextInclusive implements UpdateStrategyInterface
             return $clicked->endDate();
         }
     }
+
 }

@@ -64,7 +64,7 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
 
         $handler->handle($command);
 
-        $this->assertEquals($command->endDate, new DateTime("+2 hour"));
+        $this->assertEquals($command->endDate, new DateTime("+2 hour"), null, 2); // 1 second delta is allowed
     }
 
     public function testHandleUpdateCommandWeekly()

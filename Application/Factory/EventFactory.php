@@ -82,14 +82,14 @@ class EventFactory implements EventFactoryInterface
     public function createFromCommand(EventCommandInterface $command)
     {
         return static::createFromArray([
-            'title'           => $command->title,
-            'calendar'        => $command->calendar,
-            'repetitions'     => new Repetitions($command->repetitionDays),
-            'type'            => new EventType($command->type),
-            'startDate'       => $command->startDate,
-            'endDate'         => $command->endDate,
-            'duration'        => new Duration($command->duration),
-            'previousEvent'  => isset($command->occurrence) ? $command->occurrence->event() : null
+            'title'         => $command->title,
+            'calendar'      => $command->calendar,
+            'repetitions'   => new Repetitions($command->repetitionDays),
+            'type'          => new EventType($command->type),
+            'startDate'     => $command->startDate,
+            'endDate'       => $command->endDate,
+            'duration'      => new Duration($command->duration),
+            'previousEvent' => isset($command->occurrence) ? $command->occurrence->event() : null
         ]);
     }
 }

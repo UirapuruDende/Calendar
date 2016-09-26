@@ -173,7 +173,9 @@ class Occurrence
     public function changeDuration(OccurrenceDuration $duration)
     {
         $this->duration = $duration;
-        $this->setAsModified();
+        if($this->event()->isType(EventType::TYPE_WEEKLY)) {
+            $this->setAsModified();
+        }
     }
 
     protected function setAsModified()
@@ -190,8 +192,14 @@ class Occurrence
     {
         if($this->event()->isType(EventType::TYPE_SINGLE)) {
             $this->changeStartDate($this->event->startDate());
-            $this->changeDuration(new OccurrenceDuration($this->event()->duration()));
-            $this->updateEndDate();
         }
+
+        $this->changeDuration(new OccurrenceDuration($this->event()->duration()));
+        $this->updateEndDate();
+    }
+
+    public function moveToEvent(Event $event)
+    {
+        $this->event = $event;
     }
 }

@@ -10,7 +10,7 @@ use Dende\Calendar\Domain\Calendar\Event\Occurrence;
  * Class CreateEventCommand
  * @package Gyman\Domain\Command
  */
-final class UpdateEventCommand implements  EventCommandInterface
+final class UpdateEventCommand implements  EventCommandInterface, UpdateEventCommandInterface
 {
     use CommandConstructorTrait;
 
