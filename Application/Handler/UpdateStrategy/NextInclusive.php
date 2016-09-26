@@ -28,12 +28,8 @@ class NextInclusive implements UpdateStrategyInterface
             /** @var Occurrence $occurrence */
             $occurrence = $originalEvent->occurrences()->first();
 
-            /**
-             * @todo this should not be here! it's a Single strategy responsibility!
-             */
             if($command->type === Event\EventType::TYPE_SINGLE) {
-                $occurrence->synchronizeWithEvent();
-                $this->occurrenceRepository->update($occurrence);
+                throw new \Exception('This strategy is for series types events! Use SingleStrategy!');
             } elseif ($command->type === Event\EventType::TYPE_WEEKLY) {
                 $this->occurrenceRepository->remove($occurrence);
 
