@@ -1,0 +1,18 @@
+{
+    "source": {
+        "directories": [
+            "Application",
+            "Domain",
+            "Infrastructure"
+        ],
+        "excludes": [
+            "vendor",
+            "Tests"
+        ]
+    },
+    "timeout": 10,
+    "logs": {
+        "text": "humbuglog.txt",
+        "json": "humbuglog.json"
+    }
+}

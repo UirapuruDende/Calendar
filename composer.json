@@ -5,7 +5,8 @@
     "require": {
         "nesbot/carbon": "*",
         "doctrine/common": "*",
-        "doctrine/orm": "^2.5"
+        "doctrine/orm": "^2.5",
+        "humbug/humbug": "~1.0@dev"
     },
     "autoload": {
         "psr-0": {
