@@ -1,31 +1,29 @@
 <?php
 namespace Dende\Calendar\Domain;
 
+use DateTime;
+
 trait SoftDeleteable
 {
     /**
-     * @var \DateTime
+     * @var DateTime
      */
     protected $deletedAt;
 
     /**
      * Sets deletedAt.
      *
-     * @param \Datetime|null $deletedAt
-     *
-     * @return $this
+     * @param Datetime|null $deletedAt
      */
-    public function setDeletedAt(\DateTime $deletedAt = null)
+    public function setDeletedAt(DateTime $deletedAt = null)
     {
         $this->deletedAt = $deletedAt;
-
-        return $this;
     }
 
     /**
      * Returns deletedAt.
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getDeletedAt()
     {
