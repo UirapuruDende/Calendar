@@ -39,7 +39,7 @@ final class EventId
      * @return string
      * @codeCoverageIgnore
      */
-    function __toString()
+    public function __toString()
     {
         return (string) $this->id();
     }
