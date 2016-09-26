@@ -2,6 +2,7 @@
 namespace Dende\Calendar\Tests\Unit\Application\Handler\UpdateStrategy;
 
 use DateTime;
+use Dende\Calendar\Application\Command\RemoveEventCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
 use Dende\Calendar\Application\Handler\UpdateStrategy\Overwrite;
@@ -17,59 +18,78 @@ use Mockery as m;
 
 final class OverwriteTest extends \PHPUnit_Framework_TestCase
 {
-    public function testUpdateSingleType()
+    public function testUpdate()
     {
-        $this->markTestSkipped();
-
-        $command = new UpdateEventCommand();
-        $command->type = EventType::TYPE_SINGLE;
-        $command->duration = 90;
-        $command->startDate = new DateTime("-2 day");
-        $command->endDate = new DateTime("-1 day");
-        $command->title = "New title";
-        $command->method = 'single';
-        $command->repetitionDays = [];
+        $startDate = new DateTime("-2 day");
 
         $calendarMock1 = m::mock(Calendar::class);
-        $calendarMock1->shouldReceive("id")->andReturn(123);
 
-        $calendarMock2 = m::mock(Calendar::class);
-        $calendarMock2->shouldReceive("id")->andReturn(125);
+        $newOccurrenceCollectionMock = new ArrayCollection([]);
 
-        $occurrenceCollectionMock = new ArrayCollection([]);
+        $oldOccurrenceMock = m::mock(Occurrence::class);
+        $oldOccurrenceCollectionMock = new ArrayCollection([$oldOccurrenceMock]);
 
         $eventMock = m::mock(Event::class);
-        $eventMock->shouldReceive("isType")->with($command->type)->andReturn(true);
-        $eventMock->shouldReceive("isType")->with(EventType::TYPE_WEEKLY)->andReturn(false);
-        $eventMock->shouldReceive("changeStartDate")->with($command->startDate);
-        $eventMock->shouldReceive("changeEndDate")->with($command->endDate);
-        $eventMock->shouldReceive("changeTitle")->with($command->title);
-        $eventMock->shouldReceive("changeDuration");
-        $eventMock->shouldReceive("changeCalendar")->with($calendarMock1);
-        $eventMock->shouldReceive("changeType");
-        $eventMock->shouldReceive("changeRepetitions");
-        $eventMock->shouldReceive("calendar")->andReturn($calendarMock2);
-        $eventMock->shouldReceive("setOccurrences")->with($occurrenceCollectionMock);
+        $eventMock->shouldReceive("occurrences")->once()->andReturn($oldOccurrenceCollectionMock);
+        $eventMock->shouldReceive("setOccurrences")->once()->with($newOccurrenceCollectionMock);
 
-        $occurrenceMock = m::mock(Occurrence::class);
-        $occurrenceMock->shouldReceive("event")->andReturn($eventMock);
-        $occurrenceMock->shouldReceive("changeStartDate")->with($command->startDate);
-        $occurrenceMock->shouldReceive("changeDuration");
+        $oldOccurrenceMock->shouldReceive("event")->once()->andReturn($eventMock);
 
-        $command->occurrence = $occurrenceMock;
-        $command->calendar = $calendarMock1;
+        createCommand: {
+            $command = new UpdateEventCommand();
+            $command->type = EventType::TYPE_SINGLE;
+            $command->duration = 90;
+            $command->startDate = $startDate;
+            $command->endDate = new DateTime("-1 day");
+            $command->title = "New title";
+            $command->method = 'overwrite';
+            $command->repetitionDays = [];
+            $command->occurrence = $oldOccurrenceMock;
+            $command->calendar = $calendarMock1;
+        }
 
-        $overwrite = new Overwrite();
+        $eventMock->shouldReceive("updateWithCommand")->once()->with($command);
+
         $eventRepositoryMock = m::mock(EventRepositoryInterface::class);
-        $eventRepositoryMock->shouldReceive("update")->with($eventMock);
+        $eventRepositoryMock->shouldReceive("update")->once()->with($eventMock);
 
         $occurrenceRepositoryMock = m::mock(OccurrenceRepositoryInterface::class);
-        $occurrenceRepositoryMock->shouldReceive("removeAllForEvent")->with($eventMock);
+        $occurrenceRepositoryMock->shouldReceive("remove")->once()->with($oldOccurrenceCollectionMock);
+        $occurrenceRepositoryMock->shouldReceive("insert")->once()->with($newOccurrenceCollectionMock);
 
         $occurrenceFactoryMock = m::mock(OccurrenceFactoryInterface::class);
-        $occurrenceFactoryMock->shouldReceive("generateCollectionFromEvent")->andReturn($occurrenceCollectionMock);
+        $occurrenceFactoryMock->shouldReceive("generateCollectionFromEvent")->once()->with($eventMock)->andReturn($newOccurrenceCollectionMock);
 
+        $overwrite = new Overwrite();
         $overwrite->setOccurrenceFactory($occurrenceFactoryMock);
+        $overwrite->setEventRepository($eventRepositoryMock);
+        $overwrite->setOccurrenceRepository($occurrenceRepositoryMock);
+        $overwrite->update($command);
+    }
+
+    public function testRemove()
+    {
+        $occurrenceMock = m::mock(Occurrence::class);
+        $occurrencesCollectionMock = new ArrayCollection([$occurrenceMock]);
+
+        $eventMock = m::mock(Event::class);
+        $eventMock->shouldReceive("occurrences")->once()->andReturn($occurrencesCollectionMock);
+
+        $occurrenceMock->shouldReceive("event")->once()->andReturn($eventMock);
+
+        createCommand: {
+            $command = new RemoveEventCommand();
+            $command->method = 'overwrite';
+            $command->occurrence = $occurrenceMock;
+        }
+
+        $eventRepositoryMock = m::mock(EventRepositoryInterface::class);
+        $eventRepositoryMock->shouldReceive("remove")->once()->with($eventMock);
+
+        $occurrenceRepositoryMock = m::mock(OccurrenceRepositoryInterface::class);
+        $occurrenceRepositoryMock->shouldReceive("remove")->once()->with($occurrencesCollectionMock);
+
+        $overwrite = new Overwrite();
         $overwrite->setEventRepository($eventRepositoryMock);
         $overwrite->setOccurrenceRepository($occurrenceRepositoryMock);
         $overwrite->update($command);

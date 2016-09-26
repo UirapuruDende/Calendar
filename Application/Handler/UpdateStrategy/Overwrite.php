@@ -7,6 +7,7 @@ use Dende\Calendar\Application\Command\UpdateEventCommandInterface;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
+use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
 use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
@@ -22,7 +23,6 @@ final class Overwrite implements UpdateStrategyInterface
     use SetRepositoriesTrait, SetFactoriesTrait;
 
     /**
-     * @todo add fabrics for value objects or update commands
      * @param UpdateEventCommandInterface|UpdateEventCommand|RemoveEventCommand $command
      * @return null
      */
@@ -31,22 +31,16 @@ final class Overwrite implements UpdateStrategyInterface
         /** @var Event $event */
         $event = $command->occurrence->event();
 
-        $event->changeDuration(new Duration($command->duration));
-        $event->changeStartDate($command->startDate);
-        $event->changeEndDate($command->endDate);
-        $event->changeTitle($command->title);
-        $event->changeType(new EventType($command->type));
-        $event->changeRepetitions(new Repetitions($command->repetitionDays));
-
-        if($command->calendar->id() != $event->calendar()->id()) {
-            $event->changeCalendar($command->calendar);
+        if($command instanceof UpdateEventCommand) {
+            $event->updateWithCommand($command);
+            $this->occurrenceRepository->remove($event->occurrences());
+            $occurrences = $this->occurrenceFactory->generateCollectionFromEvent($event);
+            $event->setOccurrences($occurrences);
+            $this->eventRepository->update($event);
+            $this->occurrenceRepository->insert($occurrences);
+        } elseif ($command instanceof RemoveEventCommand) {
+            $this->occurrenceRepository->remove($event->occurrences());
+            $this->eventRepository->remove($event);
         }
-
-        $this->occurrenceRepository->removeAllForEvent($event);
-
-        $occurrences = $this->occurrenceFactory->generateCollectionFromEvent($event);
-        $event->setOccurrences($occurrences);
-
-        $this->eventRepository->update($event);
     }
 }
