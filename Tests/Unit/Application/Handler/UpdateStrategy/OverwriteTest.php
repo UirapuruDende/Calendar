@@ -19,6 +19,8 @@ final class OverwriteTest extends \PHPUnit_Framework_TestCase
 {
     public function testUpdateSingleType()
     {
+        $this->markTestSkipped();
+
         $command = new UpdateEventCommand();
         $command->type = EventType::TYPE_SINGLE;
         $command->duration = 90;

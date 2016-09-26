@@ -22,8 +22,12 @@ use Mockery as m;
  * Class EventTest
  * @package Gyman\Domain\Tests\Unit\Model
  */
-final class SingleTest extends \PHPUnit_Framework_TestCase
+class SingleTest extends \PHPUnit_Framework_TestCase
 {
+
+    /**
+     * @test
+     */
     public function testUpdateSingleToSingle()
     {
         $calendarMock = m::mock(Calendar::class);
@@ -60,6 +64,9 @@ final class SingleTest extends \PHPUnit_Framework_TestCase
         $single->update($command);
     }
 
+    /**
+     * @test
+     */
     public function testUpdateWeeklyToWeekly()
     {
         $command = new UpdateEventCommand();
@@ -104,6 +111,9 @@ final class SingleTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($command->duration, $occurrenceDuration->minutes());
     }
 
+    /**
+     * @test
+     */
     public function testUpdateSingleToWeekly() {
         $newOccurrencesCollection = new ArrayCollection([]);
 
@@ -147,6 +157,9 @@ final class SingleTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($oldOccurrenceMock, $newOccurrencesCollection->first());
     }
 
+    /**
+     * @test
+     */
     public function testUpdateWeeklyToSingle() {
         $eventMock = m::mock(Event::class);
         $eventMock->shouldReceive("isType")->with('single')->once()->andReturn(false);
@@ -206,6 +219,9 @@ final class SingleTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($newEventOccurrences, $newEventOccurrencesToUpdate);
     }
 
+    /**
+     * @test
+     */
     public function testRemoveSingleFromSingle() {
         $eventMock = m::mock(Event::class);
         $eventMock->shouldReceive("isType")->with('single')->once()->andReturn(true);
@@ -231,6 +247,9 @@ final class SingleTest extends \PHPUnit_Framework_TestCase
         $single->update($command);
     }
 
+    /**
+     * @test
+     */
     public function testRemoveSingleFromWeekly() {
         $eventMock = m::mock(Event::class);
         $eventMock->shouldReceive("isType")->with('single')->once()->andReturn(false);
