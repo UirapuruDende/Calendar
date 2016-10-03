@@ -37,6 +37,11 @@ final class UpdateEventCommand implements EventCommandInterface, UpdateEventComm
     public $calendar;
 
     /**
+     * @var string
+     */
+    public $newCalendarName;
+
+    /**
      * @var DateTime
      */
     public $startDate;

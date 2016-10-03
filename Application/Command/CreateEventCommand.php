@@ -21,6 +21,11 @@ final class CreateEventCommand implements EventCommandInterface
     public $calendar;
 
     /**
+     * @var string
+     */
+    public $newCalendarName;
+
+    /**
      * @var DateTime|Carbon
      */
     public $startDate;

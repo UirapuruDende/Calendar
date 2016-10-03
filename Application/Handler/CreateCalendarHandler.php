@@ -1,14 +1,17 @@
 <?php
 namespace Dende\Calendar\Application\Handler;
 
+use Dende\Calendar\Application\Command\CreateEventCommand;
+use Dende\Calendar\Application\Command\EventCommandInterface;
+use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Factory\CalendarFactory;
 use Dende\Calendar\Application\Factory\CalendarFactoryInterface;
 use Dende\Calendar\Domain\Repository\CalendarRepositoryInterface;
 use Dende\CalendarBundle\Event\CalendarAfterCreationEvent;
 use Dende\CalendarBundle\Events;
 use Dende\CalendarBundle\Repository\ORM\CalendarRepository;
+use Exception;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\Form;
 
 /**
  * Class NewCalendarCreationHandler.
@@ -44,21 +47,24 @@ class CreateCalendarHandler
     }
 
     /**
-     * @param Form $form
-     * @param $command
+     * @param UpdateEventCommand|CreateEventCommand $command
      */
-    public function handleForm(Form $form, $command)
+    public function handleForm(EventCommandInterface $command)
     {
-        $newCalendarName = $form->get('new_calendar_name')->getData();
+        $newCalendarName = $command->newCalendarName;
 
-        if (!is_null($newCalendarName)) {
-            $newCalendar = $this->calendarFactory->createFromArray(['title' => $newCalendarName]);
-            $this->calendarRepository->insert($newCalendar);
-            $this->eventDispatcher->dispatch(
-                Events::CALENDAR_AFTER_CREATION,
-                new CalendarAfterCreationEvent($newCalendar)
-            );
-            $command->calendar = $newCalendar;
+        if (is_null($newCalendarName)) {
+            throw new Exception('Calendar name is required!');
         }
+
+        $newCalendar = $this->calendarFactory->createFromArray(['title' => $newCalendarName]);
+        $this->calendarRepository->insert($newCalendar);
+
+        $this->eventDispatcher->dispatch(
+            Events::CALENDAR_AFTER_CREATION,
+            new CalendarAfterCreationEvent($newCalendar)
+        );
+
+        $command->calendar = $newCalendar;
     }
 }

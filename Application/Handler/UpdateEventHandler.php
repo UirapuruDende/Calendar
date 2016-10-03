@@ -32,10 +32,10 @@ final class UpdateEventHandler
      */
     public static $availableModes = [
         self::MODE_SINGLE,
-        self::MODE_ALL_INCLUSIVE,
-        self::MODE_ALL_EXCLUSIVE,
+//        self::MODE_ALL_INCLUSIVE,
+//        self::MODE_ALL_EXCLUSIVE,
         self::MODE_NEXT_INCLUSIVE,
-        self::MODE_NEXT_EXCLUSIVE,
+//        self::MODE_NEXT_EXCLUSIVE,
         self::MODE_OVERWRITE,
     ];
 
