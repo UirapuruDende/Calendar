@@ -23,11 +23,11 @@ class NextInclusiveTest extends PHPUnit_Framework_TestCase
         $eventMock = m::mock(Event::class);
 
         {
-            $occurrence1 = new Occurrence(null, new DateTime('2016-09-01 12:00:00'), new Occurrence\Duration(60), $eventMock);
-            $occurrence2 = new Occurrence(null, new DateTime('2016-09-02 12:00:00'), new Occurrence\Duration(60), $eventMock);
-            $occurrence3 = new Occurrence(null, new DateTime('2016-09-03 12:00:00'), new Occurrence\Duration(60), $eventMock);
-            $occurrence4 = new Occurrence(null, new DateTime('2016-09-04 12:00:00'), new Occurrence\Duration(60), $eventMock);
-            $occurrence5 = new Occurrence(null, new DateTime('2016-09-05 12:00:00'), new Occurrence\Duration(60), $eventMock);
+            $occurrence1 = new Occurrence(null, new DateTime('2016-09-01 12:00:00'), new Occurrence\OccurrenceDuration(60), $eventMock);
+            $occurrence2 = new Occurrence(null, new DateTime('2016-09-02 12:00:00'), new Occurrence\OccurrenceDuration(60), $eventMock);
+            $occurrence3 = new Occurrence(null, new DateTime('2016-09-03 12:00:00'), new Occurrence\OccurrenceDuration(60), $eventMock);
+            $occurrence4 = new Occurrence(null, new DateTime('2016-09-04 12:00:00'), new Occurrence\OccurrenceDuration(60), $eventMock);
+            $occurrence5 = new Occurrence(null, new DateTime('2016-09-05 12:00:00'), new Occurrence\OccurrenceDuration(60), $eventMock);
         }
 
         $occurrences = [

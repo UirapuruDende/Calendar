@@ -1,12 +1,10 @@
 <?php
 namespace Dende\Calendar\Domain\Calendar\Event\Occurrence;
 
-use Dende\Calendar\Domain\Calendar\Event\Duration as EventDuration;
-
 /**
  * Class Duration.
  */
-class Duration
+class OccurrenceDuration
 {
     /**
      * @var int
@@ -16,14 +14,10 @@ class Duration
     /**
      * Duration constructor.
      *
-     * @param EventDuration|int $duration
+     * @param int $duration
      */
-    public function __construct($duration)
+    public function __construct($duration = 0)
     {
-        if ($duration instanceof EventDuration) {
-            $duration = $duration->minutes();
-        }
-
         $this->minutes = intval($duration);
     }
 

@@ -5,7 +5,7 @@ use DateTime;
 use Dende\Calendar\Application\Generator\IdGeneratorInterface;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
-use Dende\Calendar\Domain\Calendar\Event\Occurrence\Duration;
+use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
@@ -47,7 +47,7 @@ class OccurrenceFactory implements OccurrenceFactoryInterface
         return new Occurrence(
             $array['id'],
             $array['startDate'],
-            new Duration($array['duration']),
+            new OccurrenceDuration($array['duration']),
             $array['event']
         );
     }

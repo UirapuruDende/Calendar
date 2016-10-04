@@ -3,7 +3,7 @@ namespace Dende\Calendar\Application\Command;
 
 use DateTime;
 use Dende\Calendar\Domain\Calendar\Event;
-use Dende\Calendar\Domain\Calendar\Event\Occurrence\Duration;
+use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
 
 /**
  * Class UpdateOccurrenceCommand.
@@ -23,7 +23,7 @@ final class UpdateOccurrenceCommand
     public $endDate;
 
     /**
-     * @var Duration
+     * @var OccurrenceDuration
      */
     public $duration;
 
