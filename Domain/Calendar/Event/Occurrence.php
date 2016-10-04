@@ -200,7 +200,7 @@ class Occurrence
             $this->changeStartDate($this->event->startDate());
         }
 
-        $this->changeDuration(new OccurrenceDuration($this->event()->duration()));
+        $this->changeDuration(new OccurrenceDuration($this->event()->duration()->minutes()));
         $this->updateEndDate();
     }
 
