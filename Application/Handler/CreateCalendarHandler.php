@@ -49,7 +49,7 @@ class CreateCalendarHandler
     /**
      * @param UpdateEventCommand|CreateEventCommand $command
      */
-    public function handleForm(EventCommandInterface $command)
+    public function handle(EventCommandInterface $command)
     {
         $newCalendarName = $command->newCalendarName;
 

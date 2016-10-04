@@ -2,11 +2,13 @@
 namespace Dende\Calendar\Domain\Calendar\Event;
 
 use Carbon\Carbon;
+use DateInterval;
 use DateTime;
 use Dende\Calendar\Domain\Calendar\Event;
-use Dende\Calendar\Domain\Calendar\Event\Occurrence\Duration as OccurrenceDuration;
+use Dende\Calendar\Domain\Calendar\Event\Occurrence\Duration;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 use Dende\Calendar\Domain\SoftDeleteable;
+use Exception;
 
 /**
  * Class Occurrence.
@@ -26,7 +28,7 @@ class Occurrence
     protected $endDate;
 
     /**
-     * @var OccurrenceDuration
+     * @var Duration
      */
     protected $duration;
 
@@ -50,10 +52,10 @@ class Occurrence
      *
      * @param string             $id
      * @param DateTime           $startDate
-     * @param OccurrenceDuration $duration
+     * @param Duration $duration
      * @param Event              $event
      */
-    public function __construct($id, DateTime $startDate, OccurrenceDuration $duration, Event $event)
+    public function __construct($id, DateTime $startDate, Duration $duration, Event $event)
     {
         $this->id = $id;
         $this->startDate = $startDate;
@@ -63,9 +65,9 @@ class Occurrence
     }
 
     /**
-     * @param OccurrenceDuration $newDuration
+     * @param Duration $newDuration
      */
-    public function resize(OccurrenceDuration $newDuration)
+    public function resize(Duration $newDuration)
     {
         $this->modified = true;
         $this->duration = $newDuration;
@@ -101,7 +103,7 @@ class Occurrence
     protected function updateEndDate()
     {
         $endDate = clone $this->startDate();
-        $diff = new \DateInterval(sprintf('PT%dM', abs($this->duration()->minutes())));
+        $diff = new DateInterval(sprintf('PT%dM', abs($this->duration()->minutes())));
         $endDate->add($diff);
 
         $this->endDate = $endDate;
@@ -116,7 +118,7 @@ class Occurrence
     }
 
     /**
-     * @return OccurrenceDuration
+     * @return Duration
      */
     public function duration()
     {
@@ -131,11 +133,15 @@ class Occurrence
         return $this->event;
     }
 
+    /**
+     * @deprecated
+     */
     public function resetToEvent()
     {
-        $this->modified = false;
-        $this->startDate = '';
-        $this->duration = $this->event->duration();
+        throw new Exception('Implement setting startdate before using!');
+//        $this->modified = false;
+//        $this->startDate = '';
+//        $this->duration = new Duration($this->event->duration()->minutes());
     }
 
     /**
@@ -168,9 +174,9 @@ class Occurrence
     }
 
     /**
-     * @param OccurrenceDuration $duration
+     * @param Duration $duration
      */
-    public function changeDuration(OccurrenceDuration $duration)
+    public function changeDuration(Duration $duration)
     {
         $this->duration = $duration;
         if ($this->event()->isType(EventType::TYPE_WEEKLY)) {
@@ -194,7 +200,7 @@ class Occurrence
             $this->changeStartDate($this->event->startDate());
         }
 
-        $this->changeDuration(new OccurrenceDuration($this->event()->duration()));
+        $this->changeDuration(new Duration($this->event()->duration()));
         $this->updateEndDate();
     }
 
