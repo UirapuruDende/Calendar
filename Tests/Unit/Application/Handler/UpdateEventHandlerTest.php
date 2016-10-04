@@ -3,7 +3,9 @@ namespace Dende\Calendar\Tests\Unit\Application\Handler;
 
 use DateTime;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
+use Dende\Calendar\Application\Factory\EventFactory;
 use Dende\Calendar\Application\Factory\EventFactoryInterface;
+use Dende\Calendar\Application\Factory\OccurrenceFactory;
 use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
 use Dende\Calendar\Application\Handler\UpdateEventHandler;
 use Dende\Calendar\Application\Handler\UpdateStrategy\UpdateStrategyInterface;
@@ -124,7 +126,7 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @throws \Exception
      * @expectedException Exception
-     * @expectedExceptionMessage Mode 'weird_mode' not allowed. Only single, all_inclusive, all_exclusive, nextinclusive, next_exclusive, overwrite allowed.
+     * @expectedExceptionMessage Mode 'weird_mode' not allowed. Only single, nextinclusive, overwrite allowed.
      */
     public function testMethodNotAllowedException()
     {
@@ -170,18 +172,18 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @throws Exception
      * @expectedException Exception
-     * @expectedExceptionMessage Strategy 'weird_strategy' not allowed. Only single, all_inclusive, all_exclusive, nextinclusive, next_exclusive, overwrite allowed.
+     * @expectedExceptionMessage Strategy 'weird_strategy' not allowed. Only single, nextinclusive, overwrite allowed.
      */
     public function testStrategyNotAllowedException()
     {
         $command = new UpdateEventCommand();
         $command->method = UpdateEventHandler::MODE_SINGLE;
 
-        $eventRepositoryMock = m::mock("Dende\Calendar\Domain\Repository\EventRepositoryInterface");
-        $occurrenceRepositoryMock = m::mock("Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface");
-        $strategyMock = m::mock("Dende\Calendar\Application\Handler\UpdateStrategy\UpdateStrategyInterface");
-        $eventFactoryMock = m::mock("Dende\Calendar\Application\Factory\EventFactory");
-        $occurrenceFactoryMock = m::mock("Dende\Calendar\Application\Factory\OccurrenceFactory");
+        $eventRepositoryMock = m::mock(EventRepositoryInterface::class);
+        $occurrenceRepositoryMock = m::mock(OccurrenceRepositoryInterface::class);
+        $strategyMock = m::mock(UpdateStrategyInterface::class);
+        $eventFactoryMock = m::mock(EventFactory::class);
+        $occurrenceFactoryMock = m::mock(OccurrenceFactory::class);
 
         $handler = new UpdateEventHandler($eventRepositoryMock, $occurrenceRepositoryMock, $eventFactoryMock, $occurrenceFactoryMock);
         $handler->addStrategy('weird_strategy', $strategyMock);
