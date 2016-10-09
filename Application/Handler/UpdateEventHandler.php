@@ -20,6 +20,9 @@ use Exception;
  */
 final class UpdateEventHandler
 {
+    /**
+     * @todo: remove const and hardcoded strategies, let them register themselve and use existing ones
+     */
     const MODE_SINGLE = 'single';
     const MODE_ALL_INCLUSIVE = 'all_inclusive';
     const MODE_ALL_EXCLUSIVE = 'all_exclusive';

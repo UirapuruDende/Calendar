@@ -36,16 +36,16 @@ final class Single implements UpdateStrategyInterface
         } elseif ($command instanceof UpdateEventCommand) {
             if ($event->isType(EventType::TYPE_SINGLE)) {
                 $event->updateWithCommand($command);
-                $occurrence->synchronizeWithEvent();
 
                 if ($command->type === EventType::TYPE_WEEKLY) {
                     /** @var ArrayCollection|Occurrence[] $occurrences */
                     $occurrences = $this->occurrenceFactory->generateCollectionFromEvent($event);
-                    $occurrences->set(0, $occurrence);
 
                     $event->setOccurrences($occurrences);
+                    $this->occurrenceRepository->remove($occurrence);
                     $this->occurrenceRepository->insert($occurrences);
-                } else {
+                } elseif ($command->type === EventType::TYPE_SINGLE) {
+                    $occurrence->synchronizeWithEvent();
                     $this->occurrenceRepository->update($occurrence);
                 }
             } elseif ($event->isType(EventType::TYPE_WEEKLY)) {
