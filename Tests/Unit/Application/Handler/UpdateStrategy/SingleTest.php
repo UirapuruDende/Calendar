@@ -120,7 +120,6 @@ class SingleTest extends \PHPUnit_Framework_TestCase
 
         $oldOccurrenceMock = m::mock(Occurrence::class);
         $oldOccurrenceMock->shouldReceive('event')->once()->andReturn($eventMock);
-        $oldOccurrenceMock->shouldReceive('synchronizeWithEvent')->once();
 
         createsCommand: {
             $command = new UpdateEventCommand();
@@ -146,14 +145,13 @@ class SingleTest extends \PHPUnit_Framework_TestCase
 
         $occurrenceRepositoryMock = m::mock(OccurrenceRepositoryInterface::class);
         $occurrenceRepositoryMock->shouldReceive('insert')->once()->with($newOccurrencesCollection);
+        $occurrenceRepositoryMock->shouldReceive('remove')->once()->with($oldOccurrenceMock);
 
         $single = new Single();
         $single->setOccurrenceFactory($occurrenceFactoryMock);
         $single->setOccurrenceRepository($occurrenceRepositoryMock);
         $single->setEventRepository($eventRepositoryMock);
         $single->update($command);
-
-        $this->assertEquals($oldOccurrenceMock, $newOccurrencesCollection->first());
     }
 
     /**
