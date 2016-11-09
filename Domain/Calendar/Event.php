@@ -71,16 +71,6 @@ class Event
     protected $occurrencesDates;
 
     /**
-     * @var Event
-     */
-    protected $previousEvent;
-
-    /**
-     * @var Event
-     */
-    protected $nextEvent;
-
-    /**
      * Event constructor.
      *
      * @param string                       $id
@@ -346,22 +336,6 @@ class Event
     }
 
     /**
-     * @return Event
-     */
-    public function previous()
-    {
-        return $this->previousEvent;
-    }
-
-    /**
-     * @return Event
-     */
-    public function next()
-    {
-        return $this->nextEvent;
-    }
-
-    /**
      * @param UpdateEventCommand $command
      */
     public function updateWithCommand(UpdateEventCommand $command)
@@ -392,20 +366,5 @@ class Event
 
             $this->changeRepetitions(new Repetitions($command->repetitionDays));
         }
-    }
-
-    /**
-     * @param Event $event
-     *
-     * @throws Exception
-     */
-    public function setNext(Event $event)
-    {
-        $this->nextEvent = $event;
-    }
-
-    public function unsetPrevious()
-    {
-        $this->previousEvent = null;
     }
 }

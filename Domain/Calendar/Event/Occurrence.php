@@ -13,7 +13,7 @@ use Exception;
 /**
  * Class Occurrence.
  */
-class Occurrence
+class Occurrence implements OccurrenceInterface
 {
     use SoftDeleteable;
 

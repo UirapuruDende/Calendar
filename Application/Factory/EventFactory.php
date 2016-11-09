@@ -91,7 +91,6 @@ class EventFactory implements EventFactoryInterface
             'startDate'     => $command->startDate,
             'endDate'       => $command->endDate,
             'duration'      => new Duration($command->duration),
-            'previousEvent' => isset($command->occurrence) ? $command->occurrence->event() : null,
         ]);
     }
 }

@@ -8,7 +8,9 @@ use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration as OccurrenceDuration;
+use Dende\Calendar\Domain\Calendar\Event\OccurrenceInterface;
 use Doctrine\Common\Collections\ArrayCollection;
+use Mockery\CountValidator\Exception;
 
 /**
  * Class Single.
@@ -51,16 +53,25 @@ final class Single implements UpdateStrategyInterface
             } elseif ($event->isType(EventType::TYPE_WEEKLY)) {
                 switch ($command->type) {
                     case EventType::TYPE_SINGLE:
-                        $command->startDate = $occurrence->startDate();
-                        $command->endDate = $occurrence->endDate();
+                        throw new Exception("Can't convert weekly event type to single. Use overwrite method instead");
 
-                        /** @var Event $newEvent */
-                        $newEvent = $this->eventFactory->createFromCommand($command);
-                        $occurrence->moveToEvent($newEvent);
-                        $occurrences = new ArrayCollection([$occurrence]);
-                        $newEvent->setOccurrences($occurrences);
-                        $this->occurrenceRepository->update($occurrences);
-                        $this->eventRepository->insert($newEvent);
+//                        $command->startDate = $occurrence->startDate();
+//                        $command->endDate = $occurrence->endDate();
+//                        $command->duration = $occurrence->duration()->minutes();
+//
+//                        /** @var Event $event */
+//                        $event->updateWithCommand($command);
+//                        $oldOccurrences = $event->occurrences()->filter(function(OccurrenceInterface $oldOccurrence) use ($occurrence){
+//                            return $occurrence !== $oldOccurrence;
+//                        });
+//
+//                        $occurrence->synchronizeWithEvent();
+//                        $occurrences = new ArrayCollection([$occurrence]);
+//                        $event->setOccurrences($occurrences);
+//
+//                        $this->eventRepository->update($event);
+//                        $this->occurrenceRepository->update($occurrence);
+//                        $this->occurrenceRepository->remove($oldOccurrences);
                         break;
 
                     case EventType::TYPE_WEEKLY:
