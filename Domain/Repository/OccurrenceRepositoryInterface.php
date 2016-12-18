@@ -6,6 +6,7 @@ use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Doctrine\Common\Collections\ArrayCollection;
+use Traversable;
 
 /**
  * Interface OccurrenceRepositoryInterface.
@@ -40,7 +41,7 @@ interface OccurrenceRepositoryInterface
     public function findAll();
 
     /**
-     * @param Occurrence|Occurrence[] $occurrence
+     * @param Occurrence|Occurrence[]|Traversable $occurrence
      */
     public function update($occurrence);
 

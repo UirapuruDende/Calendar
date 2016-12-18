@@ -4,6 +4,7 @@ namespace Dende\Calendar\Application\Command;
 use DateTime;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
+use Dende\Calendar\Domain\Calendar\Event\OccurrenceInterface;
 
 /**
  * Class CreateEventCommand.
@@ -15,7 +16,7 @@ final class UpdateEventCommand implements EventCommandInterface, UpdateEventComm
     /**
      * Occurrence that was clicked to edit relating event.
      *
-     * @var Occurrence
+     * @var OccurrenceInterface
      */
     public $occurrence;
 

@@ -135,6 +135,11 @@ final class UpdateEventHandler
             ));
         }
 
+        if(!$command->occurrence->event()->isType($command->type))
+        {
+            throw new Exception('Change of type is banned!');
+        }
+
         if ($command->type === EventType::TYPE_SINGLE) {
             /** @var Carbon $date */
             $date = Carbon::instance($command->startDate)
