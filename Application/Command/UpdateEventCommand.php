@@ -2,7 +2,6 @@
 namespace Dende\Calendar\Application\Command;
 
 use DateTime;
-use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Calendar\Event\OccurrenceInterface;
 
@@ -11,19 +10,12 @@ use Dende\Calendar\Domain\Calendar\Event\OccurrenceInterface;
  */
 final class UpdateEventCommand implements EventCommandInterface, UpdateEventCommandInterface
 {
-    use CommandConstructorTrait;
-
     /**
      * Occurrence that was clicked to edit relating event.
      *
      * @var OccurrenceInterface
      */
-    public $occurrence;
-
-    /**
-     * @var string
-     */
-    public $type;
+    public $occurrence; // this should be changed to $occurrenceId
 
     /**
      * Update Strategy Method.
@@ -31,16 +23,6 @@ final class UpdateEventCommand implements EventCommandInterface, UpdateEventComm
      * @var string
      */
     public $method;
-
-    /**
-     * @var Calendar
-     */
-    public $calendar;
-
-    /**
-     * @var string
-     */
-    public $newCalendarName;
 
     /**
      * @var DateTime
@@ -53,11 +35,6 @@ final class UpdateEventCommand implements EventCommandInterface, UpdateEventComm
     public $endDate;
 
     /**
-     * @var int
-     */
-    public $duration = 90;
-
-    /**
      * @var string
      */
     public $title = '';
@@ -66,4 +43,20 @@ final class UpdateEventCommand implements EventCommandInterface, UpdateEventComm
      * @var array
      */
     public $repetitionDays = [];
+
+    public static function fromArray(array $array = []) : UpdateEventCommand
+    {
+        $command = new self();
+
+        $array = array_merge(get_object_vars($command), $array);
+
+        $command->occurrence = $array['occurrence'];
+        $command->method = $array['method'];
+        $command->startDate = $array['startDate'];
+        $command->endDate = $array['endDate'];
+        $command->title = $array['title'];
+        $command->repetitionDays = $array['repetitionDays'];
+
+        return $command;
+    }
 }

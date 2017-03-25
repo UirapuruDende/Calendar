@@ -76,10 +76,6 @@ final class CreateEventHandler
         $event = $this->eventFactory->createFromCommand($command);
         $occurrences = $this->occurrenceFactory->generateCollectionFromEvent($event);
 
-        if (count($occurrences) === 0) {
-            throw new Exception('Could not generate occurrences from event');
-        }
-
         $event->setOccurrences($occurrences);
         $this->occurrenceRepository->insert($occurrences);
 //        $this->eventRepository->insert($event);

@@ -10,8 +10,6 @@ use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
  */
 final class UpdateOccurrenceCommand
 {
-    use CommandConstructorTrait;
-
     /**
      * @var DateTime
      */

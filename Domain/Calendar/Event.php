@@ -62,7 +62,9 @@ class Event
      */
     protected $duration;
 
-    /** @var ArrayCollection|Occurrence[] */
+    /**
+     * @var ArrayCollection|Occurrence[]
+     */
     protected $occurrences;
 
     /**
@@ -85,7 +87,7 @@ class Event
      *
      * @throws \Exception
      */
-    public function __construct($id, Calendar $calendar, EventType $type, DateTime $startDate, DateTime $endDate, $title, Repetitions $repetitions, Duration $duration, Event $previousEvent = null, Event $nextEvent = null)
+    public function __construct($id, Calendar $calendar, EventType $type, DateTime $startDate, DateTime $endDate, $title, Repetitions $repetitions)
     {
         if (Carbon::instance($startDate)->gt(Carbon::instance($endDate))) {
             throw new \Exception(sprintf(
@@ -104,9 +106,7 @@ class Event
         $this->endDate = $endDate;
         $this->title = $title;
         $this->repetitions = $repetitions;
-        $this->duration = $duration;
-        $this->previousEvent = $previousEvent;
-        $this->nextEvent = $nextEvent;
+        $this->duration = Duration::calculate($this->startDate(), $this->endDate());
     }
 
     /**
@@ -284,14 +284,19 @@ class Event
         $this->title = $title;
     }
 
-    /**
-     * @param $type
-     *
-     * @return bool
-     */
-    public function isType($type)
+    public function isType($type) : bool
     {
         return $this->type()->isType($type);
+    }
+
+    public function isSingle() : bool
+    {
+        return $this->isType(EventType::TYPE_SINGLE);
+    }
+
+    public function isWeekly() : bool
+    {
+        return $this->isType(EventType::TYPE_WEEKLY);
     }
 
     /**
@@ -340,31 +345,10 @@ class Event
      */
     public function updateWithCommand(UpdateEventCommand $command)
     {
-        if ($command->calendar instanceof Calendar && $this->calendar !== $command->calendar) {
-            $this->calendar = $command->calendar;
-            $eventsCollection = $this->calendar->events();
-            if (!$eventsCollection->contains($this)) {
-                $eventsCollection->add($this);
-            }
-        }
-
         $this->changeStartDate($command->startDate);
         $this->changeEndDate($command->endDate);
-        $this->changeDuration(new Duration($command->duration));
+        $this->changeDuration(Duration::calculate($this->startDate(), $this->endDate()));
         $this->changeTitle($command->title);
-
-        if ($command->type === EventType::TYPE_SINGLE && !$this->isType($command->type)) {
-            $this->changeType(new EventType($command->type));
-            $this->changeRepetitions(new Repetitions([]));
-        }
-
-        if ($command->type === EventType::TYPE_WEEKLY) {
-            if ($this->isType($command->type)) {
-            } else {
-                $this->changeType(new EventType($command->type));
-            }
-
-            $this->changeRepetitions(new Repetitions($command->repetitionDays));
-        }
+        $this->changeRepetitions(new Repetitions($command->repetitionDays));
     }
 }

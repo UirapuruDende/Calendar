@@ -1,13 +1,13 @@
 <?php
 namespace Dende\Calendar\Domain\Calendar\Event;
+
 use DateTime;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
 
 /**
- * Interface OccurrenceInterface
- * @package Dende\Calendar\Domain\Calendar\Event
- * 
+ * Interface OccurrenceInterface.
+ *
  * @property DateTime $startDate
  * @property DateTime $endDate
  * @property OccurrenceDuration $duration
@@ -20,66 +20,66 @@ interface OccurrenceInterface
     /**
      * @param OccurrenceDuration $newDuration
      */
-    function resize(OccurrenceDuration $newDuration);
+    public function resize(OccurrenceDuration $newDuration);
 
     /**
      * @param DateTime $newStartDate
      */
-    function move(DateTime $newStartDate);
+    public function move(DateTime $newStartDate);
 
     /**
      * @return bool
      */
-    function isOngoing();
+    public function isOngoing();
 
     /**
      * @return bool
      */
-    function isPast();
+    public function isPast();
 
     /**
      * @return DateTime
      */
-    function startDate();
+    public function startDate();
 
     /**
      * @return OccurrenceDuration
      */
-    function duration();
+    public function duration();
 
     /**
      * @return Event
      */
-    function event();
+    public function event();
 
     /**
      * @deprecated
      */
-    function resetToEvent();
+    public function resetToEvent();
 
     /**
      * @return DateTime
      */
-    function endDate();
+    public function endDate();
 
     /**
      * @return string
      */
-    function id();
+    public function id();
 
     /**
      * @param DateTime $startDate
      */
-    function changeStartDate(DateTime $startDate);
+    public function changeStartDate(DateTime $startDate);
 
     /**
      * @param OccurrenceDuration $duration
      */
-    function changeDuration(OccurrenceDuration $duration);
+    public function changeDuration(OccurrenceDuration $duration);
 
-    function isModified();
+    public function isModified();
 
-    function synchronizeWithEvent();
+    public function synchronizeWithEvent();
 
-    function moveToEvent(Event $event);
+    public function moveToEvent(Event $event);
 }

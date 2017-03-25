@@ -8,9 +8,6 @@ use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration as OccurrenceDuration;
-use Dende\Calendar\Domain\Calendar\Event\OccurrenceInterface;
-use Doctrine\Common\Collections\ArrayCollection;
-use Mockery\CountValidator\Exception;
 
 /**
  * Class Single.
@@ -20,8 +17,6 @@ final class Single implements UpdateStrategyInterface
     use SetRepositoriesTrait, SetFactoriesTrait;
 
     /**
-     * @todo: crate and update to DurationFactory
-     *
      * @param UpdateEventCommandInterface|UpdateEventCommand|RemoveEventCommand $command
      */
     public function update(UpdateEventCommandInterface $command)
@@ -35,54 +30,20 @@ final class Single implements UpdateStrategyInterface
                 $this->eventRepository->remove($event);
             }
             $this->occurrenceRepository->remove($occurrence);
-        } elseif ($command instanceof UpdateEventCommand) {
-            if ($event->isType(EventType::TYPE_SINGLE)) {
-                $event->updateWithCommand($command);
 
-                if ($command->type === EventType::TYPE_WEEKLY) {
-                    /** @var ArrayCollection|Occurrence[] $occurrences */
-                    $occurrences = $this->occurrenceFactory->generateCollectionFromEvent($event);
-
-                    $event->setOccurrences($occurrences);
-                    $this->occurrenceRepository->remove($occurrence);
-                    $this->occurrenceRepository->insert($occurrences);
-                } elseif ($command->type === EventType::TYPE_SINGLE) {
-                    $occurrence->synchronizeWithEvent();
-                    $this->occurrenceRepository->update($occurrence);
-                }
-            } elseif ($event->isType(EventType::TYPE_WEEKLY)) {
-                switch ($command->type) {
-                    case EventType::TYPE_SINGLE:
-                        throw new Exception("Can't convert weekly event type to single. Use overwrite method instead");
-
-//                        $command->startDate = $occurrence->startDate();
-//                        $command->endDate = $occurrence->endDate();
-//                        $command->duration = $occurrence->duration()->minutes();
-//
-//                        /** @var Event $event */
-//                        $event->updateWithCommand($command);
-//                        $oldOccurrences = $event->occurrences()->filter(function(OccurrenceInterface $oldOccurrence) use ($occurrence){
-//                            return $occurrence !== $oldOccurrence;
-//                        });
-//
-//                        $occurrence->synchronizeWithEvent();
-//                        $occurrences = new ArrayCollection([$occurrence]);
-//                        $event->setOccurrences($occurrences);
-//
-//                        $this->eventRepository->update($event);
-//                        $this->occurrenceRepository->update($occurrence);
-//                        $this->occurrenceRepository->remove($oldOccurrences);
-                        break;
-
-                    case EventType::TYPE_WEEKLY:
-                        $occurrence->changeStartDate($command->startDate);
-                        $occurrence->changeDuration(new OccurrenceDuration($command->duration));
-                        $this->occurrenceRepository->update($occurrence);
-                        break;
-                }
-            }
-
-            $this->eventRepository->update($event);
+            return;
         }
+
+        if ($event->isSingle()) {
+            $event->updateWithCommand($command);
+            $occurrence->synchronizeWithEvent();
+            $this->occurrenceRepository->update($occurrence);
+        } elseif ($event->isWeekly()) {
+            $occurrence->changeStartDate($command->startDate);
+            $occurrence->changeDuration(new OccurrenceDuration($command->duration));
+            $this->occurrenceRepository->update($occurrence);
+        }
+
+        $this->eventRepository->update($event);
     }
 }

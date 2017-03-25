@@ -19,25 +19,12 @@ class EventTest extends \PHPUnit_Framework_TestCase
      */
     public function testUpdateEventWithCommand($params, $command, $expectedValues)
     {
-        list($calendar, $type, $startDate, $endDate, $repetitions, $title, $duration) = array_values($params);
-
-        $event = new Event(
-            null,
-            $calendar,
-            $type,
-            $startDate,
-            $endDate,
-            $title,
-            $repetitions,
-            $duration
-        );
+        $event = new Event(null, ...array_values($params));
 
         $event->updateWithCommand($command);
 
-        $this->assertEquals($event->calendar(), $expectedValues['calendar']);
-        $this->assertTrue($event->type()->isType($expectedValues['type']));
-        $this->assertEquals($event->startDate(), $expectedValues['startDate']);
-        $this->assertEquals($event->endDate(), $expectedValues['endDate']);
+        $this->assertEquals($event->startDate(), $expectedValues['startDate'], null, 2);
+        $this->assertEquals($event->endDate(), $expectedValues['endDate'], null, 2);
         $this->assertEquals($event->title(), $expectedValues['title']);
         $this->assertEquals($event->repetitions()->weekdays(), $expectedValues['repetitions']);
         $this->assertEquals($event->duration()->minutes(), $expectedValues['duration']);
@@ -62,14 +49,10 @@ class EventTest extends \PHPUnit_Framework_TestCase
         $originalEndDate = new DateTime('today 13:30');
         $originalRepetitions = new Event\Repetitions([]);
         $originalTitle = 'Test Title';
-        $originalDuration = new Duration(90);
 
         $updateCommand = new UpdateEventCommand();
-        $updateCommand->type = $originalType->type();
-        $updateCommand->calendar = $originalCalendar;
         $updateCommand->startDate = $originalStartDate;
         $updateCommand->endDate = $originalEndDate;
-        $updateCommand->duration = $originalDuration->minutes();
         $updateCommand->title = $originalTitle;
         $updateCommand->repetitionDays = $originalRepetitions->weekdays();
 
@@ -79,9 +62,8 @@ class EventTest extends \PHPUnit_Framework_TestCase
                 'type'        => $originalType,
                 'startDate'   => $originalStartDate,
                 'endDate'     => $originalEndDate,
-                'repetitions' => $originalRepetitions,
                 'title'       => $originalTitle,
-                'duration'    => $originalDuration,
+                'repetitions' => $originalRepetitions,
             ],
             'command'        => $updateCommand,
             'expectedValues' => [
@@ -89,9 +71,9 @@ class EventTest extends \PHPUnit_Framework_TestCase
                 'type'        => $originalType->type(),
                 'startDate'   => $originalStartDate,
                 'endDate'     => $originalEndDate,
-                'repetitions' => $originalRepetitions->weekdays(),
                 'title'       => $originalTitle,
-                'duration'    => $originalDuration->minutes(),
+                'repetitions' => $originalRepetitions->weekdays(),
+                'duration'    => 90,
             ],
         ];
     }
@@ -107,11 +89,8 @@ class EventTest extends \PHPUnit_Framework_TestCase
         $originalDuration = new Duration(90);
 
         $updateCommand = new UpdateEventCommand();
-        $updateCommand->type = EventType::TYPE_WEEKLY;
-        $updateCommand->calendar = $originalCalendar;
         $updateCommand->startDate = $originalStartDate;
         $updateCommand->endDate = Carbon::instance($originalEndDate)->addMonth();
-        $updateCommand->duration = 60;
         $updateCommand->title = 'New Title';
         $updateCommand->repetitionDays = [2, 3, 4];
 
@@ -121,9 +100,8 @@ class EventTest extends \PHPUnit_Framework_TestCase
                 'type'        => $originalType,
                 'startDate'   => $originalStartDate,
                 'endDate'     => $originalEndDate,
-                'repetitions' => $originalRepetitions,
                 'title'       => $originalTitle,
-                'duration'    => $originalDuration,
+                'repetitions' => $originalRepetitions,
             ],
             'command'        => $updateCommand,
             'expectedValues' => [
@@ -131,9 +109,9 @@ class EventTest extends \PHPUnit_Framework_TestCase
                 'type'        => EventType::TYPE_WEEKLY,
                 'startDate'   => new DateTime('today 12:00'),
                 'endDate'     => new DateTime('+1 month 13:30'),
-                'repetitions' => [2, 3, 4],
                 'title'       => 'New Title',
-                'duration'    => 60,
+                'repetitions' => [2, 3, 4],
+                'duration'    => 90,
             ],
         ];
     }
@@ -149,11 +127,8 @@ class EventTest extends \PHPUnit_Framework_TestCase
         $originalDuration = new Duration(90);
 
         $updateCommand = new UpdateEventCommand();
-        $updateCommand->type = EventType::TYPE_SINGLE;
-        $updateCommand->calendar = $originalCalendar;
         $updateCommand->startDate = new DateTime('2016-08-15 12:00');
         $updateCommand->endDate = new DateTime('2016-08-15 13:00');
-        $updateCommand->duration = 60;
         $updateCommand->title = 'New Title';
         $updateCommand->repetitionDays = [];
 
@@ -163,9 +138,8 @@ class EventTest extends \PHPUnit_Framework_TestCase
                 'type'        => $originalType,
                 'startDate'   => $originalStartDate,
                 'endDate'     => $originalEndDate,
-                'repetitions' => $originalRepetitions,
                 'title'       => $originalTitle,
-                'duration'    => $originalDuration,
+                'repetitions' => $originalRepetitions,
             ],
             'command'        => $updateCommand,
             'expectedValues' => [
@@ -173,8 +147,8 @@ class EventTest extends \PHPUnit_Framework_TestCase
                 'type'        => EventType::TYPE_SINGLE,
                 'startDate'   => new DateTime('2016-08-15 12:00'),
                 'endDate'     => new DateTime('2016-08-15 13:00'),
-                'repetitions' => [],
                 'title'       => 'New Title',
+                'repetitions' => [],
                 'duration'    => 60,
             ],
         ];
@@ -193,11 +167,8 @@ class EventTest extends \PHPUnit_Framework_TestCase
         $originalDuration = new Duration(90);
 
         $updateCommand = new UpdateEventCommand();
-        $updateCommand->type = EventType::TYPE_WEEKLY;
-        $updateCommand->calendar = $newCalendar;
         $updateCommand->startDate = new DateTime('2016-09-01 12:00');
         $updateCommand->endDate = new DateTime('2016-09-30 13:00');
-        $updateCommand->duration = 60;
         $updateCommand->title = 'New Title';
         $updateCommand->repetitionDays = [2, 4];
 
@@ -207,18 +178,16 @@ class EventTest extends \PHPUnit_Framework_TestCase
                 'type'        => $originalType,
                 'startDate'   => $originalStartDate,
                 'endDate'     => $originalEndDate,
-                'repetitions' => $originalRepetitions,
                 'title'       => $originalTitle,
-                'duration'    => $originalDuration,
+                'repetitions' => $originalRepetitions,
             ],
             'command'        => $updateCommand,
             'expectedValues' => [
-                'calendar'    => $newCalendar,
                 'type'        => EventType::TYPE_WEEKLY,
                 'startDate'   => new DateTime('2016-09-01 12:00'),
                 'endDate'     => new DateTime('2016-09-30 13:00'),
-                'repetitions' => [2, 4],
                 'title'       => 'New Title',
+                'repetitions' => [2, 4],
                 'duration'    => 60,
             ],
         ];

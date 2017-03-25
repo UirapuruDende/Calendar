@@ -37,7 +37,7 @@ class Repetitions
      *
      * @param array $weekdays
      */
-    public function __construct(array $weekdays)
+    public function __construct(array $weekdays = [])
     {
         $this->weekdays = $weekdays;
     }
@@ -45,7 +45,7 @@ class Repetitions
     /**
      * @return array
      */
-    public function weekdays()
+    public function weekdays() : array
     {
         return $this->weekdays;
     }
@@ -55,7 +55,7 @@ class Repetitions
      *
      * @return bool
      */
-    public function sameDays($repetitions)
+    public function sameDays($repetitions) : bool
     {
         $a = $this->weekdays;
         $b = $repetitions;
@@ -64,5 +64,24 @@ class Repetitions
         sort($b);
 
         return $a == $b;
+    }
+
+    public static function workingDays() : Repetitions
+    {
+        return new self([
+            self::MONDAY,
+            self::TUESDAY,
+            self::WEDNESDAY,
+            self::THURSDAY,
+            self::FRIDAY,
+        ]);
+    }
+
+    public static function weekendDays() : Repetitions
+    {
+        return new self([
+            self::SATURDAY,
+            self::SUNDAY,
+        ]);
     }
 }

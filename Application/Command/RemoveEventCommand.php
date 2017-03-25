@@ -8,8 +8,6 @@ use Dende\Calendar\Domain\Calendar\Event\Occurrence;
  */
 final class RemoveEventCommand implements EventCommandInterface, UpdateEventCommandInterface
 {
-    use CommandConstructorTrait;
-
     /**
      * Occurrence that was clicked to edit relating event.
      *
