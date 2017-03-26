@@ -2,6 +2,7 @@
 namespace Dende\Calendar\Application\Handler;
 
 use Carbon\Carbon;
+use Dende\Calendar\Domain\Calendar\Event\Duration;
 use Dende\Calendar\Application\Command\CreateEventCommand;
 use Dende\Calendar\Application\Factory\EventFactory;
 use Dende\Calendar\Application\Factory\EventFactoryInterface;
@@ -65,7 +66,7 @@ final class CreateEventHandler
         if ($command->type === EventType::TYPE_SINGLE) {
             /** @var Carbon $date */
             $date = Carbon::instance($command->startDate)
-                ->addMinutes($command->duration);
+                ->addMinutes(Duration::calculate($command->startDate, $command->endDate)->minutes());
         } else {
             /** @var Carbon $date */
             $date = Carbon::instance($command->endDate);
