@@ -36,7 +36,6 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
             'method'     => UpdateEventHandler::MODE_SINGLE,
             'startDate'  => new DateTime('+1 hour'),
             'endDate'    => new DateTime('+3 hour'),
-            'type'       => EventType::TYPE_SINGLE,
             'occurrence' => $occurrence,
         ]);
 
@@ -85,7 +84,7 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @throws \Exception
-     * @expectedException Exception
+     * @expectedException \Exception
      * @expectedExceptionMessage Mode 'weird_mode' not allowed. Only single, nextinclusive, overwrite allowed.
      */
     public function testMethodNotAllowedException()
@@ -108,7 +107,7 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @throws \Exception
-     * @expectedException Exception
+     * @expectedException \Exception
      * @expectedExceptionMessage Strategy 'single' has not been added. Use UpdateEventHandler::addStrategy() method to add it
      */
     public function testStrategyNotSetException()
@@ -131,7 +130,7 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @throws Exception
-     * @expectedException Exception
+     * @expectedException \Exception
      * @expectedExceptionMessage Strategy 'weird_strategy' not allowed. Only single, nextinclusive, overwrite allowed.
      */
     public function testStrategyNotAllowedException()

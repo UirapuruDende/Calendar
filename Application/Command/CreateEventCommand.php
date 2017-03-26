@@ -44,4 +44,21 @@ final class CreateEventCommand implements EventCommandInterface
      * @var array
      */
     public $repetitionDays = [];
+
+    public static function fromArray(array $array = []) : CreateEventCommand
+    {
+        $command = new self();
+
+        $array = array_merge(get_object_vars($command), $array);
+
+        $command->calendar = $array['calendar'];
+        $command->newCalendarName = $array['newCalendarName'];
+        $command->type = $array['type'];
+        $command->startDate = $array['startDate'];
+        $command->endDate = $array['endDate'];
+        $command->title = $array['title'];
+        $command->repetitionDays = $array['repetitionDays'];
+
+        return $command;
+    }
 }

@@ -7,6 +7,7 @@ use Dende\Calendar\Application\Factory\EventFactory;
 use Dende\Calendar\Application\Factory\EventFactoryInterface;
 use Dende\Calendar\Application\Factory\OccurrenceFactory;
 use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
+use Dende\Calendar\Domain\Calendar\Event\Duration;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
 use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
@@ -65,7 +66,7 @@ final class CreateEventHandler
         if ($command->type === EventType::TYPE_SINGLE) {
             /** @var Carbon $date */
             $date = Carbon::instance($command->startDate)
-                ->addMinutes($command->duration);
+                ->addMinutes(Duration::calculate($command->startDate, $command->endDate)->minutes());
         } else {
             /** @var Carbon $date */
             $date = Carbon::instance($command->endDate);

@@ -32,6 +32,11 @@ class DurationTest extends \PHPUnit_Framework_TestCase
                 'endDate'        => new DateTime('2009-10-15 12:35'),
                 'expectedResult' => 5,
             ],
+            'next day' => [
+                'startDate'      => new DateTime('2009-10-14 23:55'),
+                'endDate'        => new DateTime('2009-10-15 00:20'),
+                'expectedResult' => 25,
+            ],
             'inverted dates' => [
                 'startDate'      => new DateTime('2009-10-15 12:30'),
                 'endDate'        => new DateTime('2009-10-14 12:35'),
