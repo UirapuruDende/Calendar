@@ -1,7 +1,6 @@
 <?php
 namespace Dende\Calendar\Application\Handler;
 
-use Carbon\Carbon;
 use Dende\Calendar\Application\Command\RemoveEventCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommandInterface;
@@ -10,7 +9,6 @@ use Dende\Calendar\Application\Factory\EventFactoryInterface;
 use Dende\Calendar\Application\Factory\OccurrenceFactory;
 use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
 use Dende\Calendar\Application\Handler\UpdateStrategy\UpdateStrategyInterface;
-use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
 use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
 use Exception;
@@ -111,15 +109,6 @@ final class UpdateEventHandler
      */
     public function handle(UpdateEventCommandInterface $command)
     {
-        /*
-         * @todo @deprecated
-         * remove it - if calendar is null, it would be the same as in the beginning
-         * update only if not null
-         */
-        if ($command instanceof UpdateEventCommand && is_null($command->calendar)) {
-            throw new Exception('Calendar is null and it has to be set!');
-        }
-
         if (!in_array($command->method, self::$availableModes)) {
             throw new Exception(sprintf(
                 "Mode '%s' not allowed. Only %s allowed.",
@@ -134,22 +123,6 @@ final class UpdateEventHandler
                 $command->method
             ));
         }
-
-        if(!$command->occurrence->event()->isType($command->type))
-        {
-            throw new Exception('Change of type is banned!');
-        }
-
-        if ($command->type === EventType::TYPE_SINGLE) {
-            /** @var Carbon $date */
-            $date = Carbon::instance($command->startDate)
-                ->addMinutes($command->duration);
-        } else {
-            /** @var Carbon $date */
-            $date = Carbon::instance($command->endDate);
-        }
-
-        $command->endDate = $date;
 
         $this->strategy[$command->method]->update($command);
     }

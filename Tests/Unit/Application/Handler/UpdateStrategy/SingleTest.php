@@ -4,8 +4,6 @@ namespace Dende\Calendar\Tests\Unit\Application\Handler\UpdateStrategy;
 use DateTime;
 use Dende\Calendar\Application\Command\RemoveEventCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
-use Dende\Calendar\Application\Factory\EventFactoryInterface;
-use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
 use Dende\Calendar\Application\Handler\UpdateStrategy\Single;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
@@ -15,7 +13,6 @@ use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration as OccurrenceDuration;
 use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
 use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
-use Doctrine\Common\Collections\ArrayCollection;
 use Mockery as m;
 
 /**
@@ -31,7 +28,7 @@ class SingleTest extends \PHPUnit_Framework_TestCase
         $calendarMock = m::mock(Calendar::class);
 
         $eventMock = m::mock(Event::class);
-        $eventMock->shouldReceive('isType')->once()->with(EventType::TYPE_SINGLE)->andReturn(true);
+        $eventMock->shouldReceive('isSingle')->once()->andReturn(true);
 
         $occurrenceMock = m::mock(Occurrence::class);
         $occurrenceMock->shouldReceive('event')->once()->andReturn($eventMock);
@@ -79,8 +76,8 @@ class SingleTest extends \PHPUnit_Framework_TestCase
         $calendarMock = m::mock(Calendar::class);
 
         $eventMock = m::mock(Event::class);
-        $eventMock->shouldReceive('isType')->once()->with(EventType::TYPE_SINGLE)->andReturn(false);
-        $eventMock->shouldReceive('isType')->once()->with(EventType::TYPE_WEEKLY)->andReturn(true);
+        $eventMock->shouldReceive('isSingle')->once()->andReturn(false);
+        $eventMock->shouldReceive('isWeekly')->once()->andReturn(true);
 
         /** @var OccurrenceDuration|null $occurrenceDuration */
         $occurrenceDuration = null;
@@ -107,114 +104,6 @@ class SingleTest extends \PHPUnit_Framework_TestCase
         $single->update($command);
 
         $this->assertEquals($command->duration, $occurrenceDuration->minutes());
-    }
-
-    /**
-     * @test
-     */
-    public function testUpdateSingleToWeekly()
-    {
-        $newOccurrencesCollection = new ArrayCollection([]);
-
-        $eventMock = m::mock(Event::class);
-
-        $oldOccurrenceMock = m::mock(Occurrence::class);
-        $oldOccurrenceMock->shouldReceive('event')->once()->andReturn($eventMock);
-
-        createsCommand: {
-            $command = new UpdateEventCommand();
-            $command->type = EventType::TYPE_WEEKLY;
-            $command->duration = 60;
-            $command->startDate = new DateTime('yesterday');
-            $command->endDate = new DateTime('tomorrow');
-            $command->title = 'New title';
-            $command->method = 'single';
-            $command->repetitionDays = [];
-            $command->occurrence = $oldOccurrenceMock;
-        }
-
-        $eventMock->shouldReceive('isType')->with('single')->once()->andReturn(true);
-        $eventMock->shouldReceive('updateWithCommand')->with($command)->once();
-        $eventMock->shouldReceive('setOccurrences')->with($newOccurrencesCollection)->once();
-
-        $occurrenceFactoryMock = m::mock(OccurrenceFactoryInterface::class);
-        $occurrenceFactoryMock->shouldReceive('generateCollectionFromEvent')->once()->with($eventMock)->andReturn($newOccurrencesCollection);
-
-        $eventRepositoryMock = m::mock(EventRepositoryInterface::class);
-        $eventRepositoryMock->shouldReceive('update')->once()->with($eventMock);
-
-        $occurrenceRepositoryMock = m::mock(OccurrenceRepositoryInterface::class);
-        $occurrenceRepositoryMock->shouldReceive('insert')->once()->with($newOccurrencesCollection);
-        $occurrenceRepositoryMock->shouldReceive('remove')->once()->with($oldOccurrenceMock);
-
-        $single = new Single();
-        $single->setOccurrenceFactory($occurrenceFactoryMock);
-        $single->setOccurrenceRepository($occurrenceRepositoryMock);
-        $single->setEventRepository($eventRepositoryMock);
-        $single->update($command);
-    }
-
-    /**
-     * @test
-     */
-    public function testUpdateWeeklyToSingle()
-    {
-        $eventMock = m::mock(Event::class);
-        $eventMock->shouldReceive('isType')->with('single')->once()->andReturn(false);
-        $eventMock->shouldReceive('isType')->with('weekly')->once()->andReturn(true);
-
-        $startDate = new DateTime('yesterday');
-        $endDate = new DateTime('tomorrow');
-
-        $newEventOccurrences = null;
-
-        $newEventMock = m::mock(Event::class);
-        $newEventMock->shouldReceive('setOccurrences')->once()->andReturnUsing(function (ArrayCollection $arrayCollection) use (&$newEventOccurrences) {
-            $newEventOccurrences = $arrayCollection;
-        });
-
-        $oldOccurrenceMock = m::mock(Occurrence::class);
-        $oldOccurrenceMock->shouldReceive('event')->once()->andReturn($eventMock);
-        $oldOccurrenceMock->shouldReceive('startDate')->once()->andReturn($startDate);
-        $oldOccurrenceMock->shouldReceive('endDate')->once()->andReturn($endDate);
-        $oldOccurrenceMock->shouldReceive('moveToEvent')->once()->with($newEventMock);
-
-        createsCommand: {
-            $command = new UpdateEventCommand();
-            $command->type = EventType::TYPE_SINGLE;
-            $command->duration = 60;
-            $command->startDate = new Datetime();
-            $command->endDate = new Datetime('+60 minutes');
-            $command->title = 'New title';
-            $command->method = 'single';
-            $command->repetitionDays = [];
-            $command->occurrence = $oldOccurrenceMock;
-        }
-
-        $eventFactoryMock = m::mock(EventFactoryInterface::class);
-        $eventFactoryMock->shouldReceive('createFromCommand')->once()->andReturn($newEventMock);
-
-        $eventRepositoryMock = m::mock(EventRepositoryInterface::class);
-        $eventRepositoryMock->shouldReceive('insert')->once()->with($newEventMock);
-        $eventRepositoryMock->shouldReceive('update')->once()->with($eventMock);
-
-        $newEventOccurrencesToUpdate = null;
-
-        $occurrenceRepositoryMock = m::mock(OccurrenceRepositoryInterface::class);
-        $occurrenceRepositoryMock->shouldReceive('update')->once()->andReturnUsing(function (ArrayCollection $arrayCollection) use (&$newEventOccurrencesToUpdate) {
-            $newEventOccurrencesToUpdate = $arrayCollection;
-        });
-
-        $single = new Single();
-        $single->setEventFactory($eventFactoryMock);
-        $single->setEventRepository($eventRepositoryMock);
-        $single->setOccurrenceRepository($occurrenceRepositoryMock);
-        $single->update($command);
-
-        $this->assertSame($command->startDate, $startDate);
-        $this->assertSame($command->endDate, $endDate);
-        $this->assertSame($oldOccurrenceMock, $newEventOccurrences->first());
-        $this->assertSame($newEventOccurrences, $newEventOccurrencesToUpdate);
     }
 
     /**

@@ -1,6 +1,8 @@
 <?php
 namespace Dende\Calendar\Domain\Calendar\Event;
 
+use DateTime;
+
 /**
  * Class Duration.
  */
@@ -16,16 +18,31 @@ class Duration
      *
      * @param int $minutes
      */
-    public function __construct($minutes)
+    public function __construct(int $minutes)
     {
-        $this->minutes = intval($minutes);
+        $this->minutes = $minutes;
+    }
+
+    public function minutes() : int
+    {
+        return $this->minutes;
     }
 
     /**
-     * @return int
+     * @param DateTime $startDate
+     * @param DateTime $endDate
+     *
+     * @return Duration
      */
-    public function minutes()
+    public static function calculate(DateTime $startDate, DateTime $endDate) : Duration
     {
-        return $this->minutes;
+        /** @var DateTime $tmpEndDate */
+        $tmpEndDate = clone $endDate;
+        $tmpEndDate->modify($startDate->format('Y-m-d'));
+
+        /** @var DateInterval */
+        $diff = $startDate->diff($tmpEndDate);
+
+        return new self($diff->h * 60 + $diff->i);
     }
 }

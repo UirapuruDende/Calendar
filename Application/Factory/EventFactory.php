@@ -38,7 +38,7 @@ class EventFactory implements EventFactoryInterface
      *
      * @return Event
      */
-    public function createFromArray(array $array = [])
+    public function createFromArray(array $array = []) : Event
     {
         $template = [
             'id'            => $this->idGenerator->generateId(),
@@ -68,29 +68,24 @@ class EventFactory implements EventFactoryInterface
         );
     }
 
-    /**
-     * @return Event
-     */
-    public function create()
+    public function create() : Event
     {
         return self::createFromArray([]);
     }
 
     /**
      * @param CreateEventCommand|UpdateEventCommand $command
-     *
-     * @return Event
      */
-    public function createFromCommand(EventCommandInterface $command)
+    public function createFromCommand(EventCommandInterface $command) : Event
     {
         return static::createFromArray([
-            'title'         => $command->title,
-            'calendar'      => $command->calendar,
-            'repetitions'   => new Repetitions($command->repetitionDays),
-            'type'          => new EventType($command->type),
-            'startDate'     => $command->startDate,
-            'endDate'       => $command->endDate,
-            'duration'      => new Duration($command->duration),
+            'title'       => $command->title,
+            'calendar'    => $command->calendar,
+            'repetitions' => new Repetitions($command->repetitionDays),
+            'type'        => new EventType($command->type),
+            'startDate'   => $command->startDate,
+            'endDate'     => $command->endDate,
+            'duration'    => Duration::calculate($command->startDate, $command->endDate),
         ]);
     }
 }

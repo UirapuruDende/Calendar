@@ -36,11 +36,6 @@ final class CreateEventCommand implements EventCommandInterface
     public $endDate;
 
     /**
-     * @var int
-     */
-    public $duration = 90;
-
-    /**
      * @var string
      */
     public $title = '';
