@@ -21,7 +21,7 @@ class NextInclusive implements UpdateStrategyInterface
         /** @var Event $originalEvent */
         $originalEvent = $command->occurrence->event();
 
-        if ($originalEvent->type()->isType(Event\EventType::TYPE_SINGLE)) {
+        if ($originalEvent->isSingle()) {
             $originalEvent->updateWithCommand($command);
 
             /** @var Occurrence $occurrence */
@@ -36,7 +36,7 @@ class NextInclusive implements UpdateStrategyInterface
                 $originalEvent->setOccurrences($occurrences);
                 $this->occurrenceRepository->insert($occurrences);
             }
-        } elseif ($originalEvent->type()->isType(Event\EventType::TYPE_WEEKLY)) {
+        } elseif ($originalEvent->isWeekly()) {
             $originalEvent->changeEndDate($command->occurrence->startDate());
             $pivot = $this->findPivotDate($command->occurrence);
 
@@ -47,20 +47,6 @@ class NextInclusive implements UpdateStrategyInterface
 
                 return $occurrence;
             });
-
-            /** @var Event $nextEvent */
-            $nextEvent = $originalEvent->next();
-
-            while (!is_null($nextEvent)) {
-                $nextEvent->occurrences()->map(function (Occurrence $occurrence) {
-                    $occurrence->setDeletedAt(new DateTime());
-
-                    return $occurrence;
-                });
-                $nextEvent->setDeletedAt(new DateTime());
-                $nextEvent->unsetPrevious();
-                $nextEvent = $nextEvent->next();
-            }
 
             $originalEvent->setOccurrences($originalOccurrences);
 
@@ -73,7 +59,6 @@ class NextInclusive implements UpdateStrategyInterface
                 $newOccurrences = $this->occurrenceFactory->generateCollectionFromEvent($newEvent);
                 $newEvent->setOccurrences($newOccurrences);
 
-                $originalEvent->setNext($newEvent);
                 $this->eventRepository->insert($newEvent);
             }
 

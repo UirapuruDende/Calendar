@@ -47,10 +47,8 @@ class EventFactory implements EventFactoryInterface
             'type'          => new EventType(),
             'occurrences'   => new ArrayCollection(),
             'calendar'      => new Calendar(null, ''),
-            'duration'      => new Duration(0),
             'startDate'     => new DateTime('now'),
             'endDate'       => new DateTime('now'),
-            'previousEvent' => null,
         ];
 
         $array = array_merge($template, $array);
@@ -62,9 +60,7 @@ class EventFactory implements EventFactoryInterface
             $array['startDate'],
             $array['endDate'],
             $array['title'],
-            $array['repetitions'],
-            $array['duration'],
-            $array['previousEvent']
+            $array['repetitions']
         );
     }
 
@@ -85,7 +81,6 @@ class EventFactory implements EventFactoryInterface
             'type'        => new EventType($command->type),
             'startDate'   => $command->startDate,
             'endDate'     => $command->endDate,
-            'duration'    => Duration::calculate($command->startDate, $command->endDate),
         ]);
     }
 }
