@@ -2,6 +2,7 @@
 namespace Dende\Calendar\Application\Handler\UpdateStrategy;
 
 use DateTime;
+use Dende\Calendar\Application\Command\CreateEventCommand;
 use Dende\Calendar\Application\Command\RemoveEventCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommandInterface;
@@ -51,11 +52,17 @@ class NextInclusive implements UpdateStrategyInterface
             $originalEvent->setOccurrences($originalOccurrences);
 
             if ($command instanceof UpdateEventCommand) {
-                $newCommand = clone $command;
-                $newCommand->startDate = $pivot;
+                $newEventCommand = CreateEventCommand::fromArray([
+                    "startDate" => $pivot,
+                    "endDate" => $command->endDate,
+                    "calendar" => $command->occurrence->event()->calendar(),
+                    "type" => $command->occurrence->event()->type()->type(),
+                    "title" => $command->title,
+                    "repetitionDays" => $command->repetitionDays,
+                ]);
 
                 /** @var Event $newEvent */
-                $newEvent = $this->eventFactory->createFromCommand($newCommand);
+                $newEvent = $this->eventFactory->createFromCommand($newEventCommand);
                 $newOccurrences = $this->occurrenceFactory->generateCollectionFromEvent($newEvent);
                 $newEvent->setOccurrences($newOccurrences);
 

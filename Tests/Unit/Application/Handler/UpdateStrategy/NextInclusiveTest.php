@@ -7,6 +7,7 @@ use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Factory\EventFactoryInterface;
 use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
 use Dende\Calendar\Application\Handler\UpdateStrategy\NextInclusive;
+use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
@@ -105,10 +106,10 @@ class NextInclusiveTest extends PHPUnit_Framework_TestCase
 
         $originalEventMock->shouldReceive('changeEndDate')->once()->with($pivotDate);
         $originalEventMock->shouldReceive('occurrences')->times(3)->andReturn($oldOccurrencesCollection);
-        $originalEventMock->shouldReceive('type->isType')->once()->with('single')->andReturn(false);
-        $originalEventMock->shouldReceive('type->isType')->once()->with('weekly')->andReturn(true);
-        $originalEventMock->shouldReceive('next')->once()->andReturn($oldNextEvent);
-        $originalEventMock->shouldReceive('setNext')->with($newEventMock)->once();
+        $originalEventMock->shouldReceive('isSingle')->once()->andReturn(false);
+        $originalEventMock->shouldReceive('isWeekly')->once()->andReturn(true);
+        $originalEventMock->shouldReceive('calendar')->once()->andReturn(m::mock(Calendar::class));
+        $originalEventMock->shouldReceive('type->type')->once()->andReturn('single');
 
         $filteredOccurrences = null;
 
@@ -208,13 +209,11 @@ class NextInclusiveTest extends PHPUnit_Framework_TestCase
             $nextEventOccurrence,
         ]));
         $nextEvent->shouldReceive('unsetPrevious')->once()->andReturnNull();
-        $nextEvent->shouldReceive('next')->once()->andReturnNull();
 
         $originalEventMock->shouldReceive('changeEndDate')->once()->with($pivotDate);
         $originalEventMock->shouldReceive('occurrences')->times(3)->andReturn($oldOccurrencesCollection);
-        $originalEventMock->shouldReceive('type->isType')->once()->with('single')->andReturn(false);
-        $originalEventMock->shouldReceive('type->isType')->once()->with('weekly')->andReturn(true);
-        $originalEventMock->shouldReceive('next')->once()->andReturn($nextEvent);
+        $originalEventMock->shouldReceive('isSingle')->once()->andReturn(false);
+        $originalEventMock->shouldReceive('isWeekly')->once()->andReturn(true);
 
         $filteredOccurrences = null;
 
