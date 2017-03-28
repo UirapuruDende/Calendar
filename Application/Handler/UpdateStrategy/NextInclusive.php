@@ -23,37 +23,16 @@ class NextInclusive implements UpdateStrategyInterface
         $originalEvent = $command->occurrence->event();
 
         if ($originalEvent->isSingle()) {
-            $originalEvent->updateWithCommand($command);
-
-            /** @var Occurrence $occurrence */
-            $occurrence = $originalEvent->occurrences()->first();
-
-            if ($command->type === Event\EventType::TYPE_SINGLE) {
-                throw new \Exception('This strategy is for series types events! Use SingleStrategy!');
-            } elseif ($command->type === Event\EventType::TYPE_WEEKLY) {
-                $this->occurrenceRepository->remove($occurrence);
-
-                $occurrences = $this->occurrenceFactory->generateCollectionFromEvent($originalEvent);
-                $originalEvent->setOccurrences($occurrences);
-                $this->occurrenceRepository->insert($occurrences);
-            }
+                throw new \Exception('This strategy is for series types events!');
         } elseif ($originalEvent->isWeekly()) {
-            $originalEvent->changeEndDate($command->occurrence->startDate());
-            $pivot = $this->findPivotDate($command->occurrence);
+            $pivotDate = $this->findPivotDate($command->occurrence);
+            $originalEvent->closeAtDate($pivotDate);
 
-            $originalOccurrences = $originalEvent->occurrences()->map(function (Occurrence $occurrence) use ($pivot) {
-                if ($occurrence->endDate() > $pivot) {
-                    $occurrence->setDeletedAt(new DateTime());
-                }
-
-                return $occurrence;
-            });
-
-            $originalEvent->setOccurrences($originalOccurrences);
+            $this->occurrenceRepository->update($originalEvent->occurrences());
 
             if ($command instanceof UpdateEventCommand) {
                 $newEventCommand = CreateEventCommand::fromArray([
-                    "startDate" => $pivot,
+                    "startDate" => $pivotDate,
                     "endDate" => $command->endDate,
                     "calendar" => $command->occurrence->event()->calendar(),
                     "type" => $command->occurrence->event()->type()->type(),
@@ -63,13 +42,10 @@ class NextInclusive implements UpdateStrategyInterface
 
                 /** @var Event $newEvent */
                 $newEvent = $this->eventFactory->createFromCommand($newEventCommand);
-                $newOccurrences = $this->occurrenceFactory->generateCollectionFromEvent($newEvent);
-                $newEvent->setOccurrences($newOccurrences);
+                $newEvent->generateOccurrencesCollection($this->occurrenceFactory);
 
                 $this->eventRepository->insert($newEvent);
             }
-
-            $this->occurrenceRepository->update($originalEvent->occurrences());
         }
 
         $this->eventRepository->update($originalEvent);
@@ -80,7 +56,7 @@ class NextInclusive implements UpdateStrategyInterface
      *
      * @return DateTime
      */
-    public function findPivotDate(Occurrence $clicked)
+    public function findPivotDate(Occurrence $clicked) : DateTime
     {
         /** @var ArrayCollection|Occurrence[] $occurrences */
         $occurrences = $clicked->event()->occurrences();

@@ -14,11 +14,4 @@ interface OccurrenceFactoryInterface
      * @return mixed
      */
     public function createFromArray($array = []);
-
-    /**
-     * @param Event $event
-     *
-     * @return mixed
-     */
-    public function generateCollectionFromEvent(Event $event);
 }

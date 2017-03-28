@@ -51,26 +51,4 @@ class OccurrenceFactory implements OccurrenceFactoryInterface
             $array['event']
         );
     }
-
-    /**
-     * @param Event $event
-     *
-     * @return ArrayCollection|Occurrence[]
-     */
-    public function generateCollectionFromEvent(Event $event)
-    {
-        $dates = $event->calculateOccurrencesDates();
-
-        $occurrences = new ArrayCollection();
-
-        foreach ($dates as $date) {
-            $occurrences->add($this->createFromArray([
-                'startDate' => $date,
-                'duration'  => $event->duration()->minutes(),
-                'event'     => $event,
-            ]));
-        }
-
-        return $occurrences;
-    }
 }

@@ -6,6 +6,7 @@ use DateInterval;
 use DatePeriod;
 use DateTime;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
+use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
@@ -183,9 +184,9 @@ class Event
         if (is_null($this->occurrencesDates) || !$force) {
             $occurrences = new ArrayCollection();
 
-            if ($this->type->isType(EventType::TYPE_SINGLE)) {
+            if ($this->isSingle()) {
                 $occurrences->add($this->startDate);
-            } elseif ($this->type->isType(EventType::TYPE_WEEKLY)) {
+            } elseif ($this->isWeekly()) {
                 $interval = new DateInterval('P1D');
                 /** @var DateTime[] $period */
                 $period = new DatePeriod($this->startDate, $interval, $this->endDate);
@@ -245,46 +246,14 @@ class Event
     }
 
     /**
-     * @param ArrayCollection $occurrences
-     */
-    public function setOccurrences(ArrayCollection $occurrences)
-    {
-        $this->occurrences = $occurrences;
-    }
-
-    /**
-     * @param DateTime $startDate
-     */
-    public function changeStartDate(DateTime $startDate)
-    {
-        $this->startDate = $startDate;
-    }
-
-    /**
-     * @param DateTime $endDate
-     */
-    public function changeEndDate(DateTime $endDate)
-    {
-        $this->endDate = $endDate;
-    }
-
-    /**
-     * @param Duration $duration
-     */
-    public function changeDuration(Duration $duration)
-    {
-        $this->duration = $duration;
-    }
-
-    /**
      * @param $title
      */
-    public function changeTitle($title)
+    public function changeTitle(string $title)
     {
         $this->title = $title;
     }
 
-    public function isType($type) : bool
+    public function isType(string $type) : bool
     {
         return $this->type()->isType($type);
     }
@@ -309,25 +278,6 @@ class Event
     }
 
     /**
-     * @param EventType $type
-     *
-     * @throws Exception
-     */
-    public function changeType(EventType $type)
-    {
-        $this->type = $type;
-        $this->calculateOccurrencesDates(true);
-    }
-
-    /**
-     * @param Calendar $calendar
-     */
-    public function changeCalendar(Calendar $calendar)
-    {
-        $this->calendar = $calendar;
-    }
-
-    /**
      * @param Occurrence $occurrenceToRemove
      */
     public function removeOccurrence(Occurrence $occurrenceToRemove)
@@ -345,10 +295,40 @@ class Event
      */
     public function updateWithCommand(UpdateEventCommand $command)
     {
-        $this->changeStartDate($command->startDate);
-        $this->changeEndDate($command->endDate);
-        $this->changeDuration(Duration::calculate($this->startDate(), $this->endDate()));
-        $this->changeTitle($command->title);
-        $this->changeRepetitions(new Repetitions($command->repetitionDays));
+        $this->startDate = $command->startDate;
+        $this->endDate = $command->endDate;
+        $this->duration = Duration::calculate($this->startDate(), $this->endDate());
+        $this->title = $command->title;
+        $this->repetitions = new Repetitions($command->repetitionDays);
+    }
+
+    /**
+     * @param DateTime $date
+     */
+    public function closeAtDate(DateTime $date)
+    {
+        foreach($this->occurrences() as $occurrence) {
+            if ($occurrence->endDate() > $date) {
+                $occurrence->setDeletedAt(new DateTime());
+            }
+        }
+
+        $this->endDate = $date;
+    }
+
+    /**
+     * @param OccurrenceFactoryInterface $factory
+     */
+    public function generateOccurrenceCollection(OccurrenceFactoryInterface $factory)
+    {
+        $this->occurrences = new ArrayCollection();
+
+        foreach ($this->calculateOccurrencesDates() as $date) {
+            $occurrences->add($factory->createFromArray([
+                'startDate' => $date,
+                'duration'  => $this->duration()->minutes(),
+                'event'     => $this,
+            ]));
+        }
     }
 }
