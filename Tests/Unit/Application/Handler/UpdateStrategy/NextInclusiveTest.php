@@ -66,8 +66,11 @@ class NextInclusiveTest extends PHPUnit_Framework_TestCase
         $originalEventMock = m::mock(Event::class);
 
         occurrencesCollection: {
-            $oldOccurrenceMock1 = m::mock(Occurrence::class);
-            $oldOccurrenceMock1->shouldReceive('endDate')->times(3)->andReturn(new Datetime('yesterday +90 minutes'));
+
+            $oldOccurrence1 = new Occurrence(null, new DateTime("yesterday"), new OccurrenceDuration(90));
+            $oldOccurrence2 = new Occurrence(null, new DateTime("today"), new OccurrenceDuration(90));
+            $oldOccurrence3 = new Occurrence(null, new DateTime("tomorrow"), new OccurrenceDuration(90));
+
 
             $oldOccurrenceMock2 = m::mock(Occurrence::class);
             $oldOccurrenceMock2->shouldReceive('startDate')->times(4)->andReturn(new DateTime("-90 minutes"));

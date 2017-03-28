@@ -38,11 +38,6 @@ class Occurrence implements OccurrenceInterface
     protected $modified = false;
 
     /**
-     * @var Event
-     */
-    protected $event;
-
-    /**
      * @var string|OccurrenceId
      */
     protected $id;
@@ -55,12 +50,11 @@ class Occurrence implements OccurrenceInterface
      * @param OccurrenceDuration $duration
      * @param Event              $event
      */
-    public function __construct($id, DateTime $startDate, OccurrenceDuration $duration, Event $event)
+    public function __construct($id, DateTime $startDate, OccurrenceDuration $duration)
     {
         $this->id = $id;
         $this->startDate = $startDate;
         $this->duration = $duration;
-        $this->event = $event;
         $this->updateEndDate();
     }
 
@@ -126,25 +120,6 @@ class Occurrence implements OccurrenceInterface
     }
 
     /**
-     * @return Event
-     */
-    public function event()
-    {
-        return $this->event;
-    }
-
-    /**
-     * @deprecated
-     */
-    public function resetToEvent()
-    {
-        throw new Exception('Implement setting startdate before using!');
-//        $this->modified = false;
-//        $this->startDate = '';
-//        $this->duration = new Duration($this->event->duration()->minutes());
-    }
-
-    /**
      * @return DateTime
      */
     public function endDate()
@@ -179,9 +154,7 @@ class Occurrence implements OccurrenceInterface
     public function changeDuration(OccurrenceDuration $duration)
     {
         $this->duration = $duration;
-        if ($this->event()->isType(EventType::TYPE_WEEKLY)) {
-            $this->setAsModified();
-        }
+        $this->updateEndDate();
     }
 
     protected function setAsModified()
@@ -194,18 +167,14 @@ class Occurrence implements OccurrenceInterface
         return $this->modified;
     }
 
-    public function synchronizeWithEvent()
+    public function synchronizeWithEvent(Event $event)
     {
-        if ($this->event()->isType(EventType::TYPE_SINGLE)) {
-            $this->changeStartDate($this->event->startDate());
+        if ($event->isSingle()) {
+            $this->changeStartDate($event->startDate());
+        } elseif($event->isWeekly()) {
+            $this->startDate->modify($event->startDate()->format("H:i:s"));
         }
 
-        $this->changeDuration(new OccurrenceDuration($this->event()->duration()->minutes()));
-        $this->updateEndDate();
-    }
-
-    public function moveToEvent(Event $event)
-    {
-        $this->event = $event;
+        $this->changeDuration(new OccurrenceDuration($event->duration()->minutes()));
     }
 }

@@ -30,11 +30,11 @@ class Calendar
      * @param string $id
      * @param string $name
      */
-    public function __construct($id = null, $name = '')
+    public function __construct($id = null, $name = '', ArrayCollection $events = null)
     {
         $this->id = $id;
         $this->name = $name;
-        $this->events = new ArrayCollection();
+        $this->events = $events ?: new ArrayCollection();
     }
 
     /**
@@ -43,7 +43,6 @@ class Calendar
     public function insertEvent(Event $event)
     {
         $this->events->add($event);
-        $event->assignCalendar($this);
     }
 
     /**

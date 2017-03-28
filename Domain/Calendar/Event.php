@@ -77,18 +77,16 @@ class Event
      * Event constructor.
      *
      * @param string                       $id
-     * @param Calendar                     $calendar
      * @param EventType                    $type
      * @param DateTime                     $startDate
      * @param DateTime                     $endDate
      * @param string                       $title
      * @param Repetitions                  $repetitions
-     * @param Duration                     $duration
      * @param ArrayCollection|Occurrence[] $occurrences
      *
      * @throws \Exception
      */
-    public function __construct($id, Calendar $calendar, EventType $type, DateTime $startDate, DateTime $endDate, $title, Repetitions $repetitions)
+    public function __construct($id, EventType $type, DateTime $startDate, DateTime $endDate, $title, Repetitions $repetitions, ArrayCollection $occurrences = null)
     {
         if (Carbon::instance($startDate)->gt(Carbon::instance($endDate))) {
             throw new \Exception(sprintf(
@@ -98,16 +96,14 @@ class Event
             ));
         }
 
-        $calendar->insertEvent($this);
-
         $this->id = $id;
-        $this->calendar = $calendar;
         $this->type = $type;
         $this->startDate = $startDate;
         $this->endDate = $endDate;
         $this->title = $title;
         $this->repetitions = $repetitions;
         $this->duration = Duration::calculate($this->startDate(), $this->endDate());
+        $this->occurrences = $occurrences ?: new ArrayCollection([]);
     }
 
     /**
