@@ -288,11 +288,11 @@ class Event
     /**
      * @param DateTime $date
      */
-    public function closeAtDate(DateTime $date)
+    public function closeAtDate(DateTime $date, DateTime $closingDate = null)
     {
-        foreach ($this->occurrences() as $occurrence) {
+        foreach ($this->occurrences as $occurrence) {
             if ($occurrence->endDate() > $date) {
-                $occurrence->setDeletedAt(new DateTime());
+                $occurrence->setDeletedAt($closingDate ?: new DateTime());
             }
         }
 

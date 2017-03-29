@@ -8,6 +8,7 @@ use Dende\Calendar\Domain\Calendar\Event\Duration;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Tests\AssertDatesEqualTrait;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Class EventTest.
@@ -20,10 +21,6 @@ class EventTest extends \PHPUnit_Framework_TestCase
     {
         $event = new Event(
             0,
-            new Calendar(
-                0,
-                'calendar-title'
-            ),
             new EventType(EventType::TYPE_WEEKLY),
             new DateTime('2015-09-01 12:00:00'),
             new DateTime('2015-09-30 13:30:00'),
@@ -32,9 +29,7 @@ class EventTest extends \PHPUnit_Framework_TestCase
                 Repetitions::MONDAY,
                 Repetitions::WEDNESDAY,
                 Repetitions::FRIDAY,
-            ]),
-            new Duration(90),
-            null
+            ])
         );
 
         $collection = $event->calculateOccurrencesDates();
@@ -59,17 +54,11 @@ class EventTest extends \PHPUnit_Framework_TestCase
     {
         $event = new Event(
             0,
-            new Calendar(
-                0,
-                'calendar-title'
-            ),
             new EventType(EventType::TYPE_SINGLE),
             new DateTime('2015-09-01 12:00:00'),
             new DateTime('2015-09-30 13:30:00'),
             'some title',
-            new Repetitions([]),
-            new Duration(90),
-            null
+            new Repetitions([])
         );
 
         $collection = $event->calculateOccurrencesDates();
@@ -86,19 +75,79 @@ class EventTest extends \PHPUnit_Framework_TestCase
     {
         $event = new Event(
             0,
-            new Calendar(
-                0,
-                'calendar-title'
-            ),
             new EventType(EventType::TYPE_WEEKLY),
             new DateTime('2015-09-01 12:00:00'),
             new DateTime('2015-08-01 12:00:00'),
             'some title',
             new Repetitions([
                 Repetitions::TUESDAY,
-            ]),
-            new Duration(90),
-            null
+            ])
         );
+    }
+
+    /**
+     * @dataProvider closeAtDateDataProvider
+     */
+    public function testCloseAtDate($collection, $closingDate, $expected)
+    {
+        $event = new Event(
+            0,
+            new EventType(EventType::TYPE_WEEKLY),
+            new DateTime('2015-09-01 12:00:00'),
+            new DateTime('2015-09-30 12:30:00'),
+            'some title',
+            Repetitions::workingDays(),
+            $collection
+        );
+
+        $event->closeAtDate($closingDate);
+
+        $this->assertEquals($expected[0], $event->occurrences()->get(0)->getDeletedAt(), null, 2);
+        $this->assertEquals($expected[1], $event->occurrences()->get(1)->getDeletedAt(), null, 2);
+        $this->assertEquals($expected[2], $event->occurrences()->get(2)->getDeletedAt(), null, 2);
+        $this->assertEquals($closingDate, $event->endDate(), null, 2);
+    }
+
+    public function closeAtDateDataProvider() : array
+    {
+        $occurrence1 = new Event\Occurrence(null, new DateTime("2015-09-01 12:00"), new Event\Occurrence\OccurrenceDuration(30));
+        $occurrence2 = new Event\Occurrence(null, new DateTime("2015-09-03 12:00"), new Event\Occurrence\OccurrenceDuration(30));
+        $occurrence3 = new Event\Occurrence(null, new DateTime("2015-09-05 12:00"), new Event\Occurrence\OccurrenceDuration(30));
+
+        $collection = function() use($occurrence1, $occurrence2, $occurrence3) {
+            return new ArrayCollection([
+                clone($occurrence1), clone($occurrence2), clone($occurrence3)
+            ]);
+        };
+
+        return [
+            "middle" => [
+                "collection" => $collection(),
+                "closingDate" => new DateTime("2015-09-04 12:00"),
+                "expected" => [
+                    null,
+                    null,
+                    new DateTime(),
+                ]
+            ],
+            "first" => [
+                "collection" => $collection(),
+                "closingDate" => new DateTime("2015-09-01 09:00"),
+                "expected" => [
+                    new DateTime(),
+                    new DateTime(),
+                    new DateTime(),
+                ]
+            ],
+            "last" => [
+                "collection" => $collection(),
+                "closingDate" => new DateTime("2015-09-06 12:00"),
+                "expected" => [
+                    null,
+                    null,
+                    null,
+                ]
+            ],
+        ];
     }
 }

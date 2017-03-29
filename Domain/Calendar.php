@@ -1,6 +1,7 @@
 <?php
 namespace Dende\Calendar\Domain;
 
+use Dende\Calendar\Application\Factory\EventFactory;
 use Dende\Calendar\Domain\Calendar\Event;
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -27,6 +28,11 @@ class Calendar
     protected $events;
 
     /**
+     * @var string
+     */
+    static public $eventFactoryClass = EventFactory::class;
+
+    /**
      * @param string $id
      * @param string $name
      */
@@ -35,6 +41,17 @@ class Calendar
         $this->id = $id;
         $this->name = $name;
         $this->events = $events ?: new ArrayCollection();
+    }
+
+    public function createEvent(string $title, EventType $type, DateTime $startDate, DateTime $endDate, Repetitions $repetitions = null)
+    {
+        $this->events->add((self::$eventFactoryClass)::createFromArray([
+            "startDate" => $startDate,
+            "endDate" => $endDate,
+            "type" => $type,
+            "repetitions" => $repetitions,
+            "title" => $title
+        ]));
     }
 
     /**

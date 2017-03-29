@@ -125,90 +125,42 @@ class NextInclusiveTest extends PHPUnit_Framework_TestCase
     public function testRemove()
     {
         $pivotDate = new DateTime('now');
-        $deletedDate1 = null;
-        $deletedDate2 = null;
-        $deletedDate3 = null;
 
         /** @var m\MockInterface|Event $originalEventMock */
-        $originalEventMock = m::mock(Event::class);
-        $originalEventMock->shouldReceive('closeAtDate')->once()->with($pivotDate);
 
         occurrencesCollection: {
-            $oldOccurrenceMock1 = m::mock(Occurrence::class);
-            $oldOccurrenceMock1->shouldReceive('endDate')->times(3)->andReturn(new Datetime('yesterday +90 minutes'));
+            $occurrence1 = new Occurrence(null, new DateTime('-1 day'), new OccurrenceDuration(90));
+            $occurrence2 = new Occurrence(null, new DateTime('-2 hours'), new OccurrenceDuration(90));
+            $occurrence3 = new Occurrence(null, new DateTime('+1 day'), new OccurrenceDuration(90));
 
-            $oldOccurrenceMock2 = m::mock(Occurrence::class);
-            $oldOccurrenceMock2->shouldReceive('startDate')->times(4)->andReturn($pivotDate);
-            $oldOccurrenceMock2->shouldReceive('endDate')->times(2)->andReturn(new Datetime('+90 minutes'));
-            $oldOccurrenceMock2->shouldReceive('event')->times(2)->andReturn($originalEventMock);
-            $oldOccurrenceMock2->shouldReceive('setDeletedAt')->once()->andReturnUsing(function (DateTime $date) use (&$deletedDate1) {
-                $deletedDate1 = $date;
-            });
-
-            $oldOccurrenceMock3 = m::mock(Occurrence::class);
-            $oldOccurrenceMock3->shouldReceive('endDate')->andReturn(new Datetime('tomorrow +90 minutes'));
-            $oldOccurrenceMock3->shouldReceive('setDeletedAt')->once()->andReturnUsing(function (DateTime $date) use (&$deletedDate2) {
-                $deletedDate2 = $date;
-            });
-
-            $oldOccurrencesCollection = new ArrayCollection([
-                $oldOccurrenceMock1,
-                $oldOccurrenceMock2,
-                $oldOccurrenceMock3,
-            ]);
+            $oldOccurrencesCollection = new ArrayCollection([$occurrence1, $occurrence2, $occurrence3]);
         }
 
-        $nextEventOccurrence = m::mock(Occurrence::class);
-        $nextEventOccurrence->shouldReceive('setDeletedAt')->once()->andReturnUsing(function (DateTime $date) use (&$deletedDate3) {
-            $deletedDate3 = $date;
-        });
-
-        $nextEvent = m::mock(Event::class);
-        $nextEvent->shouldReceive('setDeletedAt')->once();
-        $nextEvent->shouldReceive('occurrences')->once()->andReturn(new ArrayCollection([
-            $nextEventOccurrence,
-        ]));
-        $nextEvent->shouldReceive('unsetPrevious')->once()->andReturnNull();
-
-        $originalEventMock->shouldReceive('changeEndDate')->once()->with($pivotDate);
-        $originalEventMock->shouldReceive('occurrences')->times(3)->andReturn($oldOccurrencesCollection);
-        $originalEventMock->shouldReceive('isSingle')->once()->andReturn(false);
-        $originalEventMock->shouldReceive('isWeekly')->once()->andReturn(true);
-
-        $filteredOccurrences = null;
-
-        $originalEventMock->shouldReceive('setOccurrences')->andReturnUsing(
-            function (ArrayCollection $collection) use (&$filteredOccurrences) {
-                $filteredOccurrences = $collection;
-            }
-        );
+        $originalEventMock = new Event(0, Event\EventType::createWeekly(), new DateTime('yesterday'), new DateTime('tomorrow'), 'title', Event\Repetitions::workingDays(), $oldOccurrencesCollection);
 
         createsCommand: {
             $command = new RemoveEventCommand();
             $command->method = 'nextinclusive';
-            $command->occurrence = $oldOccurrenceMock2;
+            $command->occurrence = $occurrence2;
         }
 
-        $eventRepositoryMock = m::mock(EventRepositoryInterface::class);
-        $eventRepositoryMock->shouldReceive('update')->once()->with($originalEventMock);
-        $eventRepositoryMock->shouldReceive('findOneByOccurrence')->once()->with($oldOccurrenceMock2)->andReturn($originalEventMock);
+        repositoriesMocks: {
+            $eventRepositoryMock = m::mock(EventRepositoryInterface::class);
+            $eventRepositoryMock->shouldReceive('update')->once()->with($originalEventMock);
+            $eventRepositoryMock->shouldReceive('findOneByOccurrence')->once()->with($occurrence2)->andReturn($originalEventMock);
 
-        $occurrenceRepositoryMock = m::mock(OccurrenceRepositoryInterface::class);
-        $occurrenceRepositoryMock->shouldReceive('update')->once()->with($oldOccurrencesCollection);
+            $occurrenceRepositoryMock = m::mock(OccurrenceRepositoryInterface::class);
+            $occurrenceRepositoryMock->shouldReceive('update')->once()->with($oldOccurrencesCollection);
+        }
 
         $nextInclusive = new NextInclusive();
         $nextInclusive->setOccurrenceRepository($occurrenceRepositoryMock);
         $nextInclusive->setEventRepository($eventRepositoryMock);
         $nextInclusive->update($command);
 
-        $this->assertEquals(new DateTime(), $deletedDate1);
-        $this->assertEquals(new DateTime(), $deletedDate2);
-        $this->assertEquals(new DateTime(), $deletedDate3);
-
-        $this->assertCount(3, $filteredOccurrences);
-        $this->assertEquals($oldOccurrenceMock1, $filteredOccurrences[0]);
-        $this->assertEquals($oldOccurrenceMock2, $filteredOccurrences[1]);
-        $this->assertEquals($oldOccurrenceMock3, $filteredOccurrences[2]);
+        $this->assertNull($occurrence1->getDeletedAt());
+        $this->assertEquals(new DateTime(), $occurrence2->getDeletedAt());
+        $this->assertEquals(new DateTime(), $occurrence3->getDeletedAt());
     }
 
     public function tearDown()

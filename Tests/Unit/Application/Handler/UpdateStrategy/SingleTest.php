@@ -25,10 +25,8 @@ class SingleTest extends \PHPUnit_Framework_TestCase
      */
     public function testUpdateSingleToSingle()
     {
-        $calendarMock = m::mock(Calendar::class);
-
-        $eventMock = m::mock(Event::class);
-        $eventMock->shouldReceive('isSingle')->once()->andReturn(true);
+        $calendar = new Calendar(null, 'title');
+        $calendar->createEvent("testEvent", EventType::single(), new DateTime("now"), new Datetime("+1 hour"));
 
         $occurrenceMock = m::mock(Occurrence::class);
         $occurrenceMock->shouldReceive('event')->once()->andReturn($eventMock);

@@ -24,28 +24,28 @@ class NextInclusive implements UpdateStrategyInterface
 
         if ($originalEvent->isSingle()) {
             throw new \Exception('This strategy is for series types events!');
-        } elseif ($originalEvent->isWeekly()) {
-            $pivotDate = $this->findPivotDate($command->occurrence, $originalEvent);
-            $originalEvent->closeAtDate($pivotDate);
+        }
 
-            $this->occurrenceRepository->update($originalEvent->occurrences());
+        $pivotDate = $this->findPivotDate($command->occurrence, $originalEvent);
+        $originalEvent->closeAtDate($pivotDate);
 
-            if ($command instanceof UpdateEventCommand) {
-                $newEventCommand = CreateEventCommand::fromArray([
-                    'startDate'      => $pivotDate,
-                    'endDate'        => $command->endDate,
-                    'calendar'       => $originalEvent->calendar(),
-                    'type'           => $originalEvent->type()->type(),
-                    'title'          => $command->title,
-                    'repetitionDays' => $command->repetitionDays,
-                ]);
+        $this->occurrenceRepository->update($originalEvent->occurrences());
 
-                /** @var Event $newEvent */
-                $newEvent = $this->eventFactory->createFromCommand($newEventCommand);
-                $newEvent->generateOccurrencesCollection($this->occurrenceFactory);
+        if ($command instanceof UpdateEventCommand) {
+            $newEventCommand = CreateEventCommand::fromArray([
+                'startDate'      => $pivotDate,
+                'endDate'        => $command->endDate,
+                'calendar'       => $originalEvent->calendar(),
+                'type'           => $originalEvent->type()->type(),
+                'title'          => $command->title,
+                'repetitionDays' => $command->repetitionDays,
+            ]);
 
-                $this->eventRepository->insert($newEvent);
-            }
+            /** @var Event $newEvent */
+            $newEvent = $this->eventFactory->createFromCommand($newEventCommand);
+            $newEvent->generateOccurrencesCollection($this->occurrenceFactory);
+
+            $this->eventRepository->insert($newEvent);
         }
 
         $this->eventRepository->update($originalEvent);

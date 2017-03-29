@@ -56,12 +56,12 @@ final class EventType
         return $this->type === $type;
     }
 
-    public static function createSingle()
+    public static function single()
     {
         return new self(self::TYPE_SINGLE);
     }
 
-    public static function createWeekly()
+    public static function weekly()
     {
         return new self(self::TYPE_WEEKLY);
     }
