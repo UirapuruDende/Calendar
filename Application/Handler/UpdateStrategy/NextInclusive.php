@@ -20,24 +20,24 @@ class NextInclusive implements UpdateStrategyInterface
     public function update(UpdateEventCommandInterface $command)
     {
         /** @var Event $originalEvent */
-        $originalEvent = $command->occurrence->event();
+        $originalEvent = $this->eventRepository->findOneByOccurrence($command->occurrence);
 
         if ($originalEvent->isSingle()) {
-                throw new \Exception('This strategy is for series types events!');
+            throw new \Exception('This strategy is for series types events!');
         } elseif ($originalEvent->isWeekly()) {
-            $pivotDate = $this->findPivotDate($command->occurrence);
+            $pivotDate = $this->findPivotDate($command->occurrence, $originalEvent);
             $originalEvent->closeAtDate($pivotDate);
 
             $this->occurrenceRepository->update($originalEvent->occurrences());
 
             if ($command instanceof UpdateEventCommand) {
                 $newEventCommand = CreateEventCommand::fromArray([
-                    "startDate" => $pivotDate,
-                    "endDate" => $command->endDate,
-                    "calendar" => $command->occurrence->event()->calendar(),
-                    "type" => $command->occurrence->event()->type()->type(),
-                    "title" => $command->title,
-                    "repetitionDays" => $command->repetitionDays,
+                    'startDate'      => $pivotDate,
+                    'endDate'        => $command->endDate,
+                    'calendar'       => $originalEvent->calendar(),
+                    'type'           => $originalEvent->type()->type(),
+                    'title'          => $command->title,
+                    'repetitionDays' => $command->repetitionDays,
                 ]);
 
                 /** @var Event $newEvent */
@@ -56,10 +56,10 @@ class NextInclusive implements UpdateStrategyInterface
      *
      * @return DateTime
      */
-    public function findPivotDate(Occurrence $clicked) : DateTime
+    public function findPivotDate(Occurrence $clicked, Event $event) : DateTime
     {
         /** @var ArrayCollection|Occurrence[] $occurrences */
-        $occurrences = $clicked->event()->occurrences();
+        $occurrences = $event->occurrences();
 
         /** @var ArrayCollection $beforeClicked */
         $beforeClicked = $occurrences->filter(function (Occurrence $occurrence) use ($clicked) {

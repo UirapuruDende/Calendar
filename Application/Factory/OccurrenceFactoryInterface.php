@@ -1,8 +1,6 @@
 <?php
 namespace Dende\Calendar\Application\Factory;
 
-use Dende\Calendar\Domain\Calendar\Event;
-
 /**
  * Interface OccurrenceFactoryInterface.
  */

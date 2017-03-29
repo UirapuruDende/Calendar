@@ -4,6 +4,7 @@ namespace Dende\Calendar\Infrastructure\Persistence\InMemory;
 use DateTime;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
+use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
 use Dende\Calendar\Domain\Repository\Specification\InMemoryEventSpecificationInterface;
 use Dende\Calendar\Infrastructure\Persistence\InMemory\Specification\InMemoryEventsByDateRangeAndCalendarSpecification;
@@ -108,5 +109,12 @@ class InMemoryEventRepository implements EventRepositoryInterface
     public function remove(Event $event)
     {
         unset($this->events[$event->id()]);
+    }
+
+    public function findOneByOccurrence(Occurrence $occurrence) : Event
+    {
+        $events = array_filter($this->events, function (Event $event) use ($occurrence) {
+            return $event->occurrences()->contains($occurrence);
+        });
     }
 }

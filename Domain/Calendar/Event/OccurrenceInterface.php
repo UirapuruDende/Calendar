@@ -30,42 +30,32 @@ interface OccurrenceInterface
     /**
      * @return bool
      */
-    public function isOngoing();
+    public function isOngoing() : bool;
 
     /**
      * @return bool
      */
-    public function isPast();
+    public function isPast() : bool;
 
     /**
      * @return DateTime
      */
-    public function startDate();
+    public function startDate() : DateTime;
 
     /**
      * @return OccurrenceDuration
      */
-    public function duration();
-
-    /**
-     * @return Event
-     */
-    public function event();
-
-    /**
-     * @deprecated
-     */
-    public function resetToEvent();
+    public function duration() : OccurrenceDuration;
 
     /**
      * @return DateTime
      */
-    public function endDate();
+    public function endDate() : DateTime;
 
     /**
      * @return string
      */
-    public function id();
+    public function id() : string;
 
     /**
      * @param DateTime $startDate
@@ -77,9 +67,7 @@ interface OccurrenceInterface
      */
     public function changeDuration(OccurrenceDuration $duration);
 
-    public function isModified();
+    public function isModified() : bool;
 
-    public function synchronizeWithEvent();
-
-    public function moveToEvent(Event $event);
+    public function synchronizeWithEvent(Event $event);
 }

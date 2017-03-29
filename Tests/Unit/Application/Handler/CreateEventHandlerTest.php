@@ -27,13 +27,12 @@ final class CreateEventHandlerTest extends \PHPUnit_Framework_TestCase
        ]);
 
         $event = $this->prophesize(Event::class);
-        $event->setOccurrences();
 
         $eventRepositoryMock = $this->prophesize(EventRepositoryInterface::class);
         $occurrenceRepositoryMock = $this->prophesize(OccurrenceRepositoryInterface::class);
         $eventFactoryMock = $this->prophesize(EventFactoryInterface::class);
         $occurrenceFactoryMock = $this->prophesize(OccurrenceFactoryInterface::class);
-        $occurrenceFactoryMock->generateCollectionFromEvent($event)->willReturn(new ArrayCollection([]));
+        $occurrenceFactoryMock->createFromArray()->willReturn(new ArrayCollection([]));
         $eventFactoryMock->createFromCommand($command)->willReturn($event->reveal());
 
         $handler = new CreateEventHandler($eventRepositoryMock->reveal(), $occurrenceRepositoryMock->reveal(), $eventFactoryMock->reveal(), $occurrenceFactoryMock->reveal());

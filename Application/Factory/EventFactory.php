@@ -8,7 +8,6 @@ use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Generator\IdGeneratorInterface;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
-use Dende\Calendar\Domain\Calendar\Event\Duration;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -41,14 +40,14 @@ class EventFactory implements EventFactoryInterface
     public function createFromArray(array $array = []) : Event
     {
         $template = [
-            'id'            => $this->idGenerator->generateId(),
-            'title'         => '',
-            'repetitions'   => new Repetitions([]),
-            'type'          => new EventType(),
-            'occurrences'   => new ArrayCollection(),
-            'calendar'      => new Calendar(null, ''),
-            'startDate'     => new DateTime('now'),
-            'endDate'       => new DateTime('now'),
+            'id'          => $this->idGenerator->generateId(),
+            'title'       => '',
+            'repetitions' => new Repetitions([]),
+            'type'        => new EventType(),
+            'occurrences' => new ArrayCollection([]),
+            'calendar'    => new Calendar(null, ''),
+            'startDate'   => new DateTime('now'),
+            'endDate'     => new DateTime('now'),
         ];
 
         $array = array_merge($template, $array);
@@ -60,7 +59,8 @@ class EventFactory implements EventFactoryInterface
             $array['startDate'],
             $array['endDate'],
             $array['title'],
-            $array['repetitions']
+            $array['repetitions'],
+            $array['occurrences']
         );
     }
 

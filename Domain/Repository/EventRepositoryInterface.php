@@ -2,6 +2,7 @@
 namespace Dende\Calendar\Domain\Repository;
 
 use Dende\Calendar\Domain\Calendar\Event;
+use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 
 /**
  * Interface EventRepositoryInterface.
@@ -29,4 +30,9 @@ interface EventRepositoryInterface
      * @return Event[]
      */
     public function findAll();
+
+    /**
+     * @return Event
+     */
+    public function findOneByOccurrence(Occurrence $occurrence) : Event;
 }

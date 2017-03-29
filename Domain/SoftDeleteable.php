@@ -23,9 +23,9 @@ trait SoftDeleteable
     /**
      * Returns deletedAt.
      *
-     * @return DateTime
+     * @return DateTime|null
      */
-    public function getDeletedAt() : DateTime
+    public function getDeletedAt()
     {
         return $this->deletedAt;
     }

@@ -28,11 +28,10 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
     public function testHandleUpdateCommand()
     {
         $calendar = new Calendar('test');
-        $event = new Event(null, $calendar, EventType::createSingle(), new DateTime('+1 hour'), new DateTime('+2 hour'), 'some Title', new Repetitions());
+        $event = new Event(null, EventType::createSingle(), new DateTime('+1 hour'), new DateTime('+2 hour'), 'some Title', new Repetitions());
         $occurrence = new Occurrence(null, new DateTime('+1 hour'), new OccurrenceDuration(60), $event);
 
         $command = UpdateEventCommand::fromArray([
-            'calendar'   => $calendar,
             'method'     => UpdateEventHandler::MODE_SINGLE,
             'startDate'  => new DateTime('+1 hour'),
             'endDate'    => new DateTime('+3 hour'),
@@ -114,7 +113,6 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $command = new UpdateEventCommand();
         $command->method = UpdateEventHandler::MODE_SINGLE;
-        $command->calendar = m::mock(Calendar::class);
         $command->startDate = new DateTime('+1 hour');
         $command->endDate = new DateTime('+2 hour');
 

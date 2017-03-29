@@ -8,7 +8,6 @@ use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 use Dende\Calendar\Domain\SoftDeleteable;
-use Exception;
 
 /**
  * Class Occurrence.
@@ -48,7 +47,6 @@ class Occurrence implements OccurrenceInterface
      * @param string             $id
      * @param DateTime           $startDate
      * @param OccurrenceDuration $duration
-     * @param Event              $event
      */
     public function __construct($id, DateTime $startDate, OccurrenceDuration $duration)
     {
@@ -81,7 +79,7 @@ class Occurrence implements OccurrenceInterface
     /**
      * @return bool
      */
-    public function isOngoing()
+    public function isOngoing() : bool
     {
         return Carbon::now()->between(Carbon::instance($this->startDate()), Carbon::instance($this->endDate()));
     }
@@ -89,7 +87,7 @@ class Occurrence implements OccurrenceInterface
     /**
      * @return bool
      */
-    public function isPast()
+    public function isPast() : bool
     {
         return Carbon::now()->greaterThan(Carbon::instance($this->endDate()));
     }
@@ -106,7 +104,7 @@ class Occurrence implements OccurrenceInterface
     /**
      * @return DateTime
      */
-    public function startDate()
+    public function startDate() : DateTime
     {
         return $this->startDate;
     }
@@ -114,7 +112,7 @@ class Occurrence implements OccurrenceInterface
     /**
      * @return OccurrenceDuration
      */
-    public function duration()
+    public function duration() : OccurrenceDuration
     {
         return $this->duration;
     }
@@ -122,7 +120,7 @@ class Occurrence implements OccurrenceInterface
     /**
      * @return DateTime
      */
-    public function endDate()
+    public function endDate() : DateTime
     {
         if (is_null($this->endDate)) {
             $this->updateEndDate();
@@ -134,7 +132,7 @@ class Occurrence implements OccurrenceInterface
     /**
      * @return string
      */
-    public function id()
+    public function id() : string
     {
         return $this->id;
     }
@@ -162,7 +160,7 @@ class Occurrence implements OccurrenceInterface
         $this->modified = true;
     }
 
-    public function isModified()
+    public function isModified() : bool
     {
         return $this->modified;
     }
@@ -171,8 +169,8 @@ class Occurrence implements OccurrenceInterface
     {
         if ($event->isSingle()) {
             $this->changeStartDate($event->startDate());
-        } elseif($event->isWeekly()) {
-            $this->startDate->modify($event->startDate()->format("H:i:s"));
+        } elseif ($event->isWeekly()) {
+            $this->startDate->modify($event->startDate()->format('H:i:s'));
         }
 
         $this->changeDuration(new OccurrenceDuration($event->duration()->minutes()));

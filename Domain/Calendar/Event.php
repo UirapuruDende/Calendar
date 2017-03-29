@@ -147,14 +147,6 @@ class Event
     }
 
     /**
-     * @return Calendar
-     */
-    public function calendar()
-    {
-        return $this->calendar;
-    }
-
-    /**
      * @return DateTime
      */
     public function startDate()
@@ -228,11 +220,6 @@ class Event
 //        $this->resetAllOccurrences();
 //    }
 
-    public function assignCalendar(Calendar $calendar)
-    {
-        $this->calendar = $calendar;
-    }
-
     /**
      * @return string
      */
@@ -303,7 +290,7 @@ class Event
      */
     public function closeAtDate(DateTime $date)
     {
-        foreach($this->occurrences() as $occurrence) {
+        foreach ($this->occurrences() as $occurrence) {
             if ($occurrence->endDate() > $date) {
                 $occurrence->setDeletedAt(new DateTime());
             }
@@ -320,7 +307,7 @@ class Event
         $this->occurrences = new ArrayCollection();
 
         foreach ($this->calculateOccurrencesDates() as $date) {
-            $occurrences->add($factory->createFromArray([
+            $this->occurrences->add($factory->createFromArray([
                 'startDate' => $date,
                 'duration'  => $this->duration()->minutes(),
                 'event'     => $this,

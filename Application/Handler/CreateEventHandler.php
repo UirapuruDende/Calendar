@@ -75,10 +75,8 @@ final class CreateEventHandler
         $command->endDate = $date;
 
         $event = $this->eventFactory->createFromCommand($command);
-        $occurrences = $this->occurrenceFactory->generateCollectionFromEvent($event);
+        $event->generateOccurrenceCollection($this->occurrenceFactory);
 
-        $event->setOccurrences($occurrences);
-        $this->occurrenceRepository->insert($occurrences);
-//        $this->eventRepository->insert($event);
+        $this->eventRepository->insert($event);
     }
 }

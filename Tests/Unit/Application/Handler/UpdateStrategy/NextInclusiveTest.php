@@ -9,7 +9,6 @@ use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
 use Dende\Calendar\Application\Handler\UpdateStrategy\NextInclusive;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
-use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
 use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
@@ -46,11 +45,11 @@ class NextInclusiveTest extends PHPUnit_Framework_TestCase
 
         $nextInclusive = new NextInclusive();
 
-        $this->assertEquals($nextInclusive->findPivotDate($occurrence5), $occurrence4->endDate());
-        $this->assertEquals($nextInclusive->findPivotDate($occurrence4), $occurrence3->endDate());
-        $this->assertEquals($nextInclusive->findPivotDate($occurrence3), $occurrence2->endDate());
-        $this->assertEquals($nextInclusive->findPivotDate($occurrence2), $occurrence1->endDate());
-        $this->assertEquals($nextInclusive->findPivotDate($occurrence1), $occurrence1->endDate());
+        $this->assertEquals($nextInclusive->findPivotDate($occurrence5, $eventMock), $occurrence4->endDate());
+        $this->assertEquals($nextInclusive->findPivotDate($occurrence4, $eventMock), $occurrence3->endDate());
+        $this->assertEquals($nextInclusive->findPivotDate($occurrence3, $eventMock), $occurrence2->endDate());
+        $this->assertEquals($nextInclusive->findPivotDate($occurrence2, $eventMock), $occurrence1->endDate());
+        $this->assertEquals($nextInclusive->findPivotDate($occurrence1, $eventMock), $occurrence1->endDate());
     }
 
     public function testUpdate()
@@ -67,28 +66,14 @@ class NextInclusiveTest extends PHPUnit_Framework_TestCase
 
         occurrencesCollection: {
 
-            $oldOccurrence1 = new Occurrence(null, new DateTime("yesterday"), new OccurrenceDuration(90));
-            $oldOccurrence2 = new Occurrence(null, new DateTime("today"), new OccurrenceDuration(90));
-            $oldOccurrence3 = new Occurrence(null, new DateTime("tomorrow"), new OccurrenceDuration(90));
-
-
-            $oldOccurrenceMock2 = m::mock(Occurrence::class);
-            $oldOccurrenceMock2->shouldReceive('startDate')->times(4)->andReturn(new DateTime("-90 minutes"));
-            $oldOccurrenceMock2->shouldReceive('endDate')->times(2)->andReturn($pivotDate);
-            $oldOccurrenceMock2->shouldReceive('event')->times(2)->andReturn($originalEventMock);
-            $oldOccurrenceMock2->shouldReceive('setDeletedAt')->once()->with(new DateTime())->andReturnUsing(function (DateTime $date) use (&$deletedDate1) {
-                $deletedDate1 = $date;
-            });
-            $oldOccurrenceMock3 = m::mock(Occurrence::class);
-            $oldOccurrenceMock3->shouldReceive('endDate')->andReturn(new Datetime('tomorrow +90 minutes'));
-            $oldOccurrenceMock3->shouldReceive('setDeletedAt')->once()->andReturnUsing(function (DateTime $date) use (&$deletedDate2) {
-                $deletedDate2 = $date;
-            });
+            $oldOccurrence1 = new Occurrence(null, new DateTime('yesterday'), new OccurrenceDuration(90));
+            $oldOccurrence2 = new Occurrence(null, new DateTime('today'), new OccurrenceDuration(90));
+            $oldOccurrence3 = new Occurrence(null, new DateTime('tomorrow'), new OccurrenceDuration(90));
 
             $oldOccurrencesCollection = new ArrayCollection([
-                $oldOccurrenceMock1,
-                $oldOccurrenceMock2,
-                $oldOccurrenceMock3,
+                $oldOccurrence1,
+                $oldOccurrence2,
+                $oldOccurrence3,
             ]);
         }
 
@@ -111,7 +96,7 @@ class NextInclusiveTest extends PHPUnit_Framework_TestCase
             $command->title = 'New title';
             $command->method = 'nextinclusive';
             $command->repetitionDays = [];
-            $command->occurrence = $oldOccurrenceMock2;
+            $command->occurrence = $oldOccurrence2;
         }
 
         $eventFactoryMock = m::mock(EventFactoryInterface::class);
@@ -120,6 +105,7 @@ class NextInclusiveTest extends PHPUnit_Framework_TestCase
         $eventRepositoryMock = m::mock(EventRepositoryInterface::class);
         $eventRepositoryMock->shouldReceive('update')->once()->with($originalEventMock);
         $eventRepositoryMock->shouldReceive('insert')->once()->with($newEventMock);
+        $eventRepositoryMock->shouldReceive('findOneByOccurrence')->once()->with($oldOccurrence2)->andReturn($originalEventMock);
 
         $occurrenceRepositoryMock = m::mock(OccurrenceRepositoryInterface::class);
         $occurrenceRepositoryMock->shouldReceive('update')->once()->with($oldOccurrencesCollection);
@@ -145,6 +131,7 @@ class NextInclusiveTest extends PHPUnit_Framework_TestCase
 
         /** @var m\MockInterface|Event $originalEventMock */
         $originalEventMock = m::mock(Event::class);
+        $originalEventMock->shouldReceive('closeAtDate')->once()->with($pivotDate);
 
         occurrencesCollection: {
             $oldOccurrenceMock1 = m::mock(Occurrence::class);
@@ -204,6 +191,7 @@ class NextInclusiveTest extends PHPUnit_Framework_TestCase
 
         $eventRepositoryMock = m::mock(EventRepositoryInterface::class);
         $eventRepositoryMock->shouldReceive('update')->once()->with($originalEventMock);
+        $eventRepositoryMock->shouldReceive('findOneByOccurrence')->once()->with($oldOccurrenceMock2)->andReturn($originalEventMock);
 
         $occurrenceRepositoryMock = m::mock(OccurrenceRepositoryInterface::class);
         $occurrenceRepositoryMock->shouldReceive('update')->once()->with($oldOccurrencesCollection);
