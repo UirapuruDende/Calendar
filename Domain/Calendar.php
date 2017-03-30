@@ -1,9 +1,15 @@
 <?php
 namespace Dende\Calendar\Domain;
 
+use DateTime;
 use Dende\Calendar\Application\Factory\EventFactory;
+use Dende\Calendar\Domain\Calendar\CalendarId;
 use Dende\Calendar\Domain\Calendar\Event;
+use Dende\Calendar\Domain\Calendar\Event\EventId;
+use Dende\Calendar\Domain\Calendar\Event\EventType;
+use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 
 /**
  * Class Calendar.
@@ -13,14 +19,14 @@ class Calendar
     use SoftDeleteable;
 
     /**
-     * @var string
+     * @var CalendarId
      */
     protected $id;
 
     /**
      * @var string
      */
-    protected $name;
+    protected $title;
 
     /**
      * @var ArrayCollection|Event[]
@@ -36,22 +42,37 @@ class Calendar
      * @param string $id
      * @param string $name
      */
-    public function __construct($id = null, $name = '', ArrayCollection $events = null)
+    public function __construct(CalendarId $id, $name = '', ArrayCollection $events = null)
     {
         $this->id = $id;
-        $this->name = $name;
+        $this->title = $name;
         $this->events = $events ?: new ArrayCollection();
     }
 
     public function createEvent(string $title, EventType $type, DateTime $startDate, DateTime $endDate, Repetitions $repetitions = null)
     {
-        $this->events->add((self::$eventFactoryClass)::createFromArray([
+        /** @var Event $event */
+        $event = (self::$eventFactoryClass)::createFromArray([
+            "calendar" => $this,
             "startDate" => $startDate,
             "endDate" => $endDate,
             "type" => $type,
             "repetitions" => $repetitions,
-            "title" => $title
-        ]));
+            "title" => $title,
+        ]);
+
+        $event->generateOccurrenceCollection();
+
+        $this->events->add($event);
+    }
+
+    public function resizeEvent(EventId $id, DateTime $startDate, DateTime $endDate)
+    {
+        $result = $this->events()->matching(Criteria::create()->where(
+            Criteria::expr()->eq('id', $id)
+        ));
+
+        $result->first()->resize($startDate, $endDate);
     }
 
     /**
@@ -81,13 +102,8 @@ class Calendar
     /**
      * @return string
      */
-    public function name()
+    public function title()
     {
-        return $this->name;
-    }
-
-    public function updateName($title)
-    {
-        $this->name = $title;
+        return $this->title;
     }
 }

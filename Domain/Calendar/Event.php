@@ -6,11 +6,13 @@ use DateInterval;
 use DatePeriod;
 use DateTime;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
+use Dende\Calendar\Application\Factory\OccurrenceFactory;
 use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
+use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Domain\SoftDeleteable;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -22,6 +24,8 @@ use Exception;
 class Event
 {
     use SoftDeleteable;
+
+    static public $occurrenceFactoryClass = OccurrenceFactory::class;
 
     /**
      * @var string
@@ -69,11 +73,6 @@ class Event
     protected $occurrences;
 
     /**
-     * @var DateTime[]
-     */
-    protected $occurrencesDates;
-
-    /**
      * Event constructor.
      *
      * @param string                       $id
@@ -86,17 +85,22 @@ class Event
      *
      * @throws \Exception
      */
-    public function __construct($id, EventType $type, DateTime $startDate, DateTime $endDate, $title, Repetitions $repetitions, ArrayCollection $occurrences = null)
+    public function __construct($id, Calendar $calendar, EventType $type, DateTime $startDate, DateTime $endDate, string $title, Repetitions $repetitions, ArrayCollection $occurrences = null)
     {
         if (Carbon::instance($startDate)->gt(Carbon::instance($endDate))) {
-            throw new \Exception(sprintf(
+            throw new Exception(sprintf(
                 "End date '%s' cannot be before start date '%s'",
                 $endDate->format('Y-m-d H:i:s'),
                 $startDate->format('Y-m-d H:i:s')
             ));
         }
 
+        if($type->isWeekly() && count($repetitions->weekdays()) === 0) {
+            throw new Exception('Weekly repeated event must have at least one repetition');
+        }
+
         $this->id = $id;
+        $this->calendar = $calendar;
         $this->type = $type;
         $this->startDate = $startDate;
         $this->endDate = $endDate;
@@ -109,7 +113,7 @@ class Event
     /**
      * @return ArrayCollection|Occurrence[]
      */
-    public function occurrences()
+    public function occurrences() : ArrayCollection
     {
         return $this->occurrences;
     }
@@ -117,7 +121,7 @@ class Event
     /**
      * @return string
      */
-    public function title()
+    public function title() : string
     {
         return $this->title;
     }
@@ -125,7 +129,7 @@ class Event
     /**
      * @return EventType
      */
-    public function type()
+    public function type() : EventType
     {
         return $this->type;
     }
@@ -133,7 +137,7 @@ class Event
     /**
      * @return Repetitions
      */
-    public function repetitions()
+    public function repetitions() : Repetitions
     {
         return $this->repetitions;
     }
@@ -141,7 +145,7 @@ class Event
     /**
      * @return Duration
      */
-    public function duration()
+    public function duration() : Duration
     {
         return $this->duration;
     }
@@ -149,7 +153,7 @@ class Event
     /**
      * @return DateTime
      */
-    public function startDate()
+    public function startDate() : DateTime
     {
         return $this->startDate;
     }
@@ -157,50 +161,10 @@ class Event
     /**
      * @return DateTime
      */
-    public function endDate()
+    public function endDate() : DateTime
     {
         return $this->endDate;
     }
-
-    /**
-     * @param bool $force
-     *
-     * @return \DateTime[]|ArrayCollection
-     */
-    public function calculateOccurrencesDates($force = false)
-    {
-        if (is_null($this->occurrencesDates) || !$force) {
-            $occurrences = new ArrayCollection();
-
-            if ($this->isSingle()) {
-                $occurrences->add($this->startDate);
-            } elseif ($this->isWeekly()) {
-                $interval = new DateInterval('P1D');
-                /** @var DateTime[] $period */
-                $period = new DatePeriod($this->startDate, $interval, $this->endDate);
-                foreach ($period as $date) {
-                    if (in_array($date->format('N'), $this->repetitions->weekdays())) {
-                        $occurrences->add($date);
-                    }
-                }
-            } else {
-                throw new Exception('Invalid event type!');
-            }
-
-            $this->occurrencesDates = $occurrences;
-        }
-
-        return $this->occurrencesDates;
-    }
-
-    /**
-     * @param Repetitions $repetitions
-     */
-//    public function updateRepetitions(Repetitions $repetitions)
-//    {
-//        $this->repetitions = $repetitions;
-//        $this->resetAllOccurrences();
-//    }
 
     /**
      * @param Duration $duration
@@ -220,10 +184,7 @@ class Event
 //        $this->resetAllOccurrences();
 //    }
 
-    /**
-     * @return string
-     */
-    public function id()
+    public function getId()
     {
         return $this->id;
     }
@@ -252,15 +213,6 @@ class Event
     }
 
     /**
-     * @param Repetitions $repetitions
-     */
-    public function changeRepetitions(Repetitions $repetitions)
-    {
-        $this->repetitions = $repetitions;
-        $this->calculateOccurrencesDates(true);
-    }
-
-    /**
      * @param Occurrence $occurrenceToRemove
      */
     public function removeOccurrence(Occurrence $occurrenceToRemove)
@@ -271,18 +223,6 @@ class Event
                 break;
             }
         }
-    }
-
-    /**
-     * @param UpdateEventCommand $command
-     */
-    public function updateWithCommand(UpdateEventCommand $command)
-    {
-        $this->startDate = $command->startDate;
-        $this->endDate = $command->endDate;
-        $this->duration = Duration::calculate($this->startDate(), $this->endDate());
-        $this->title = $command->title;
-        $this->repetitions = new Repetitions($command->repetitionDays);
     }
 
     /**
@@ -302,16 +242,32 @@ class Event
     /**
      * @param OccurrenceFactoryInterface $factory
      */
-    public function generateOccurrenceCollection(OccurrenceFactoryInterface $factory)
+    public function generateOccurrenceCollection()
     {
+        /** @var OccurrenceFactoryInterface $factory */
+        $factory = new self::$occurrenceFactoryClass();
         $this->occurrences = new ArrayCollection();
 
-        foreach ($this->calculateOccurrencesDates() as $date) {
+        $add = function(DateTime $date) use($factory) {
             $this->occurrences->add($factory->createFromArray([
                 'startDate' => $date,
-                'duration'  => $this->duration()->minutes(),
+                'duration'  => new OccurrenceDuration($this->duration()->minutes()),
                 'event'     => $this,
             ]));
+        };
+
+        if ($this->isSingle()) {
+            $add($this->startDate);
+        } elseif ($this->isWeekly()) {
+            $interval = new DateInterval('P1D');
+            /** @var DateTime[] $period */
+            $period = new DatePeriod($this->startDate, $interval, $this->endDate);
+
+            foreach ($period as $date) {
+                if (in_array($date->format('N'), $this->repetitions->weekdays())) {
+                    $add($date);
+                }
+            }
         }
     }
 }

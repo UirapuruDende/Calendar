@@ -42,15 +42,21 @@ class Occurrence implements OccurrenceInterface
     protected $id;
 
     /**
+     * @var Event
+     */
+    protected $event;
+
+    /**
      * Occurrence constructor.
      *
      * @param string             $id
      * @param DateTime           $startDate
      * @param OccurrenceDuration $duration
      */
-    public function __construct($id, DateTime $startDate, OccurrenceDuration $duration)
+    public function __construct($id, Event $event, DateTime $startDate, OccurrenceDuration $duration)
     {
         $this->id = $id;
+        $this->event = $event;
         $this->startDate = $startDate;
         $this->duration = $duration;
         $this->updateEndDate();

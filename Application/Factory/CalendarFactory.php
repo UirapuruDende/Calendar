@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 /**
  * Class CalendarFactory.
  *
- * @todo change 'title' to name, because calendar has 'name' field
+ * @todo change 'title' to title, because calendar has 'title' field
  */
 class CalendarFactory implements CalendarFactoryInterface
 {

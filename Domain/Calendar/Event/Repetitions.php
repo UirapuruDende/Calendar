@@ -42,6 +42,24 @@ class Repetitions
         $this->weekdays = $weekdays;
     }
 
+    public static function none() : Repetitions
+    {
+        return new self([]);
+    }
+
+    public static function daily() : Repetitions
+    {
+        return new self([
+            self::MONDAY,
+            self::TUESDAY,
+            self::WEDNESDAY,
+            self::THURSDAY,
+            self::FRIDAY,
+            self::SATURDAY,
+            self::SUNDAY,
+        ]);
+    }
+
     /**
      * @return array
      */

@@ -46,7 +46,7 @@ final class EventType
      * @return string
      * @codeCoverageIgnore
      */
-    public function type()
+    public function type() : string
     {
         return $this->type;
     }
@@ -56,13 +56,18 @@ final class EventType
         return $this->type === $type;
     }
 
-    public static function single()
+    public static function single() : EventType
     {
         return new self(self::TYPE_SINGLE);
     }
 
-    public static function weekly()
+    public static function weekly() : EventType
     {
         return new self(self::TYPE_WEEKLY);
+    }
+
+    public function isWeekly() : bool
+    {
+        return $this->isType(self::TYPE_WEEKLY);
     }
 }

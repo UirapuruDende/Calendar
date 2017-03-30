@@ -8,6 +8,7 @@ use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Generator\IdGeneratorInterface;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
+use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -40,12 +41,12 @@ class EventFactory implements EventFactoryInterface
     public function createFromArray(array $array = []) : Event
     {
         $template = [
-            'id'          => $this->idGenerator->generateId(),
+            'id'          => new EventId(),
             'title'       => '',
             'repetitions' => new Repetitions([]),
             'type'        => new EventType(),
             'occurrences' => new ArrayCollection([]),
-            'calendar'    => new Calendar(null, ''),
+            'calendar'    => null,
             'startDate'   => new DateTime('now'),
             'endDate'     => new DateTime('now'),
         ];

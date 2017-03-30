@@ -59,7 +59,7 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Strategy name 'single' already set!
+     * @expectedExceptionMessage Strategy title 'single' already set!
      */
     public function testStrategyAlreadySet()
     {
