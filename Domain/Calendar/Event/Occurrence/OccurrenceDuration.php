@@ -1,6 +1,8 @@
 <?php
 namespace Dende\Calendar\Domain\Calendar\Event\Occurrence;
 
+use Exception;
+
 /**
  * Class Duration.
  */
@@ -9,22 +11,26 @@ class OccurrenceDuration
     /**
      * @var int
      */
-    protected $minutes;
+    protected $minutes = 1;
 
     /**
      * Duration constructor.
      *
-     * @param int $duration
+     * @param int $minutes
      */
-    public function __construct($duration = 0)
+    public function __construct(int $minutes = 1)
     {
-        $this->minutes = intval($duration);
+        if ($minutes <= 0) {
+            throw new Exception('Occurrence duration has to be greater than 0');
+        }
+
+        $this->minutes = (int) $minutes;
     }
 
     /**
      * @return int
      */
-    public function minutes()
+    public function minutes() : int
     {
         return $this->minutes;
     }

@@ -77,7 +77,7 @@ return Symfony\CS\Config\Config::create()
     'unused_use',
     'whitespacy_lines',
     'align_double_arrow',
-//    'align_equals',
+    'align_equals',
     'concat_with_spaces',
 //    'ereg_to_preg',
 //    'header_comment',

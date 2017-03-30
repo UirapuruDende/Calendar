@@ -27,16 +27,16 @@ final class Overwrite implements UpdateStrategyInterface
         /** @var Event $event */
         $event = $command->occurrence->event();
 
-        if ($command instanceof UpdateEventCommand) {
-            $event->updateWithCommand($command);
-            $this->occurrenceRepository->remove($event->occurrences());
-            $occurrences = $this->occurrenceFactory->generateCollectionFromEvent($event);
-            $event->setOccurrences($occurrences);
-            $this->eventRepository->update($event);
-            $this->occurrenceRepository->insert($occurrences);
-        } elseif ($command instanceof RemoveEventCommand) {
-            $this->occurrenceRepository->remove($event->occurrences());
-            $this->eventRepository->remove($event);
-        }
+//        if ($command instanceof UpdateEventCommand) {
+
+//            $event->updateWithCommand($command);
+
+//            $event->setOccurrences($occurrences);
+//            $this->eventRepository->update($event);
+//            $this->occurrenceRepository->insert($occurrences);
+//        } elseif ($command instanceof RemoveEventCommand) {
+//            $this->occurrenceRepository->remove($event->occurrences());
+//            $this->eventRepository->remove($event);
+//        }
     }
 }

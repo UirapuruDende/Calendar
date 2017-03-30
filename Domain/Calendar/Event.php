@@ -5,15 +5,16 @@ use Carbon\Carbon;
 use DateInterval;
 use DatePeriod;
 use DateTime;
-use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Factory\OccurrenceFactory;
 use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
+use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
+use Dende\Calendar\Domain\IdInterface;
 use Dende\Calendar\Domain\SoftDeleteable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Exception;
@@ -25,12 +26,21 @@ class Event
 {
     use SoftDeleteable;
 
-    static public $occurrenceFactoryClass = OccurrenceFactory::class;
+    const DUMP_FORMAT = 'd.m H.i';
+
+    public static $occurrenceFactoryClass = OccurrenceFactory::class;
 
     /**
-     * @var string
+     * Id for Doctrine.
+     *
+     * @var int
      */
     protected $id;
+
+    /**
+     * @var EventId
+     */
+    protected $eventId;
 
     /**
      * @var Calendar
@@ -75,7 +85,8 @@ class Event
     /**
      * Event constructor.
      *
-     * @param string                       $id
+     * @param EventId                      $eventId
+     * @param Calendar                     $calendar
      * @param EventType                    $type
      * @param DateTime                     $startDate
      * @param DateTime                     $endDate
@@ -83,11 +94,13 @@ class Event
      * @param Repetitions                  $repetitions
      * @param ArrayCollection|Occurrence[] $occurrences
      *
-     * @throws \Exception
+     * @throws Exception
+     *
+     * @internal param string $id
      */
-    public function __construct($id, Calendar $calendar, EventType $type, DateTime $startDate, DateTime $endDate, string $title, Repetitions $repetitions, ArrayCollection $occurrences = null)
+    public function __construct(IdInterface $eventId, Calendar $calendar, EventType $type, DateTime $startDate, DateTime $endDate, string $title, Repetitions $repetitions, ArrayCollection $occurrences = null)
     {
-        if (Carbon::instance($startDate)->gt(Carbon::instance($endDate))) {
+        if (Carbon::instance($startDate)->gte(Carbon::instance($endDate))) {
             throw new Exception(sprintf(
                 "End date '%s' cannot be before start date '%s'",
                 $endDate->format('Y-m-d H:i:s'),
@@ -95,19 +108,23 @@ class Event
             ));
         }
 
-        if($type->isWeekly() && count($repetitions->weekdays()) === 0) {
+        if ($type->isWeekly() && count($repetitions->getArray()) === 0) {
             throw new Exception('Weekly repeated event must have at least one repetition');
         }
 
-        $this->id = $id;
-        $this->calendar = $calendar;
-        $this->type = $type;
-        $this->startDate = $startDate;
-        $this->endDate = $endDate;
-        $this->title = $title;
+        $this->eventId     = $eventId;
+        $this->calendar    = $calendar;
+        $this->type        = $type;
+        $this->startDate   = $startDate;
+        $this->endDate     = $endDate;
+        $this->title       = $title;
         $this->repetitions = $repetitions;
-        $this->duration = Duration::calculate($this->startDate(), $this->endDate());
-        $this->occurrences = $occurrences ?: new ArrayCollection([]);
+        $this->duration    = Duration::calculate($this->startDate(), $this->endDate());
+        $this->occurrences = $occurrences ?: new ArrayCollection();
+
+        if (0 === $this->occurrences()->count()) {
+            $this->generateOccurrenceCollection();
+        }
     }
 
     /**
@@ -184,11 +201,6 @@ class Event
 //        $this->resetAllOccurrences();
 //    }
 
-    public function getId()
-    {
-        return $this->id;
-    }
-
     /**
      * @param $title
      */
@@ -239,16 +251,13 @@ class Event
         $this->endDate = $date;
     }
 
-    /**
-     * @param OccurrenceFactoryInterface $factory
-     */
-    public function generateOccurrenceCollection()
+    protected function generateOccurrenceCollection()
     {
         /** @var OccurrenceFactoryInterface $factory */
-        $factory = new self::$occurrenceFactoryClass();
+        $factory           = new self::$occurrenceFactoryClass();
         $this->occurrences = new ArrayCollection();
 
-        $add = function(DateTime $date) use($factory) {
+        $add = function (DateTime $date) use ($factory) {
             $this->occurrences->add($factory->createFromArray([
                 'startDate' => $date,
                 'duration'  => new OccurrenceDuration($this->duration()->minutes()),
@@ -264,10 +273,34 @@ class Event
             $period = new DatePeriod($this->startDate, $interval, $this->endDate);
 
             foreach ($period as $date) {
-                if (in_array($date->format('N'), $this->repetitions->weekdays())) {
+                if (in_array($date->format('N'), $this->repetitions->getArray())) {
                     $add($date);
                 }
             }
         }
+    }
+
+    public function id() : IdInterface
+    {
+        return $this->eventId;
+    }
+
+    public function calendar() : Calendar
+    {
+        return $this->calendar;
+    }
+
+    public function dumpDatesAsString() : string
+    {
+        return sprintf('[%s-%s-%s]', $this->startDate()->format(self::DUMP_FORMAT), $this->endDate()->format(self::DUMP_FORMAT), $this->getDeletedAt() ? $this->getDeletedAt()->format(self::DUMP_FORMAT) : '_');
+    }
+
+    public function dumpOccurrencesDatesAsString() : string
+    {
+        $array = $this->occurrences()->map(function (Occurrence $occurrence) {
+            return sprintf('[%s:%s:%s]', $occurrence->startDate()->format(self::DUMP_FORMAT), $occurrence->duration()->minutes(), $occurrence->getDeletedAt() ? $occurrence->getDeletedAt()->format(self::DUMP_FORMAT) : '_');
+        });
+
+        return implode(' ', $array->getValues());
     }
 }

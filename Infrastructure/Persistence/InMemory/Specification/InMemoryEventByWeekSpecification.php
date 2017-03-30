@@ -29,11 +29,11 @@ final class InMemoryEventByWeekSpecification implements InMemoryEventSpecificati
     public function __construct($year, $weekNumber)
     {
         $weekStart = Carbon::instance(new \DateTime(sprintf('%d-W%d-1', $year, $weekNumber)));
-        $weekEnd = clone $weekStart;
+        $weekEnd   = clone $weekStart;
         $weekEnd->addDays(7);
 
         $this->rangeStart = $weekStart;
-        $this->rangeEnd = $weekEnd;
+        $this->rangeEnd   = $weekEnd;
     }
 
     /**

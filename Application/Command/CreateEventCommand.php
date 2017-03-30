@@ -3,7 +3,6 @@ namespace Dende\Calendar\Application\Command;
 
 use Carbon\Carbon;
 use DateTime;
-use Dende\Calendar\Domain\Calendar;
 
 /**
  * Class CreateEventCommand.
@@ -13,17 +12,12 @@ final class CreateEventCommand implements EventCommandInterface
     /**
      * @var string
      */
-    public $type;
-
-    /**
-     * @var Calendar
-     */
-    public $calendar;
+    public $calendarId;
 
     /**
      * @var string
      */
-    public $newCalendarName;
+    public $type;
 
     /**
      * @var DateTime|Carbon
@@ -43,22 +37,24 @@ final class CreateEventCommand implements EventCommandInterface
     /**
      * @var array
      */
-    public $repetitionDays = [];
+    public $repetitions = [];
 
     public static function fromArray(array $array = []) : CreateEventCommand
     {
         $command = new self();
 
-        $array = array_merge(get_object_vars($command), $array);
-
-        $command->calendar = $array['calendar'];
-        $command->newCalendarName = $array['newCalendarName'];
-        $command->type = $array['type'];
-        $command->startDate = $array['startDate'];
-        $command->endDate = $array['endDate'];
-        $command->title = $array['title'];
-        $command->repetitionDays = $array['repetitionDays'];
+        $command->calendarId  = $array['calendarId'];
+        $command->type        = $array['type'];
+        $command->startDate   = $array['startDate'];
+        $command->endDate     = $array['endDate'];
+        $command->title       = $array['title'];
+        $command->repetitions = $array['repetitions'];
 
         return $command;
+    }
+
+    public function toArray() : array
+    {
+        return get_object_vars($this);
     }
 }

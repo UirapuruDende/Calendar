@@ -1,15 +1,9 @@
 <?php
 namespace Dende\Calendar\Application\Factory;
 
-/**
- * Interface OccurrenceFactoryInterface.
- */
+use Dende\Calendar\Domain\Calendar\Event\Occurrence;
+
 interface OccurrenceFactoryInterface
 {
-    /**
-     * @param array $array
-     *
-     * @return mixed
-     */
-    public function createFromArray($array = []);
+    public function createFromArray(array $array = []) : Occurrence;
 }

@@ -1,8 +1,8 @@
 <?php
 namespace Dende\Calendar\Application\Handler\UpdateStrategy;
 
-use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
-use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
+use Dende\Calendar\Application\Repository\EventRepositoryInterface;
+use Dende\Calendar\Application\Repository\OccurrenceRepositoryInterface;
 
 /**
  * Class SetRepositoriesTrait.

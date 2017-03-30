@@ -1,7 +1,9 @@
 <?php
 namespace Dende\Calendar\Domain\Calendar\Event;
 
+use DateInterval;
 use DateTime;
+use Exception;
 
 /**
  * Class Duration.
@@ -18,9 +20,13 @@ class Duration
      *
      * @param int $minutes
      */
-    public function __construct(int $minutes)
+    public function __construct(int $duration = 1)
     {
-        $this->minutes = $minutes;
+        if ($duration <= 0) {
+            throw new Exception('Event duration has to be greater than 0');
+        }
+
+        $this->minutes = (int) $duration;
     }
 
     public function minutes() : int
@@ -46,8 +52,13 @@ class Duration
         }
 
         /** @var DateInterval */
-        $diff = $startDate->diff($tmpEndDate);
+        $diff    = $startDate->diff($tmpEndDate);
+        $minutes = $diff->h * 60 + $diff->i;
 
-        return new self($diff->h * 60 + $diff->i);
+        if ($minutes <= 0) {
+            throw new Exception('Duration time must be grater than 0 minutes');
+        }
+
+        return new self($minutes);
     }
 }

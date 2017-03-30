@@ -7,7 +7,9 @@ use DateTime;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
+use Dende\Calendar\Domain\IdInterface;
 use Dende\Calendar\Domain\SoftDeleteable;
+use Exception;
 
 /**
  * Class Occurrence.
@@ -15,6 +17,13 @@ use Dende\Calendar\Domain\SoftDeleteable;
 class Occurrence implements OccurrenceInterface
 {
     use SoftDeleteable;
+
+    /**
+     * Doctrine id.
+     *
+     * @var int
+     */
+    protected $id;
 
     /**
      * @var DateTime
@@ -37,9 +46,9 @@ class Occurrence implements OccurrenceInterface
     protected $modified = false;
 
     /**
-     * @var string|OccurrenceId
+     * @var OccurrenceId
      */
-    protected $id;
+    protected $occurrenceId;
 
     /**
      * @var Event
@@ -49,16 +58,17 @@ class Occurrence implements OccurrenceInterface
     /**
      * Occurrence constructor.
      *
-     * @param string             $id
-     * @param DateTime           $startDate
-     * @param OccurrenceDuration $duration
+     * @param OccurrenceId|IdInterface $occurrenceId
+     * @param Event                    $event
+     * @param DateTime                 $startDate
+     * @param OccurrenceDuration       $duration
      */
-    public function __construct($id, Event $event, DateTime $startDate, OccurrenceDuration $duration)
+    public function __construct(IdInterface $occurrenceId, Event $event, DateTime $startDate, OccurrenceDuration $duration)
     {
-        $this->id = $id;
-        $this->event = $event;
-        $this->startDate = $startDate;
-        $this->duration = $duration;
+        $this->occurrenceId = $occurrenceId;
+        $this->event        = $event;
+        $this->startDate    = $startDate;
+        $this->duration     = $duration;
         $this->updateEndDate();
     }
 
@@ -77,7 +87,7 @@ class Occurrence implements OccurrenceInterface
      */
     public function move(DateTime $newStartDate)
     {
-        $this->modified = true;
+        $this->modified  = true;
         $this->startDate = $newStartDate;
         $this->updateEndDate();
     }
@@ -101,8 +111,12 @@ class Occurrence implements OccurrenceInterface
     protected function updateEndDate()
     {
         $endDate = clone $this->startDate();
-        $diff = new DateInterval(sprintf('PT%dM', abs($this->duration()->minutes())));
+        $diff    = new DateInterval(sprintf('PT%dM', abs($this->duration()->minutes())));
         $endDate->add($diff);
+
+        if ($this->startDate()->format('Ymd') !== $endDate->format('Ymd')) {
+            new Exception(sprintf("Event occurrence can't overlap to new day (start: %s end: %s)", $this->startDate()->format('Y.m.d H:i:s'), $endDate->format('Y.m.d H:i:s')));
+        }
 
         $this->endDate = $endDate;
     }
@@ -135,12 +149,9 @@ class Occurrence implements OccurrenceInterface
         return $this->endDate;
     }
 
-    /**
-     * @return string
-     */
-    public function id() : string
+    public function id() : IdInterface
     {
-        return $this->id;
+        return $this->occurrenceId;
     }
 
     /**
@@ -180,5 +191,15 @@ class Occurrence implements OccurrenceInterface
         }
 
         $this->changeDuration(new OccurrenceDuration($event->duration()->minutes()));
+    }
+
+    public function event() : Event
+    {
+        return $this->event;
+    }
+
+    public function dumpDatesAsString() : string
+    {
+        return sprintf('[%s:%s:%s]', $this->startDate()->format('d/m'), $this->duration()->minutes(), $this->getDeletedAt() ? $this->getDeletedAt()->format('d/m') : '_');
     }
 }

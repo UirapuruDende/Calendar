@@ -37,7 +37,7 @@ final class InMemoryEventsByDateRangeAndCalendarSpecification implements InMemor
     public function __construct(\DateTime $rangeStart, \DateTime $rangeEnd, Calendar $calendar)
     {
         $start = Carbon::instance($rangeStart);
-        $end = Carbon::instance($rangeEnd);
+        $end   = Carbon::instance($rangeEnd);
 
         $start->setTime(0, 0, 0);
         $end->setTime(23, 59, 59);
@@ -45,7 +45,7 @@ final class InMemoryEventsByDateRangeAndCalendarSpecification implements InMemor
         $this->calendar = $calendar;
 
         $this->rangeStart = $start;
-        $this->rangeEnd = $end;
+        $this->rangeEnd   = $end;
     }
 
     /**
@@ -64,7 +64,7 @@ final class InMemoryEventsByDateRangeAndCalendarSpecification implements InMemor
         }
 
         $dates = $event->calculateOccurrencesDates();
-        $that = $this;
+        $that  = $this;
 
         $occurrencesDates = array_filter($dates->toArray(), function (DateTime $date) use ($that) {
             if ($date >= $this->rangeStart && $date < $this->rangeEnd) {

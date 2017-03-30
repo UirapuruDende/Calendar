@@ -1,38 +1,30 @@
 <?php
-namespace Dende\Calendar\Domain\Repository;
+namespace Dende\Calendar\Application\Repository;
 
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Interface EventRepositoryInterface.
  */
 interface EventRepositoryInterface
 {
-    /**
-     * @param $event
-     *
-     * @return mixed
-     */
     public function insert(Event $event);
 
-    /**
-     * @param Event $event
-     */
     public function update(Event $event);
 
-    /**
-     * @param Event $event
-     */
     public function remove(Event $event);
 
     /**
-     * @return Event[]
+     * @return Event[]|ArrayCollection
      */
-    public function findAll();
+    public function findAll() : ArrayCollection;
 
     /**
-     * @return Event
+     * @param Occurrence $occurrence
+     *
+     * @return Event|null
      */
-    public function findOneByOccurrence(Occurrence $occurrence) : Event;
+    public function findOneByOccurrence(Occurrence $occurrence);
 }

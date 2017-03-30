@@ -27,7 +27,7 @@ final class InMemoryOccurrenceByEventSpecification implements InMemoryOccurrence
      */
     public function __construct(Event $event, $onlyUnmodified = false)
     {
-        $this->event = $event;
+        $this->event          = $event;
         $this->onlyUnmodified = $onlyUnmodified;
     }
 

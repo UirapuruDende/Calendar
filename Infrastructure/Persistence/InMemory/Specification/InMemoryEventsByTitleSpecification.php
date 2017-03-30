@@ -28,7 +28,7 @@ final class InMemoryEventsByTitleSpecification implements InMemoryEventSpecifica
      */
     public function __construct($title, Calendar $calendar = null)
     {
-        $this->title = $title;
+        $this->title    = $title;
         $this->calendar = $calendar;
     }
 

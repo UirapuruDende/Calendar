@@ -6,7 +6,9 @@
         "nesbot/carbon": "*",
         "doctrine/common": "*",
         "doctrine/orm": "^2.5",
-        "humbug/humbug": "~1.0@dev"
+        "humbug/humbug": "~1.0@dev",
+        "ramsey/uuid": "^3.6",
+        "symfony/event-dispatcher": "^3.2"
     },
     "autoload": {
         "psr-0": {

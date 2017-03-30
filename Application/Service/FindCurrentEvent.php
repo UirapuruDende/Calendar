@@ -2,10 +2,11 @@
 namespace Dende\Calendar\Application\Service;
 
 use DateTime;
+use Dende\Calendar\Application\Repository\OccurrenceRepositoryInterface;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
-use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Class FindCurrentEvent.
@@ -30,21 +31,14 @@ final class FindCurrentEvent
     /**
      * @param Calendar $calendar
      *
-     * @return Event
+     * @return ArrayCollection|Event[]
      */
-    public function getCurrentEvent(Calendar $calendar)
+    public function getCurrentEvents(Calendar $calendar) : ArrayCollection
     {
-        $result = $this->occurrenceRepository->findOneByDateAndCalendar(new DateTime('now'), $calendar);
+        $result = $this->occurrenceRepository->findByDateAndCalendar(new DateTime('now'), $calendar);
 
-        if (count($result) === 0) {
-            return;
-        }
-
-        /** @var Occurrence $currentOccurrence */
-        $currentOccurrence = $result->first();
-
-        $event = $currentOccurrence->event();
-
-        return $event;
+        return $result->map(function (Occurrence $occurrence) {
+            return $occurrence->event();
+        });
     }
 }

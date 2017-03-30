@@ -38,14 +38,14 @@ class EntityManager implements Calendars, Events, Occurrences
      * @param OccurrenceRepositoryInterface $occurrenceRepository
      * @param OccurrenceFactoryInterface    $occurrenceFactory
      */
-    public function __construct(CalendarRepositoryInterface $calendarRepository, CalendarFactoryInterface $calendarFactory, EventRepositoryInterface $eventRepository, EventFactoryInterface $eventFactory, OccurrenceRepositoryInterface $occurrenceRepository, OccurrenceFactoryInterface $occurrenceFactory)
+    public function __construct(CalendarRepositoryInterface $calendarRepository = null, CalendarFactoryInterface $calendarFactory = null, EventRepositoryInterface $eventRepository = null, EventFactoryInterface $eventFactory = null, OccurrenceRepositoryInterface $occurrenceRepository = null, OccurrenceFactoryInterface $occurrenceFactory = null)
     {
-        $this->calendarRepository = $calendarRepository;
-        $this->calendarFactory = $calendarFactory;
-        $this->eventRepository = $eventRepository;
-        $this->eventFactory = $eventFactory;
+        $this->calendarRepository   = $calendarRepository;
+        $this->calendarFactory      = $calendarFactory;
+        $this->eventRepository      = $eventRepository;
+        $this->eventFactory         = $eventFactory;
         $this->occurrenceRepository = $occurrenceRepository;
-        $this->occurrenceFactory = $occurrenceFactory;
+        $this->occurrenceFactory    = $occurrenceFactory;
     }
 
     public function calendarRepository(): CalendarRepositoryInterface

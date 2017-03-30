@@ -2,17 +2,12 @@
 namespace Dende\Calendar\Infrastructure\Persistence\InMemory;
 
 use DateTime;
+use Dende\Calendar\Application\Repository\OccurrenceRepositoryInterface;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
-use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
-use Dende\Calendar\Domain\Repository\Specification\InMemoryOccurrenceSpecificationInterface;
-use Dende\Calendar\Infrastructure\Persistence\InMemory\Specification\InMemoryOccurrenceByCalendarSpecification;
-use Dende\Calendar\Infrastructure\Persistence\InMemory\Specification\InMemoryOccurrenceByDateAndCalendarSpecification;
-use Dende\Calendar\Infrastructure\Persistence\InMemory\Specification\InMemoryOccurrenceByDateRangeAndCalendarSpecification;
-use Dende\Calendar\Infrastructure\Persistence\InMemory\Specification\InMemoryOccurrenceByEventSpecification;
 use Doctrine\Common\Collections\ArrayCollection;
-use Mockery\CountValidator\Exception;
+use Doctrine\Common\Collections\Criteria;
 
 /**
  * Class InMemoryOccurrenceRepository.
@@ -20,14 +15,24 @@ use Mockery\CountValidator\Exception;
 final class InMemoryOccurrenceRepository implements OccurrenceRepositoryInterface
 {
     /**
-     * @var Occurrence[]
+     * @var Occurrence[]|ArrayCollection
      */
-    private $occurrences = [];
+    private $occurrences;
+
+    /**
+     * InMemoryOccurrenceRepository constructor.
+     *
+     * @param Occurrence[]|ArrayCollection $occurrences
+     */
+    public function __construct(ArrayCollection $occurrences = null)
+    {
+        $this->occurrences = $occurrences ?: new ArrayCollection();
+    }
 
     /**
      * @return Occurrence[]
      */
-    public function findAll()
+    public function findAll() : ArrayCollection
     {
         return $this->occurrences;
     }
@@ -35,19 +40,9 @@ final class InMemoryOccurrenceRepository implements OccurrenceRepositoryInterfac
     /**
      * @param Occurrence $occurrence
      */
-    public function insert($occurrence)
+    public function insert(Occurrence $occurrence)
     {
-        $this->occurrences[$occurrence->id()] = $occurrence;
-    }
-
-    /**
-     * @param Occurrence[] $occurrences
-     */
-    public function insertCollection($occurrences)
-    {
-        foreach ($occurrences as $occurrence) {
-            $this->occurrences[$occurrence->id()] = $occurrence;
-        }
+        $this->occurrences[$occurrence->id()->__toString()] = $occurrence;
     }
 
     /**
@@ -55,38 +50,14 @@ final class InMemoryOccurrenceRepository implements OccurrenceRepositoryInterfac
      *
      * @return ArrayCollection|Occurrence[]
      */
-    public function findAllByEvent(Event $event)
+    public function findAllByEvent(Event $event) : ArrayCollection
     {
-        return $this->query(
-            new InMemoryOccurrenceByEventSpecification($event)
-        );
-    }
+        $criteria = Criteria::create();
+        $expr     = Criteria::expr();
 
-    /**
-     * @param InMemoryOccurrenceSpecificationInterface $specification
-     *
-     * @return ArrayCollection|Occurrence[]
-     */
-    public function query(InMemoryOccurrenceSpecificationInterface $specification)
-    {
-        $result = $this->filterOccurrences(
-            function (Occurrence $occurrence) use ($specification) {
-                return $specification->specifies($occurrence);
-            }
-        );
+        $criteria->andWhere($expr->eq('event', $event));
 
-        return new ArrayCollection($result);
-    }
-
-    private function filterOccurrences(callable $callback)
-    {
-        $result = array_values(array_filter($this->occurrences, $callback));
-
-        usort($result, function (Occurrence $a, Occurrence $b) {
-            return $a->startDate() < $b->startDate() ? -1 : 1;
-        });
-
-        return $result;
+        return $this->occurrences->matching($criteria);
     }
 
     /**
@@ -95,67 +66,41 @@ final class InMemoryOccurrenceRepository implements OccurrenceRepositoryInterfac
      *
      * @return Occurrence[]|ArrayCollection
      */
-    public function findOneByDateAndCalendar(DateTime $date, Calendar $calendar)
+    public function findByDateAndCalendar(DateTime $date, Calendar $calendar) : ArrayCollection
     {
-        return $this->query(
-            new InMemoryOccurrenceByDateAndCalendarSpecification($date, $calendar)
-        );
-    }
-
-    /**
-     * @param DateTime $startDate
-     * @param DateTime $endDate
-     * @param Calendar $calendar
-     *
-     * @return Occurrence[]|ArrayCollection
-     */
-    public function findAllByCalendarInDateRange(DateTime $startDate, DateTime $endDate, Calendar $calendar)
-    {
-        return $this->query(
-            new InMemoryOccurrenceByDateRangeAndCalendarSpecification($startDate, $endDate, $calendar)
-        );
-    }
-
-    /**
-     * @param $calendar
-     *
-     * @return Occurrence[]|ArrayCollection
-     */
-    public function findAllByCalendar($calendar)
-    {
-        return $this->query(
-            new InMemoryOccurrenceByCalendarSpecification($calendar)
-        );
+        return $this->occurrences->filter(function (Occurrence $occurrence) use ($calendar, $date) {
+            return $occurrence->event()->calendar() === $calendar
+                && $occurrence->startDate() <= $date
+                && $occurrence->endDate() >= $date;
+        });
     }
 
     /**
      * @param Occurrence $occurrence
      */
-    public function update($occurrence)
+    public function update(Occurrence $occurrence)
     {
-        if (!isset($this->occurrences[$occurrence->id()])) {
-            throw new Exception(sprintf('Occurrence with id %s is not set, cannot update!', $occurrence->id()));
-        }
-
-        $this->occurrences[$occurrence->id()] = $occurrence;
+        $this->occurrences[$occurrence->id()->__toString()] = $occurrence;
     }
 
     /**
      * @return mixed
      */
-    public function findAllByEventUnmodified(Event $event)
+    public function findAllByEventUnmodified(Event $event) : ArrayCollection
     {
-        return $this->query(
-            new InMemoryOccurrenceByEventSpecification($event, true)
-        );
+        $occurrences = array_filter($this->occurrences->getIterator(), function (Occurrence $occurrence) use ($event) {
+            return $occurrence->event()->id()->equals($event->id());
+        });
+
+        return new ArrayCollection($occurrences);
     }
 
     /**
      * @param Occurrence|Event\Occurrence[]|ArrayCollection $occurrence
      */
-    public function remove($occurrence)
+    public function remove(Occurrence $occurrence)
     {
-        unset($this->occurrences[$occurrence->id()]);
+        unset($this->occurrences[$occurrence->id()->__toString()]);
     }
 
     /**
@@ -168,5 +113,15 @@ final class InMemoryOccurrenceRepository implements OccurrenceRepositoryInterfac
                 $this->remove($occurrence);
             }
         }
+    }
+
+    /**
+     * @param string $id
+     *
+     * @return Occurrence|null
+     */
+    public function findOneById(string $id)
+    {
+        return $this->occurrences->get($id);
     }
 }

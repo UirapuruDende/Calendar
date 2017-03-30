@@ -2,43 +2,19 @@
 namespace Dende\Calendar\Application\Factory;
 
 use DateTime;
-use Dende\Calendar\Application\Generator\IdGeneratorInterface;
-use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
+use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 
-/**
- * Class OccurrenceFactory.
- */
 class OccurrenceFactory implements OccurrenceFactoryInterface
 {
-    /**
-     * @var IdGeneratorInterface
-     */
-    protected $idGenerator;
-
-    /**
-     * EventFactory constructor.
-     *
-     * @param IdGeneratorInterface $idGenerator
-     */
-    public function __construct(IdGeneratorInterface $idGenerator = null)
-    {
-        $this->idGenerator = $idGenerator;
-    }
-
-    /**
-     * @param array $array
-     *
-     * @return Occurrence
-     */
-    public function createFromArray($array = [])
+    public function createFromArray(array $array = []) : Occurrence
     {
         $template = [
-            'id'        => $this->idGenerator ? $this->idGenerator->generateId() : null,
+            'id'        => OccurrenceId::create(),
             'event'     => null,
-            'startDate' => new DateTime('now'),
-            'duration'  => new OccurrenceDuration(0),
+            'startDate' => new DateTime(),
+            'duration'  => new OccurrenceDuration(),
         ];
 
         $array = array_merge($template, $array);

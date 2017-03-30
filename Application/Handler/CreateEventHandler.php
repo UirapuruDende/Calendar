@@ -4,13 +4,14 @@ namespace Dende\Calendar\Application\Handler;
 use Carbon\Carbon;
 use Dende\Calendar\Application\Command\CreateEventCommand;
 use Dende\Calendar\Application\Factory\EventFactory;
-use Dende\Calendar\Application\Factory\EventFactoryInterface;
-use Dende\Calendar\Application\Factory\OccurrenceFactory;
-use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
+use Dende\Calendar\Application\Repository\CalendarRepositoryInterface;
+use Dende\Calendar\Application\Repository\EventRepositoryInterface;
+use Dende\Calendar\Application\Repository\OccurrenceRepositoryInterface;
+use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
+use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
-use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
-use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
+use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Exception;
 
 /**
@@ -33,50 +34,68 @@ final class CreateEventHandler
      */
     private $eventFactory;
 
-    /**
-     * @var OccurrenceFactory
-     */
-    private $occurrenceFactory;
+    private $calendarRepository;
 
     /**
      * CreateEventHandler constructor.
      *
+     * @param CalendarRepositoryInterface   $calendarRepository
      * @param EventRepositoryInterface      $eventRepository
      * @param OccurrenceRepositoryInterface $occurrenceRepository
-     * @param EventFactory                  $eventFactory
-     * @param OccurrenceFactory             $occurrenceFactory
      */
-    public function __construct(EventRepositoryInterface $eventRepository, OccurrenceRepositoryInterface $occurrenceRepository, EventFactoryInterface $eventFactory, OccurrenceFactoryInterface $occurrenceFactory)
+    public function __construct(CalendarRepositoryInterface $calendarRepository, EventRepositoryInterface $eventRepository, OccurrenceRepositoryInterface $occurrenceRepository)
     {
-        $this->eventRepository = $eventRepository;
+        $this->calendarRepository   = $calendarRepository;
+        $this->eventRepository      = $eventRepository;
         $this->occurrenceRepository = $occurrenceRepository;
-        $this->eventFactory = $eventFactory;
-        $this->occurrenceFactory = $occurrenceFactory;
     }
 
     /**
      * @param CreateEventCommand $command
+     *
+     * @throws Exception
      */
     public function handle(CreateEventCommand $command)
     {
-        if (is_null($command->calendar)) {
+        if ($command->type === EventType::TYPE_SINGLE) {
+            $endDate = Carbon::instance($command->startDate)
+                ->addMinutes(Duration::calculate($command->startDate, $command->endDate)->minutes());
+
+            $repetitions = [];
+        } else {
+            $endDate = Carbon::instance($command->endDate);
+
+            if (0 === count($command->repetitions)) {
+                throw new Exception('If event is repetive, you should choose days of repetition for it!');
+            }
+
+            $repetitions = $command->repetitions;
+        }
+
+        /** @var Calendar $calendar */
+        $calendar = $this->calendarRepository->findOneByCalendarId($command->calendarId);
+
+        if (null === $calendar) {
             throw new Exception('Calendar is null and it has to be set!');
         }
 
-        if ($command->type === EventType::TYPE_SINGLE) {
-            /** @var Carbon $date */
-            $date = Carbon::instance($command->startDate)
-                ->addMinutes(Duration::calculate($command->startDate, $command->endDate)->minutes());
-        } else {
-            /** @var Carbon $date */
-            $date = Carbon::instance($command->endDate);
-        }
+        $eventId = EventId::create();
 
-        $command->endDate = $date;
+        $calendar->addEvent(
+            $eventId,
+            $command->title,
+            $command->startDate,
+            $endDate,
+            new EventType($command->type),
+            new Repetitions($repetitions)
+        );
 
-        $event = $this->eventFactory->createFromCommand($command);
-        $event->generateOccurrenceCollection($this->occurrenceFactory);
+        $event = $calendar->getEventById($eventId);
 
         $this->eventRepository->insert($event);
+
+        foreach ($event->occurrences() as $occurrence) {
+            $this->occurrenceRepository->insert($occurrence);
+        }
     }
 }

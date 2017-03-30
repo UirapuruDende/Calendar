@@ -1,15 +1,12 @@
 <?php
 namespace Dende\Calendar\Application\Handler;
 
-use Dende\Calendar\Application\Command\CreateEventCommand;
-use Dende\Calendar\Application\Command\EventCommandInterface;
-use Dende\Calendar\Application\Command\UpdateEventCommand;
-use Dende\Calendar\Application\Factory\CalendarFactory;
+use Dende\Calendar\Application\Command\CreateCalendarCommand;
+use Dende\Calendar\Application\Event\PostCreateCalendar;
+use Dende\Calendar\Application\Events;
 use Dende\Calendar\Application\Factory\CalendarFactoryInterface;
-use Dende\Calendar\Domain\Repository\CalendarRepositoryInterface;
-use Dende\CalendarBundle\Event\CalendarAfterCreationEvent;
-use Dende\CalendarBundle\Events;
-use Dende\CalendarBundle\Repository\ORM\CalendarRepository;
+use Dende\Calendar\Application\Repository\CalendarRepositoryInterface;
+use Dende\Calendar\Domain\Calendar\CalendarId;
 use Exception;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -36,35 +33,33 @@ class CreateCalendarHandler
     /**
      * NewCalendarCreationHandler constructor.
      *
-     * @param CalendarFactory    $calendarFactory
-     * @param CalendarRepository $calendarRepository
+     * @param CalendarFactoryInterface    $calendarFactory
+     * @param CalendarRepositoryInterface $calendarRepository
+     * @param EventDispatcherInterface    $eventDispatcher
      */
     public function __construct(CalendarFactoryInterface $calendarFactory, CalendarRepositoryInterface $calendarRepository, EventDispatcherInterface $eventDispatcher)
     {
-        $this->calendarFactory = $calendarFactory;
+        $this->calendarFactory    = $calendarFactory;
         $this->calendarRepository = $calendarRepository;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->eventDispatcher    = $eventDispatcher;
     }
 
-    /**
-     * @param UpdateEventCommand|CreateEventCommand $command
-     */
-    public function handle(EventCommandInterface $command)
+    public function handle(CreateCalendarCommand $command)
     {
-        $newCalendarName = $command->newCalendarName;
-
-        if (is_null($newCalendarName)) {
+        if (is_null($command->title)) {
             throw new Exception('Calendar name is required!');
         }
 
-        $newCalendar = $this->calendarFactory->createFromArray(['title' => $newCalendarName]);
-        $this->calendarRepository->insert($newCalendar);
+        $calendar = $this->calendarFactory->createFromArray([
+            'calendarId' => CalendarId::create(),
+            'title'      => $command->title,
+        ]);
+
+        $this->calendarRepository->insert($calendar);
 
         $this->eventDispatcher->dispatch(
-            Events::CALENDAR_AFTER_CREATION,
-            new CalendarAfterCreationEvent($newCalendar)
+            Events::POST_CREATE_CALENDAR,
+            new PostCreateCalendar($calendar)
         );
-
-        $command->calendar = $newCalendar;
     }
 }

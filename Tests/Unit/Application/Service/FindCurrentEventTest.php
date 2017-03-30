@@ -2,14 +2,13 @@
 namespace Dende\Calendar\Tests\Unit\Application\Service\FindCurrentEventTest;
 
 use DateTime;
-use Dende\Calendar\Application\Factory\EventFactory;
-use Dende\Calendar\Application\Factory\OccurrenceFactory;
-use Dende\Calendar\Application\Generator\InMemory\IdGenerator;
 use Dende\Calendar\Application\Service\FindCurrentEvent;
 use Dende\Calendar\Domain\Calendar;
-use Dende\Calendar\Domain\Calendar\Event\Duration;
+use Dende\Calendar\Domain\Calendar\CalendarId;
+use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
+use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryOccurrenceRepository;
 use Mockery as m;
 
 /**
@@ -19,27 +18,27 @@ class FindCurrentEventTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetCurrentEvent()
     {
-        $calendar = new Calendar(0, 'title');
+        $calendar = new Calendar(CalendarId::create(), 'title');
 
-        $event = (new EventFactory(new IdGenerator()))->createFromArray([
-            'id'          => 10,
-            'type'        => new EventType(EventType::TYPE_SINGLE),
-            'startDate'   => new DateTime('-10 minutes'),
-            'endDate'     => new DateTime('+10 minutes'),
-            'duration'    => new Duration(10),
-            'repetitions' => new Repetitions([]),
-            'calendar'    => $calendar,
-        ]);
+        $eventId = EventId::create();
 
-        $occurrences = (new OccurrenceFactory(new IdGenerator()))->generateCollectionFromEvent($event);
+        $calendar->addEvent(
+            $eventId,
+            'title',
+            new DateTime('-10 minutes'),
+            new DateTime('+10 minutes'),
+            EventType::single(),
+            Repetitions::none()
+        );
 
-        $occurrenceRepository = m::mock("Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface");
-        $occurrenceRepository->shouldReceive('findOneByDateAndCalendar')->andReturn($occurrences);
+        $occurrences = $calendar->getEventById($eventId)->occurrences();
 
-        $service = new FindCurrentEvent($occurrenceRepository);
-        $currentEvent = $service->getCurrentEvent($calendar);
+        $occurrenceRepository = new InMemoryOccurrenceRepository($occurrences);
 
-        $this->assertEquals(10, $currentEvent->id());
+        $service       = new FindCurrentEvent($occurrenceRepository);
+        $currentEvents = $service->getCurrentEvents($calendar);
+
+        $this->assertEquals($eventId, $currentEvents->first()->id());
     }
 
     public function tearDown()

@@ -8,8 +8,8 @@ use Dende\Calendar\Application\Factory\EventFactory;
 use Dende\Calendar\Application\Factory\EventFactoryInterface;
 use Dende\Calendar\Application\Factory\OccurrenceFactory;
 use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
-use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
-use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
+use Dende\Calendar\Application\Repository\EventRepositoryInterface;
+use Dende\Calendar\Application\Repository\OccurrenceRepositoryInterface;
 
 /**
  * Interface UpdateStrategyInterface.

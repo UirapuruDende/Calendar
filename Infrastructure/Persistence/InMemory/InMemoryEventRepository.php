@@ -1,27 +1,32 @@
 <?php
 namespace Dende\Calendar\Infrastructure\Persistence\InMemory;
 
-use DateTime;
-use Dende\Calendar\Domain\Calendar;
+use Dende\Calendar\Application\Repository\EventRepositoryInterface;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
-use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
-use Dende\Calendar\Domain\Repository\Specification\InMemoryEventSpecificationInterface;
-use Dende\Calendar\Infrastructure\Persistence\InMemory\Specification\InMemoryEventsByDateRangeAndCalendarSpecification;
-use Dende\Calendar\Infrastructure\Persistence\InMemory\Specification\InMemoryEventsByTitleSpecification;
-use Exception;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class InMemoryEventRepository implements EventRepositoryInterface
 {
     /**
-     * @var Event[]
+     * @var Event[]|ArrayCollection
      */
-    private $events = [];
+    private $events;
 
     /**
-     * @return Event[]
+     * InMemoryEventRepository constructor.
+     *
+     * @param Event[]|ArrayCollection $events
      */
-    public function findAll()
+    public function __construct(ArrayCollection $events = null)
+    {
+        $this->events = $events ?: new ArrayCollection();
+    }
+
+    /**
+     * @return Event[]|ArrayCollection
+     */
+    public function findAll() : ArrayCollection
     {
         return $this->events;
     }
@@ -31,64 +36,7 @@ class InMemoryEventRepository implements EventRepositoryInterface
      */
     public function insert(Event $event)
     {
-        $this->events[$event->id()] = $event;
-    }
-
-    /**
-     * @param InMemoryEventSpecificationInterface $specification
-     *
-     * @return array
-     */
-    public function query(InMemoryEventSpecificationInterface $specification)
-    {
-        return $this->filterEvents(
-            function (Event $event) use ($specification) {
-                return $specification->specifies($event);
-            }
-        );
-    }
-
-    /**
-     * @param callable $callback
-     *
-     * @return array
-     */
-    private function filterEvents(callable $callback)
-    {
-        $result = array_values(array_filter($this->events, $callback));
-
-        usort($result, function (Event $a, Event $b) {
-            return $a->startDate() < $b->startDate() ? -1 : 1;
-        });
-
-        return $result;
-    }
-
-    /**
-     * @param $startDate
-     * @param $endDate
-     * @param $calendar
-     *
-     * @return array
-     */
-    public function findAllByCalendarInDateRange(DateTime $startDate, DateTime $endDate, Calendar $calendar)
-    {
-        return $this->query(
-            new InMemoryEventsByDateRangeAndCalendarSpecification($startDate, $endDate, $calendar)
-        );
-    }
-
-    /**
-     * @param $title
-     * @param Calendar|null $calendar
-     *
-     * @return array
-     */
-    public function findOneByTitle($title, Calendar $calendar = null)
-    {
-        return $this->query(
-            new InMemoryEventsByTitleSpecification($title, $calendar)
-        );
+        $this->events[$event->id()->__toString()] = $event;
     }
 
     /**
@@ -96,11 +44,7 @@ class InMemoryEventRepository implements EventRepositoryInterface
      */
     public function update(Event $event)
     {
-        if (!isset($this->events[$event->id()])) {
-            throw new Exception(sprintf('Event with id %s is not set, cannot update!', $event->id()));
-        }
-
-        $this->events[$event->id()] = $event;
+        $this->events[$event->id()->__toString()] = $event;
     }
 
     /**
@@ -108,13 +52,15 @@ class InMemoryEventRepository implements EventRepositoryInterface
      */
     public function remove(Event $event)
     {
-        unset($this->events[$event->id()]);
+        unset($this->events[$event->id()->__toString()]);
     }
 
     public function findOneByOccurrence(Occurrence $occurrence) : Event
     {
-        $events = array_filter($this->events, function (Event $event) use ($occurrence) {
+        $events = array_filter($this->events->getIterator()->getArrayCopy(), function (Event $event) use ($occurrence) {
             return $event->occurrences()->contains($occurrence);
         });
+
+        return array_pop($events);
     }
 }

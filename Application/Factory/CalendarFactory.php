@@ -1,58 +1,30 @@
 <?php
 namespace Dende\Calendar\Application\Factory;
 
-use Dende\Calendar\Application\Generator\IdGeneratorInterface;
 use Dende\Calendar\Domain\Calendar;
+use Dende\Calendar\Domain\Calendar\CalendarId;
 use Doctrine\Common\Collections\ArrayCollection;
 
-/**
- * Class CalendarFactory.
- *
- * @todo change 'title' to title, because calendar has 'title' field
- */
 class CalendarFactory implements CalendarFactoryInterface
 {
-    /**
-     * @var IdGeneratorInterface
-     */
-    protected $idGenerator;
-
-    /**
-     * CalendarFactory constructor.
-     *
-     * @param $idGenerator
-     */
-    public function __construct(IdGeneratorInterface $idGenerator)
-    {
-        $this->idGenerator = $idGenerator;
-    }
-
-    /**
-     * @param $params
-     *
-     * @return Calendar
-     */
-    public function createFromArray($array)
+    public function createFromArray(array $array = []) : Calendar
     {
         $template = [
-            'id'     => $this->idGenerator->generateId(),
-            'title'  => '',
-            'events' => new ArrayCollection([]),
+            'calendarId' => CalendarId::create(),
+            'title'      => '',
+            'events'     => [],
         ];
 
         $array = array_merge($template, $array);
 
         return new Calendar(
-            $array['id'],
+            $array['calendarId'],
             $array['title'],
-            $array['events']
+            new ArrayCollection($array['events'])
         );
     }
 
-    /**
-     * @return Calendar
-     */
-    public function create()
+    public function create() : Calendar
     {
         return $this->createFromArray([]);
     }

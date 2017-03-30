@@ -1,24 +1,8 @@
 <?php
-
 namespace Dende\Calendar\Domain\Calendar;
 
+use Dende\Calendar\Domain\AbstractId;
 
-class CalendarId
+class CalendarId extends AbstractId
 {
-    /** @var string */
-    private $id;
-
-    /**
-     * CalendarId constructor.
-     * @param $id
-     */
-    public function __construct(string $id)
-    {
-        $this->id = $id;
-    }
-
-    public function id() : string
-    {
-        return $this->id;
-    }
 }

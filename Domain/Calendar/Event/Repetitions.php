@@ -6,13 +6,13 @@ namespace Dende\Calendar\Domain\Calendar\Event;
  */
 class Repetitions
 {
-    const MONDAY = 1;
-    const TUESDAY = 2;
+    const MONDAY    = 1;
+    const TUESDAY   = 2;
     const WEDNESDAY = 3;
-    const THURSDAY = 4;
-    const FRIDAY = 5;
-    const SATURDAY = 6;
-    const SUNDAY = 7;
+    const THURSDAY  = 4;
+    const FRIDAY    = 5;
+    const SATURDAY  = 6;
+    const SUNDAY    = 7;
 
     /**
      * @var array
@@ -63,7 +63,7 @@ class Repetitions
     /**
      * @return array
      */
-    public function weekdays() : array
+    public function getArray() : array
     {
         return $this->weekdays;
     }

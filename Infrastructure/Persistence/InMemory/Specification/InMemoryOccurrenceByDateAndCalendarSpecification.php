@@ -41,7 +41,7 @@ final class InMemoryOccurrenceByDateAndCalendarSpecification implements InMemory
     public function specifies(Occurrence $occurrence)
     {
         $rangeStart = $occurrence->startDate();
-        $rangeEnd = $occurrence->endDate();
+        $rangeEnd   = $occurrence->endDate();
 
         $calendarId = $occurrence->event()->calendar()->id();
 

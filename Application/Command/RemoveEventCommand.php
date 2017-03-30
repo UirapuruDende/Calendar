@@ -1,7 +1,7 @@
 <?php
 namespace Dende\Calendar\Application\Command;
 
-use Dende\Calendar\Domain\Calendar\Event\Occurrence;
+use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 
 /**
  * Class RemoveEventCommand.
@@ -11,9 +11,9 @@ final class RemoveEventCommand implements EventCommandInterface, UpdateEventComm
     /**
      * Occurrence that was clicked to edit relating event.
      *
-     * @var Occurrence
+     * @var OccurrenceId
      */
-    public $occurrence;
+    public $occurrenceId;
 
     /**
      * Update Strategy Method.
@@ -21,4 +21,9 @@ final class RemoveEventCommand implements EventCommandInterface, UpdateEventComm
      * @var string
      */
     public $method;
+
+    public function method(): string
+    {
+        return $this->method;
+    }
 }

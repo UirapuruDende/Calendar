@@ -4,6 +4,7 @@ namespace Dende\Calendar\Domain\Calendar\Event;
 use DateTime;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
+use Dende\Calendar\Domain\IdInterface;
 
 /**
  * Interface OccurrenceInterface.
@@ -13,58 +14,30 @@ use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
  * @property OccurrenceDuration $duration
  * @property bool $modified
  * @property Event $event
- * @property string $id
+ * @property string $occurrenceId
  */
 interface OccurrenceInterface
 {
-    /**
-     * @param OccurrenceDuration $newDuration
-     */
     public function resize(OccurrenceDuration $newDuration);
 
-    /**
-     * @param DateTime $newStartDate
-     */
     public function move(DateTime $newStartDate);
 
-    /**
-     * @return bool
-     */
     public function isOngoing() : bool;
 
-    /**
-     * @return bool
-     */
     public function isPast() : bool;
 
-    /**
-     * @return DateTime
-     */
     public function startDate() : DateTime;
 
-    /**
-     * @return OccurrenceDuration
-     */
     public function duration() : OccurrenceDuration;
 
-    /**
-     * @return DateTime
-     */
     public function endDate() : DateTime;
 
-    /**
-     * @return string
-     */
-    public function id() : string;
+    public function id() : IdInterface;
 
-    /**
-     * @param DateTime $startDate
-     */
+    public function event() : Event;
+
     public function changeStartDate(DateTime $startDate);
 
-    /**
-     * @param OccurrenceDuration $duration
-     */
     public function changeDuration(OccurrenceDuration $duration);
 
     public function isModified() : bool;

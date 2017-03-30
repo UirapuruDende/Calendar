@@ -1,194 +1,153 @@
 <?php
-namespace Unit\Domain\Calendar;
+namespace Dende\Calendar\Tests\Unit\Domain\Calendar;
 
-use Carbon\Carbon;
 use DateTime;
-use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
-use Dende\Calendar\Domain\Calendar\Event\Duration;
+use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
+use Dende\Calendar\Domain\Calendar\Event\Repetitions;
+use PHPUnit_Framework_TestCase;
 
-class EventTest extends \PHPUnit_Framework_TestCase
+class EventTest extends PHPUnit_Framework_TestCase
 {
+    public function testCalculateOccurrencesDatesWeekly()
+    {
+        $event = new Event(
+            EventId::create(),
+            Calendar::create('title'),
+            EventType::weekly(),
+            new DateTime('2015-09-01 12:00:00'),
+            new DateTime('2015-09-30 13:30:00'),
+            'some title',
+            new Repetitions([
+                Repetitions::MONDAY,
+                Repetitions::WEDNESDAY,
+                Repetitions::FRIDAY,
+            ])
+        );
+
+        $occurrences = $event->occurrences();
+
+        $this->assertCount(13, $occurrences);
+
+        $this->assertEquals($occurrences[0]->startDate(), new DateTime('2015-09-02 12:00:00'));
+        $this->assertEquals($occurrences[1]->startDate(), new DateTime('2015-09-04 12:00:00'));
+        $this->assertEquals($occurrences[2]->startDate(), new DateTime('2015-09-07 12:00:00'));
+        $this->assertEquals($occurrences[3]->startDate(), new DateTime('2015-09-09 12:00:00'));
+        $this->assertEquals($occurrences[4]->startDate(), new DateTime('2015-09-11 12:00:00'));
+        $this->assertEquals($occurrences[5]->startDate(), new DateTime('2015-09-14 12:00:00'));
+        $this->assertEquals($occurrences[6]->startDate(), new DateTime('2015-09-16 12:00:00'));
+        $this->assertEquals($occurrences[7]->startDate(), new DateTime('2015-09-18 12:00:00'));
+        $this->assertEquals($occurrences[8]->startDate(), new DateTime('2015-09-21 12:00:00'));
+        $this->assertEquals($occurrences[9]->startDate(), new DateTime('2015-09-23 12:00:00'));
+        $this->assertEquals($occurrences[10]->startDate(), new DateTime('2015-09-25 12:00:00'));
+        $this->assertEquals($occurrences[11]->startDate(), new DateTime('2015-09-28 12:00:00'));
+        $this->assertEquals($occurrences[12]->startDate(), new DateTime('2015-09-30 12:00:00'));
+    }
+
+    public function testCalculateOccurrencesDatesSingle()
+    {
+        $event = new Event(
+            EventId::create(),
+            Calendar::create('test'),
+            EventType::single(),
+            new DateTime('2015-09-01 12:00:00'),
+            new DateTime('2015-09-30 13:30:00'),
+            'some title',
+            new Repetitions([])
+        );
+
+        $occurrences = $event->occurrences();
+
+        $this->assertCount(1, $occurrences);
+        $this->assertEquals($occurrences[0]->startDate(), new DateTime('2015-09-01 12:00:00'));
+    }
+
     /**
-     * @test
-     * @dataProvider dataProvider
-     *
-     * @param $params
+     * @expectedException \Exception
+     * @expectedExceptionMessage End date '2015-08-01 12:00:00' cannot be before start date '2015-09-01 12:00:00'
      */
-    public function testUpdateEventWithCommand($params, $command, $expectedValues)
+    public function testConstructorExceptions()
     {
-        $event = new Event(null, ...array_values($params));
-
-        $event->updateWithCommand($command);
-
-        $this->assertEquals($event->startDate(), $expectedValues['startDate'], null, 2);
-        $this->assertEquals($event->endDate(), $expectedValues['endDate'], null, 2);
-        $this->assertEquals($event->title(), $expectedValues['title']);
-        $this->assertEquals($event->repetitions()->weekdays(), $expectedValues['repetitions']);
-        $this->assertEquals($event->duration()->minutes(), $expectedValues['duration']);
+        new Event(
+            EventId::create(),
+            Calendar::create('test'),
+            EventType::weekly(),
+            new DateTime('2015-09-01 12:00:00'),
+            new DateTime('2015-08-01 12:00:00'),
+            'some title',
+            new Repetitions([
+                Repetitions::TUESDAY,
+            ])
+        );
     }
 
-    public function dataProvider()
+    /**
+     * @dataProvider closeAtDateDataProvider
+     *
+     * @param DateTime $closingDate
+     * @param array    $expected
+     */
+    public function testCloseAtDate(DateTime $closingDate, array $expected)
     {
-        return [
-            'single to single update' => $this->simpleUpdateData(),
-            'single to weekly update' => $this->singleToWeeklyUpdateData(),
-            'weekly to single update' => $this->weeklyToSingleUpdateData(),
-            'weekly to weekly update' => $this->weeklyToWeeklyUpdateData(),
+        $event = new Event(
+            EventId::create(),
+            Calendar::create('test'),
+            EventType::weekly(),
+            new DateTime('last monday 12:00:00'),
+            (new DateTime('last monday 12:30:00'))->modify('+6 days'),
+            'some title',
+            new Repetitions([1, 3, 5])
+        );
 
-        ];
+        $this->assertCount(3, $event->occurrences());
+
+        $event->closeAtDate($closingDate);
+
+        $this->assertEquals($closingDate, $event->endDate(), null, 2);
+
+        $this->assertEquals($expected[0], $event->occurrences()->get(0)->getDeletedAt(), null, 2);
+        $this->assertEquals($expected[1], $event->occurrences()->get(1)->getDeletedAt(), null, 2);
+        $this->assertEquals($expected[2], $event->occurrences()->get(2)->getDeletedAt(), null, 2);
     }
 
-    private function simpleUpdateData()
+    public function closeAtDateDataProvider() : array
     {
-        $originalCalendar = new Calendar(null, 'title1');
-        $originalType = new EventType(EventType::TYPE_SINGLE);
-        $originalStartDate = new DateTime('today 12:00');
-        $originalEndDate = new DateTime('today 13:30');
-        $originalRepetitions = new Event\Repetitions([]);
-        $originalTitle = 'Test Title';
-
-        $updateCommand = new UpdateEventCommand();
-        $updateCommand->startDate = $originalStartDate;
-        $updateCommand->endDate = $originalEndDate;
-        $updateCommand->title = $originalTitle;
-        $updateCommand->repetitionDays = $originalRepetitions->weekdays();
+        $base = new DateTime('last monday 12:00:00');
 
         return [
-            'params' => [
-                'calendar'    => $originalCalendar,
-                'type'        => $originalType,
-                'startDate'   => $originalStartDate,
-                'endDate'     => $originalEndDate,
-                'title'       => $originalTitle,
-                'repetitions' => $originalRepetitions,
+            'before first' => [
+                'closingDate' => (clone $base)->modify('-1 day'),
+                'expected'    => [
+                    new DateTime(),
+                    new DateTime(),
+                    new DateTime(),
+                ],
             ],
-            'command'        => $updateCommand,
-            'expectedValues' => [
-                'calendar'    => $originalCalendar,
-                'type'        => $originalType->type(),
-                'startDate'   => $originalStartDate,
-                'endDate'     => $originalEndDate,
-                'title'       => $originalTitle,
-                'repetitions' => $originalRepetitions->weekdays(),
-                'duration'    => 90,
+            'tuesday' => [
+                'closingDate' => (clone $base)->modify('+1 day'),
+                'expected'    => [
+                    null,
+                    new DateTime(),
+                    new DateTime(),
+                ],
             ],
-        ];
-    }
-
-    private function singleToWeeklyUpdateData()
-    {
-        $originalCalendar = new Calendar(null, 'title1');
-        $originalType = new EventType(EventType::TYPE_SINGLE);
-        $originalStartDate = new DateTime('today 12:00');
-        $originalEndDate = new DateTime('today 13:30');
-        $originalRepetitions = new Event\Repetitions([]);
-        $originalTitle = 'Test Title';
-        $originalDuration = new Duration(90);
-
-        $updateCommand = new UpdateEventCommand();
-        $updateCommand->startDate = $originalStartDate;
-        $updateCommand->endDate = Carbon::instance($originalEndDate)->addMonth();
-        $updateCommand->title = 'New Title';
-        $updateCommand->repetitionDays = [2, 3, 4];
-
-        return [
-            'params' => [
-                'calendar'    => $originalCalendar,
-                'type'        => $originalType,
-                'startDate'   => $originalStartDate,
-                'endDate'     => $originalEndDate,
-                'title'       => $originalTitle,
-                'repetitions' => $originalRepetitions,
+            'thursday' => [
+                'closingDate' => (clone $base)->modify('+3 day'),
+                'expected'    => [
+                    null,
+                    null,
+                    new DateTime(),
+                ],
             ],
-            'command'        => $updateCommand,
-            'expectedValues' => [
-                'calendar'    => $originalCalendar,
-                'type'        => EventType::TYPE_WEEKLY,
-                'startDate'   => new DateTime('today 12:00'),
-                'endDate'     => new DateTime('+1 month 13:30'),
-                'title'       => 'New Title',
-                'repetitions' => [2, 3, 4],
-                'duration'    => 90,
-            ],
-        ];
-    }
-
-    private function weeklyToSingleUpdateData()
-    {
-        $originalCalendar = new Calendar(null, 'title1');
-        $originalType = new EventType(EventType::TYPE_WEEKLY);
-        $originalStartDate = new DateTime('2016-08-01 12:00');
-        $originalEndDate = new DateTime('2016-08-31 13:30');
-        $originalRepetitions = new Event\Repetitions([1, 3, 5]);
-        $originalTitle = 'Test Title';
-        $originalDuration = new Duration(90);
-
-        $updateCommand = new UpdateEventCommand();
-        $updateCommand->startDate = new DateTime('2016-08-15 12:00');
-        $updateCommand->endDate = new DateTime('2016-08-15 13:00');
-        $updateCommand->title = 'New Title';
-        $updateCommand->repetitionDays = [];
-
-        return [
-            'params' => [
-                'calendar'    => $originalCalendar,
-                'type'        => $originalType,
-                'startDate'   => $originalStartDate,
-                'endDate'     => $originalEndDate,
-                'title'       => $originalTitle,
-                'repetitions' => $originalRepetitions,
-            ],
-            'command'        => $updateCommand,
-            'expectedValues' => [
-                'calendar'    => $originalCalendar,
-                'type'        => EventType::TYPE_SINGLE,
-                'startDate'   => new DateTime('2016-08-15 12:00'),
-                'endDate'     => new DateTime('2016-08-15 13:00'),
-                'title'       => 'New Title',
-                'repetitions' => [],
-                'duration'    => 60,
-            ],
-        ];
-    }
-
-    private function weeklyToWeeklyUpdateData()
-    {
-        $newCalendar = new Calendar(null, 'new calendar');
-
-        $originalCalendar = new Calendar(null, 'title1');
-        $originalType = new EventType(EventType::TYPE_WEEKLY);
-        $originalStartDate = new DateTime('2016-08-01 12:00');
-        $originalEndDate = new DateTime('2016-08-31 13:30');
-        $originalRepetitions = new Event\Repetitions([1, 3, 5]);
-        $originalTitle = 'Test Title';
-        $originalDuration = new Duration(90);
-
-        $updateCommand = new UpdateEventCommand();
-        $updateCommand->startDate = new DateTime('2016-09-01 12:00');
-        $updateCommand->endDate = new DateTime('2016-09-30 13:00');
-        $updateCommand->title = 'New Title';
-        $updateCommand->repetitionDays = [2, 4];
-
-        return [
-            'params' => [
-                'calendar'    => $originalCalendar,
-                'type'        => $originalType,
-                'startDate'   => $originalStartDate,
-                'endDate'     => $originalEndDate,
-                'title'       => $originalTitle,
-                'repetitions' => $originalRepetitions,
-            ],
-            'command'        => $updateCommand,
-            'expectedValues' => [
-                'type'        => EventType::TYPE_WEEKLY,
-                'startDate'   => new DateTime('2016-09-01 12:00'),
-                'endDate'     => new DateTime('2016-09-30 13:00'),
-                'title'       => 'New Title',
-                'repetitions' => [2, 4],
-                'duration'    => 60,
+            'last' => [
+                'closingDate' => (clone $base)->modify('+5 day'),
+                'expected'    => [
+                    null,
+                    null,
+                    null,
+                ],
             ],
         ];
     }

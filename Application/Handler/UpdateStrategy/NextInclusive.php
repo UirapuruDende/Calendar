@@ -2,13 +2,16 @@
 namespace Dende\Calendar\Application\Handler\UpdateStrategy;
 
 use DateTime;
-use Dende\Calendar\Application\Command\CreateEventCommand;
 use Dende\Calendar\Application\Command\RemoveEventCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommandInterface;
 use Dende\Calendar\Domain\Calendar\Event;
+use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
+use Dende\Calendar\Domain\Calendar\Event\OccurrenceInterface;
+use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Doctrine\Common\Collections\ArrayCollection;
+use Exception;
 
 class NextInclusive implements UpdateStrategyInterface
 {
@@ -19,32 +22,25 @@ class NextInclusive implements UpdateStrategyInterface
      */
     public function update(UpdateEventCommandInterface $command)
     {
-        /** @var Event $originalEvent */
-        $originalEvent = $this->eventRepository->findOneByOccurrence($command->occurrence);
+        $occurrence    = $this->occurrenceRepository->findOneById($command->occurrenceId);
+        $originalEvent = $this->eventRepository->findOneByOccurrence($occurrence);
 
         if ($originalEvent->isSingle()) {
-            throw new \Exception('This strategy is for series types events!');
+            throw new Exception('This strategy is for series types events!');
         }
 
-        $pivotDate = $this->findPivotDate($command->occurrence, $originalEvent);
+        $pivotDate = $this->findPivotDate($occurrence, $originalEvent);
         $originalEvent->closeAtDate($pivotDate);
 
-        $this->occurrenceRepository->update($originalEvent->occurrences());
+        foreach ($originalEvent->occurrences() as $occurrence) {
+            $this->occurrenceRepository->update($occurrence);
+        }
 
         if ($command instanceof UpdateEventCommand) {
-            $newEventCommand = CreateEventCommand::fromArray([
-                'startDate'      => $pivotDate,
-                'endDate'        => $command->endDate,
-                'calendar'       => $originalEvent->calendar(),
-                'type'           => $originalEvent->type()->type(),
-                'title'          => $command->title,
-                'repetitionDays' => $command->repetitionDays,
-            ]);
-
-            /** @var Event $newEvent */
-            $newEvent = $this->eventFactory->createFromCommand($newEventCommand);
-            $newEvent->generateOccurrencesCollection($this->occurrenceFactory);
-
+            $calendar = $originalEvent->calendar();
+            $eventId  = EventId::create();
+            $calendar->addEvent($eventId, $command->title, $pivotDate, $command->endDate, $originalEvent->type(), new Repetitions($command->repetitions));
+            $newEvent = $calendar->getEventById($eventId);
             $this->eventRepository->insert($newEvent);
         }
 
@@ -52,21 +48,24 @@ class NextInclusive implements UpdateStrategyInterface
     }
 
     /**
-     * @param UpdateEventCommand $command
+     * @param OccurrenceInterface $occurrence
+     * @param Event               $event
      *
      * @return DateTime
+     *
+     * @internal param UpdateEventCommand $command
      */
-    public function findPivotDate(Occurrence $clicked, Event $event) : DateTime
+    public function findPivotDate(OccurrenceInterface $editedOccurrence, Event $event) : DateTime
     {
         /** @var ArrayCollection|Occurrence[] $occurrences */
         $occurrences = $event->occurrences();
 
-        /** @var ArrayCollection $beforeClicked */
-        $beforeClicked = $occurrences->filter(function (Occurrence $occurrence) use ($clicked) {
-            return $occurrence->endDate() <= $clicked->startDate();
+        /** @var ArrayCollection $filteredOccurrencesBeforeEdited */
+        $filteredOccurrencesBeforeEdited = $occurrences->filter(function (Occurrence $occurrence) use ($editedOccurrence) {
+            return $occurrence->endDate() <= $editedOccurrence->startDate();
         });
 
-        $iterator = $beforeClicked->getIterator();
+        $iterator = $filteredOccurrencesBeforeEdited->getIterator();
 
         $iterator->uasort(function (Occurrence $a, Occurrence $b) {
             return $a->startDate() > $b->startDate();
@@ -74,8 +73,8 @@ class NextInclusive implements UpdateStrategyInterface
 
         if ($latestOccurrence = end($iterator)) {
             return $latestOccurrence->endDate();
-        } else {
-            return $clicked->endDate();
         }
+
+        return $editedOccurrence->endDate();
     }
 }

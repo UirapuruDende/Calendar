@@ -5,7 +5,6 @@ use DateTime;
 use Dende\Calendar\Application\Command\CreateEventCommand;
 use Dende\Calendar\Application\Command\EventCommandInterface;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
-use Dende\Calendar\Application\Generator\IdGeneratorInterface;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\EventId;
@@ -19,21 +18,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 class EventFactory implements EventFactoryInterface
 {
     /**
-     * @var IdGeneratorInterface
-     */
-    protected $idGenerator;
-
-    /**
-     * EventFactory constructor.
-     *
-     * @param IdGeneratorInterface $idGenerator
-     */
-    public function __construct(IdGeneratorInterface $idGenerator)
-    {
-        $this->idGenerator = $idGenerator;
-    }
-
-    /**
      * @param array $array
      *
      * @return Event
@@ -41,7 +25,7 @@ class EventFactory implements EventFactoryInterface
     public function createFromArray(array $array = []) : Event
     {
         $template = [
-            'id'          => new EventId(),
+            'eventId'     => EventId::create(),
             'title'       => '',
             'repetitions' => new Repetitions([]),
             'type'        => new EventType(),
@@ -54,7 +38,7 @@ class EventFactory implements EventFactoryInterface
         $array = array_merge($template, $array);
 
         return new Event(
-            $array['id'],
+            $array['eventId'],
             $array['calendar'],
             $array['type'],
             $array['startDate'],
@@ -78,7 +62,7 @@ class EventFactory implements EventFactoryInterface
         return static::createFromArray([
             'title'       => $command->title,
             'calendar'    => $command->calendar,
-            'repetitions' => new Repetitions($command->repetitionDays),
+            'repetitions' => new Repetitions($command->repetitions),
             'type'        => new EventType($command->type),
             'startDate'   => $command->startDate,
             'endDate'     => $command->endDate,

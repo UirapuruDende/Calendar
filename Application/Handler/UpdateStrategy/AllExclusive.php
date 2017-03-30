@@ -40,7 +40,7 @@ final class AllExclusive implements UpdateStrategyInterface
             $event->changeEndDate($command->endDate);
             $event->changeDuration(new Duration($command->duration));
             $event->changeTitle($command->title);
-            $event->changeRepetitions(new Repetitions($command->repetitionDays));
+            $event->changeRepetitions(new Repetitions($command->repetitions));
 
             foreach ($event->occurrences() as $occurrence) {
                 if ($occurrence->isModified()) {

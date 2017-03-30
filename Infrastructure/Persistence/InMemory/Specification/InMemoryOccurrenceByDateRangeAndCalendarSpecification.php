@@ -35,7 +35,7 @@ final class InMemoryOccurrenceByDateRangeAndCalendarSpecification implements InM
     public function __construct(\DateTime $rangeStart, \DateTime $rangeEnd, Calendar $calendar)
     {
         $start = Carbon::instance($rangeStart);
-        $end = Carbon::instance($rangeEnd);
+        $end   = Carbon::instance($rangeEnd);
 
         $start->setTime(0, 0, 0);
         $end->setTime(23, 59, 59);
@@ -43,7 +43,7 @@ final class InMemoryOccurrenceByDateRangeAndCalendarSpecification implements InM
         $this->calendar = $calendar;
 
         $this->rangeStart = $start;
-        $this->rangeEnd = $end;
+        $this->rangeEnd   = $end;
     }
 
     /**

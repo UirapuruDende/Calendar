@@ -1,7 +1,8 @@
 <?php
-namespace Dende\Calendar\Domain\Repository;
+namespace Dende\Calendar\Application\Repository;
 
 use Dende\Calendar\Domain\Calendar;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Interface CalendarRepositoryInterface.
@@ -19,12 +20,19 @@ interface CalendarRepositoryInterface
     public function update(Calendar $calendar);
 
     /**
-     * @return Calendar[]
+     * @return Calendar[]|ArrayCollection
      */
-    public function findAll();
+    public function findAll() : ArrayCollection;
 
     /**
      * @param Calendar $calendar
      */
     public function remove(Calendar $calendar);
+
+    /**
+     * @param string $calendarId
+     *
+     * @return Calendar|null
+     */
+    public function findOneByCalendarId(string $calendarId) : Calendar;
 }

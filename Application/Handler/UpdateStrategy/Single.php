@@ -6,7 +6,6 @@ use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommandInterface;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
-use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration as OccurrenceDuration;
 
 /**
@@ -21,7 +20,7 @@ final class Single implements UpdateStrategyInterface
      */
     public function update(UpdateEventCommandInterface $command)
     {
-        $occurrence = $command->occurrence;
+        $occurrence = $this->occurrenceRepository->findOneById($command->occurrenceId);
 
         $event = $occurrence->event();
 

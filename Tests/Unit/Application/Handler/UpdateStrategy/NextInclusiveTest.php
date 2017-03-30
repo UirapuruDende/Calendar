@@ -4,143 +4,185 @@ namespace Dende\Calendar\Tests\Unit\Application\Handler\UpdateStrategy;
 use DateTime;
 use Dende\Calendar\Application\Command\RemoveEventCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
-use Dende\Calendar\Application\Factory\EventFactoryInterface;
-use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
 use Dende\Calendar\Application\Handler\UpdateStrategy\NextInclusive;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
+use Dende\Calendar\Domain\Calendar\Event\EventId;
+use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
+use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
+use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Domain\Repository\EventRepositoryInterface;
 use Dende\Calendar\Domain\Repository\OccurrenceRepositoryInterface;
+use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryEventRepository;
+use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryOccurrenceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mockery as m;
 use PHPUnit_Framework_TestCase;
 
 class NextInclusiveTest extends PHPUnit_Framework_TestCase
 {
-    public function testFindPivotDate()
+    /**
+     * @test
+     * @dataProvider findingPivotDataProvider
+     */
+    public function test_finding_pivot_date(int $clickedIndex, int $expectedPivotDateIndex)
     {
-        $eventMock = m::mock(Event::class);
+        $event = new Event(
+            EventId::create(),
+            Calendar::create(''),
+            EventType::weekly(),
+            new DateTime('last monday 12:00:00'),
+            (new DateTime('last monday 12:01:00'))->modify('+6 days'),
+            'title',
+            Repetitions::workingDays()
+        );
 
-        {
-            $occurrence1 = new Occurrence(null, new DateTime('2016-09-01 12:00:00'), new OccurrenceDuration(60), $eventMock);
-            $occurrence2 = new Occurrence(null, new DateTime('2016-09-02 12:00:00'), new OccurrenceDuration(60), $eventMock);
-            $occurrence3 = new Occurrence(null, new DateTime('2016-09-03 12:00:00'), new OccurrenceDuration(60), $eventMock);
-            $occurrence4 = new Occurrence(null, new DateTime('2016-09-04 12:00:00'), new OccurrenceDuration(60), $eventMock);
-            $occurrence5 = new Occurrence(null, new DateTime('2016-09-05 12:00:00'), new OccurrenceDuration(60), $eventMock);
-        }
+        $this->assertCount(5, $event->occurrences());
 
-        $occurrences = [
-            $occurrence5,
-            $occurrence2,
-            $occurrence1,
-            $occurrence4,
-            $occurrence3,
-        ];
+        $pivotDate = (new NextInclusive())->findPivotDate($event->occurrences()->toArray()[$clickedIndex], $event);
 
-        $occurrencesCollectionMock = new ArrayCollection($occurrences);
-
-        $eventMock->shouldReceive('occurrences')->times(5)->andReturn($occurrencesCollectionMock);
-
-        $nextInclusive = new NextInclusive();
-
-        $this->assertEquals($nextInclusive->findPivotDate($occurrence5, $eventMock), $occurrence4->endDate());
-        $this->assertEquals($nextInclusive->findPivotDate($occurrence4, $eventMock), $occurrence3->endDate());
-        $this->assertEquals($nextInclusive->findPivotDate($occurrence3, $eventMock), $occurrence2->endDate());
-        $this->assertEquals($nextInclusive->findPivotDate($occurrence2, $eventMock), $occurrence1->endDate());
-        $this->assertEquals($nextInclusive->findPivotDate($occurrence1, $eventMock), $occurrence1->endDate());
+        $this->assertEquals($event->occurrences()->toArray()[$expectedPivotDateIndex]->endDate(), $pivotDate);
     }
 
-    public function testUpdate()
+    public function findingPivotDataProvider() : array
     {
-        $pivotDate = new DateTime('now');
-        $newOccurrencesCollection = new ArrayCollection([]);
+        return [
+            ['clickedIndex' => 0, 'expectedPivotDateIndex' => 0],
+            ['clickedIndex' => 1, 'expectedPivotDateIndex' => 0],
+            ['clickedIndex' => 2, 'expectedPivotDateIndex' => 1],
+            ['clickedIndex' => 3, 'expectedPivotDateIndex' => 2],
+            ['clickedIndex' => 4, 'expectedPivotDateIndex' => 3],
+        ];
+    }
 
-        $deletedDate1 = null;
-        $deletedDate2 = null;
-        $deletedDate3 = null;
+    /**
+     * @test
+     */
+    public function it_tests_extending_event()
+    {
+        setup : {
+            $calendar = Calendar::create('');
+            $eventId  = EventId::create();
+            $baseDate = new DateTime('last monday 12:00:00');
 
-        /** @var m\MockInterface|Event $originalEventMock */
-        $originalEventMock = m::mock(Event::class);
-
-        occurrencesCollection: {
-
-            $oldOccurrence1 = new Occurrence(null, new DateTime('yesterday'), new OccurrenceDuration(90));
-            $oldOccurrence2 = new Occurrence(null, new DateTime('today'), new OccurrenceDuration(90));
-            $oldOccurrence3 = new Occurrence(null, new DateTime('tomorrow'), new OccurrenceDuration(90));
-
-            $oldOccurrencesCollection = new ArrayCollection([
-                $oldOccurrence1,
-                $oldOccurrence2,
-                $oldOccurrence3,
-            ]);
+            $calendar->addEvent(
+                $eventId,
+                'title',
+                $baseDate,
+                (clone $baseDate)->modify('+6 days +2 hours'),
+                EventType::weekly(),
+                Repetitions::workingDays()
+            );
         }
 
-        $newEventMock = m::mock(Event::class);
+        $event = $calendar->getEventById($eventId);
 
-        $originalEventMock->shouldReceive('occurrences')->times(3)->andReturn($oldOccurrencesCollection);
-        $originalEventMock->shouldReceive('isSingle')->once()->andReturn(false);
-        $originalEventMock->shouldReceive('isWeekly')->once()->andReturn(true);
-        $originalEventMock->shouldReceive('calendar')->once()->andReturn(m::mock(Calendar::class));
-        $originalEventMock->shouldReceive('type->type')->once()->andReturn('weekly');
-        $originalEventMock->shouldReceive('closeAtDate')->once();
+        $eventRepository = new InMemoryEventRepository();
+        $eventRepository->insert($event);
 
-        $occurrenceFactoryMock = m::mock(OccurrenceFactoryInterface::class);
-        $newEventMock->shouldReceive('generateOccurrencesCollection')->once()->with($occurrenceFactoryMock);
+        $occurrenceRepository = new InMemoryOccurrenceRepository($event->occurrences());
+
+        $this->assertCount(5, $event->occurrences());
+
+        $clickedOccurrence = $event->occurrences()->get(3);
+        $occurrenceRepository->insert($clickedOccurrence);
 
         createsCommand: {
-            $command = new UpdateEventCommand();
-            $command->startDate = new DateTime('yesterday');
-            $command->endDate = new DateTime('tomorrow');
-            $command->title = 'New title';
-            $command->method = 'nextinclusive';
-            $command->repetitionDays = [];
-            $command->occurrence = $oldOccurrence2;
+            $command               = new UpdateEventCommand();
+            $command->startDate    = clone $baseDate;
+            $command->endDate      = (clone $baseDate)->modify('+9 days +1 hour');
+            $command->title        = 'New title';
+            $command->method       = 'nextinclusive';
+            $command->repetitions  = Repetitions::workingDays()->getArray();
+            $command->occurrenceId = $clickedOccurrence->id()->__toString();
         }
 
-        $eventFactoryMock = m::mock(EventFactoryInterface::class);
-        $eventFactoryMock->shouldReceive('createFromCommand')->andReturn($newEventMock);
-
-        $eventRepositoryMock = m::mock(EventRepositoryInterface::class);
-        $eventRepositoryMock->shouldReceive('update')->once()->with($originalEventMock);
-        $eventRepositoryMock->shouldReceive('insert')->once()->with($newEventMock);
-        $eventRepositoryMock->shouldReceive('findOneByOccurrence')->once()->with($oldOccurrence2)->andReturn($originalEventMock);
-
-        $occurrenceRepositoryMock = m::mock(OccurrenceRepositoryInterface::class);
-        $occurrenceRepositoryMock->shouldReceive('update')->once()->with($oldOccurrencesCollection);
-
         $nextInclusive = new NextInclusive();
-        $nextInclusive->setEventFactory($eventFactoryMock);
-        $nextInclusive->setOccurrenceRepository($occurrenceRepositoryMock);
-        $nextInclusive->setOccurrenceFactory($occurrenceFactoryMock);
-        $nextInclusive->setEventRepository($eventRepositoryMock);
+        $nextInclusive->setOccurrenceRepository($occurrenceRepository);
+        $nextInclusive->setEventRepository($eventRepository);
         $nextInclusive->update($command);
 
-        $this->assertEquals(new DateTime(), $deletedDate1);
-        $this->assertEquals(new DateTime(), $deletedDate2);
-        $this->assertEquals(new DateTime(), $deletedDate3);
+        $this->assertCount(2, $eventRepository->findAll());
+        $this->assertCount(2, $calendar->events());
+
+        /** @var Event $newEvent */
+        $newEvent = $calendar->events()->last();
+
+        $pivotDate = $event->occurrences()->get(3)->endDate();
+
+        $this->markTestIncomplete();
+
+        $this->assertEquals($pivotDate, $newEvent->startDate());
+        $this->assertEquals($newEndDate, $newEvent->endDate());
+
+        $occurrences = $occurrenceRepository->findAll();
+
+        $this->assertCount(6, $occurrences);
+
+        /** @var Occurrence[]|array $result */
+        $result = array_values($occurrences->getIterator()->getArrayCopy());
+
+        // OLD ONES
+
+        $this->assertEquals($baseDate, $result[0]->startDate());
+        $this->assertEquals((clone $baseDate)->modify('+2 hours'), $result[0]->endDate());
+        $this->assertEquals(null, $result[0]->getDeletedAt());
+
+        $this->assertEquals((clone $baseDate)->modify('+1 days'), $result[1]->startDate());
+        $this->assertEquals((clone $baseDate)->modify('+1 days +2 hours'), $result[1]->endDate());
+        $this->assertEquals(null, $result[1]->getDeletedAt());
+
+        $this->assertEquals((clone $baseDate)->modify('+2 days'), $result[2]->startDate());
+        $this->assertEquals((clone $baseDate)->modify('+2 days +2 hours'), $result[2]->endDate());
+        $this->assertEquals(null, $result[2]->getDeletedAt());
+
+        // OLD ONES DELETED
+
+        $this->assertEquals((clone $baseDate)->modify('+3 days'), $result[3]->startDate());
+        $this->assertEquals((clone $baseDate)->modify('+3 days +2 hours'), $result[3]->endDate());
+        $this->assertEquals(null, $result[3]->getDeletedAt());
+
+        $this->assertEquals((clone $baseDate)->modify('+4 days'), $result[4]->startDate());
+        $this->assertEquals((clone $baseDate)->modify('+4 days +2 hours'), $result[4]->endDate());
+        $this->assertEquals(new DateTime('now'), $result[4]->getDeletedAt());
+
+        // NEW ONES
+
+        $this->assertEquals((clone $baseDate)->modify('+3 days'), $result[5]->startDate());
+        $this->assertEquals((clone $baseDate)->modify('+3 days +1 hours'), $result[5]->endDate());
+        $this->assertEquals(null, $result[5]->getDeletedAt());
+
+        $this->assertEquals((clone $baseDate)->modify('+4 days'), $result[6]->startDate());
+        $this->assertEquals((clone $baseDate)->modify('+4 days +1 hours'), $result[6]->endDate());
+        $this->assertEquals(null, $result[6]->getDeletedAt());
+
+        // NEW ONES
     }
 
     public function testRemove()
     {
+        $this->markTestIncomplete();
         $pivotDate = new DateTime('now');
 
-        /** @var m\MockInterface|Event $originalEventMock */
+        $event = new Event(EventId::create(), Calendar::create(''), EventType::weekly(), new DateTime(), new DateTime(), 'title', Repetitions::workingDays());
 
         occurrencesCollection: {
-            $occurrence1 = new Occurrence(null, new DateTime('-1 day'), new OccurrenceDuration(90));
-            $occurrence2 = new Occurrence(null, new DateTime('-2 hours'), new OccurrenceDuration(90));
-            $occurrence3 = new Occurrence(null, new DateTime('+1 day'), new OccurrenceDuration(90));
+            $occurrence1 = new Occurrence(OccurrenceId::create(), $event, new DateTime('-1 day'), new OccurrenceDuration(90));
+            $occurrence2 = new Occurrence(OccurrenceId::create(), $event, new DateTime('-2 hours'), new OccurrenceDuration(90));
+            $occurrence3 = new Occurrence(OccurrenceId::create(), $event, new DateTime('+1 day'), new OccurrenceDuration(90));
 
             $oldOccurrencesCollection = new ArrayCollection([$occurrence1, $occurrence2, $occurrence3]);
         }
 
-        $originalEventMock = new Event(0, Event\EventType::createWeekly(), new DateTime('yesterday'), new DateTime('tomorrow'), 'title', Event\Repetitions::workingDays(), $oldOccurrencesCollection);
+        $calendar = Calendar::create('test');
+
+        $originalEventMock = new Event(EventId::create(), $calendar, EventType::weekly(), new DateTime('yesterday'), new DateTime('tomorrow'), 'title', Repetitions::workingDays(), $oldOccurrencesCollection);
 
         createsCommand: {
-            $command = new RemoveEventCommand();
-            $command->method = 'nextinclusive';
+            $command             = new RemoveEventCommand();
+            $command->method     = 'nextinclusive';
             $command->occurrence = $occurrence2;
         }
 
