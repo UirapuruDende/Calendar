@@ -15,7 +15,7 @@
 
     <testsuites>
         <testsuite>
-            <directory>./Tests/**</directory>
+            <directory>./Tests/Unit/**</directory>
         </testsuite>
     </testsuites>
 

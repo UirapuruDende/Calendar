@@ -22,7 +22,7 @@ class Duration
      */
     public function __construct(int $duration = 1)
     {
-        if ($duration <= 0) {
+        if ($duration < 1) {
             throw new Exception('Event duration has to be greater than 0');
         }
 
@@ -55,7 +55,7 @@ class Duration
         $diff    = $startDate->diff($tmpEndDate);
         $minutes = $diff->h * 60 + $diff->i;
 
-        if ($minutes <= 0) {
+        if ($minutes < 1) {
             throw new Exception('Duration time must be grater than 0 minutes');
         }
 
