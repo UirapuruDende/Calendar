@@ -25,7 +25,7 @@ final class Overwrite implements UpdateStrategyInterface
     public function update(UpdateEventCommandInterface $command)
     {
         /** @var Event $event */
-        $event = $command->occurrence->event();
+//        $event = $command->occurrence->event();
 
 //        if ($command instanceof UpdateEventCommand) {
 

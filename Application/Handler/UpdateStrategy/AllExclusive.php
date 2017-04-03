@@ -49,8 +49,6 @@ final class AllExclusive implements UpdateStrategyInterface
 
                 $event->occurrences()->removeElement($occurrence);
             }
-
-            $newOccurrences = OccurrenceFactory::generateCollectionFromEvent($event, true);
         }
 
         $this->eventRepository->update($event);

@@ -30,10 +30,8 @@ final class CreateEventHandler
     private $occurrenceRepository;
 
     /**
-     * @var EventFactory
+     * @var CalendarRepositoryInterface
      */
-    private $eventFactory;
-
     private $calendarRepository;
 
     /**

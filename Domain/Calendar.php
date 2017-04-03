@@ -6,7 +6,6 @@ use Dende\Calendar\Application\Factory\EventFactory;
 use Dende\Calendar\Application\Factory\EventFactoryInterface;
 use Dende\Calendar\Domain\Calendar\CalendarId;
 use Dende\Calendar\Domain\Calendar\Event;
-use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -17,6 +16,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 class Calendar
 {
     use SoftDeleteable;
+
+    /**
+     * Doctrine id
+     * @var int
+     */
+    protected $id;
 
     /**
      * @var CalendarId
@@ -58,7 +63,7 @@ class Calendar
     public function addEvent(IdInterface $eventId, string $title, DateTime $startDate, DateTime $endDate, EventType $type, Repetitions $repetitions)
     {
         /** @var EventFactoryInterface $factory */
-        $factory = new static::$eventFactoryClass();
+        $factory = new self::$eventFactoryClass();
 
         $event = $factory->createFromArray([
             'eventId'     => $eventId,
