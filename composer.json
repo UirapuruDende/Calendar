@@ -22,7 +22,24 @@
         "phpunit/phpunit": "^5.0",
         "behat/behat": "^3.0",
         "mockery/mockery": "^0.9.4",
-        "friendsofphp/php-cs-fixer": "^1.12"
+        "friendsofphp/php-cs-fixer": "^1.12",
+        "phpmd/phpmd": "^2.6"
+    },
+    "scripts": {
+        "phpunit" : [
+            "./bin/phpunit"
+        ],
+        "phpmd" : [
+            "./bin/phpmd Domain,Application,Infrastructure text phpmd.xml"
+        ],
+        "php-cs-fixer" : [
+            "./bin/php-cs-fixer fix --dry"
+        ],
+        "test" : [
+            "@phpunit",
+            "@php-cs-fixer",
+            "@phpmd"
+        ]
     },
     "authors": [
         {
