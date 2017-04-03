@@ -26,6 +26,9 @@
         "phpmd/phpmd": "^2.6"
     },
     "scripts": {
+        "humbug" : [
+            "./bin/humbug"
+        ],
         "phpunit" : [
             "./bin/phpunit"
         ],
@@ -33,12 +36,11 @@
             "./bin/phpmd Domain,Application,Infrastructure text phpmd.xml"
         ],
         "php-cs-fixer" : [
-            "./bin/php-cs-fixer fix --dry"
+            "./bin/php-cs-fixer fix --dry-run"
         ],
         "test" : [
             "@phpunit",
-            "@php-cs-fixer",
-            "@phpmd"
+            "@php-cs-fixer"
         ]
     },
     "authors": [

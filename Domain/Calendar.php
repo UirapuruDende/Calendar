@@ -18,7 +18,8 @@ class Calendar
     use SoftDeleteable;
 
     /**
-     * Doctrine id
+     * Doctrine id.
+     *
      * @var int
      */
     protected $id;

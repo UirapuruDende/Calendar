@@ -3,7 +3,6 @@ namespace Dende\Calendar\Application\Handler;
 
 use Carbon\Carbon;
 use Dende\Calendar\Application\Command\CreateEventCommand;
-use Dende\Calendar\Application\Factory\EventFactory;
 use Dende\Calendar\Application\Repository\CalendarRepositoryInterface;
 use Dende\Calendar\Application\Repository\EventRepositoryInterface;
 use Dende\Calendar\Application\Repository\OccurrenceRepositoryInterface;

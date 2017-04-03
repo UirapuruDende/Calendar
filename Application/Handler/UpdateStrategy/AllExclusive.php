@@ -4,7 +4,6 @@ namespace Dende\Calendar\Application\Handler\UpdateStrategy;
 use Dende\Calendar\Application\Command\RemoveEventCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommandInterface;
-use Dende\Calendar\Application\Factory\OccurrenceFactory;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
 use Dende\Calendar\Domain\Calendar\Event\EventType;

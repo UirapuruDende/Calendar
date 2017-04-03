@@ -8,5 +8,4 @@ install:
  - composer install -n
 
 script:
-  - ./bin/phpunit
-  - ./bin/php-cs-fixer fix --dry-run
+  - composer test
