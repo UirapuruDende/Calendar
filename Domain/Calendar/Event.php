@@ -134,7 +134,8 @@ class Event
         $this->occurrences = $occurrences;
 
         if (null === $occurrences) {
-            $this->regenerateOccurrenceCollection();
+            $this->occurrences = new ArrayCollection();
+            $this->regenerateOccurrences();
         }
     }
 
@@ -261,107 +262,73 @@ class Event
         $this->endDate = $date;
     }
 
-    protected function generateOccurrenceCollection()
+
+    public function resize(DateTime $newStartDate = null, DateTime $newEndDate = null, Repetitions $repetitions = null)
     {
-        /** @var OccurrenceFactoryInterface $factory */
-        $factory           = new self::$occurrenceFactoryClass();
-        $collection = new ArrayCollection();
+        $this->startDate = $newStartDate ?: $this->startDate;
+        $this->endDate = $newEndDate ?: $this->endDate;
+        $this->repetitions = $repetitions ?: $this->repetitions;
 
-        $event = $this;
-
-        $add = function (DateTime $date) use ($factory, $collection, $event) {
-            $collection->add($factory->createFromArray([
-               'startDate' => $date,
-               'duration'  => new OccurrenceDuration($event->duration()->minutes()),
-               'event'     => $event,
-            ]));
-        };
-
-        if ($this->isSingle())
-        {
-            $add($this->startDate);
-
-        } elseif ($this->isWeekly()) {
-
-            $interval = new DateInterval('P1D');
-            /** @var DateTime[] $period */
-            $period = new DatePeriod($this->startDate, $interval, $this->endDate);
-
-            foreach ($period as $date) {
-                if (in_array($date->format('N'), $this->repetitions->getArray())) {
-                    $add($date);
-                }
-            }
-        }
-
-        $this->occurrences = $collection;
+        $this->regenerateOccurrences();
     }
 
-    protected function regenerateOccurrenceCollection()
+    protected function regenerateOccurrences()
     {
         /** @var OccurrenceFactoryInterface $factory */
         $factory           = new self::$occurrenceFactoryClass();
 
-        /** @var OccurrenceInterface[]|ArrayCollection $newCollection */
-        $newCollection = new ArrayCollection();
+        $oldCollection = new ArrayCollection($this->occurrences->toArray());
+        $this->occurrences->clear();
 
-        $event = $this;
+        $tmpCollection = new ArrayCollection();
+
         $startDate = $this->startDate();
         $endDate = $this->endDate();
 
-        $add = function (DateTime $date) use ($factory, $newCollection, $event) {
-            $newCollection->add($factory->createFromArray([
-               'startDate' => $date,
-               'duration'  => new OccurrenceDuration($event->duration()->minutes()),
-               'event'     => $event,
-           ]));
-        };
-
         if ($this->isSingle())
         {
-            $add($this->startDate);
+            $this->occurrences->add($factory->createFromArray([
+              'startDate' => $this->startDate(),
+              'duration'  => new OccurrenceDuration($this->duration()->minutes()),
+              'event'     => $this,
+            ]));
 
-        } elseif ($this->isWeekly()) {
+            return;
+        }
 
-            $interval = new DateInterval('P1D');
+        $period = new DatePeriod($this->startDate, new DateInterval('P1D'), $this->endDate);
 
-            $period = new DatePeriod($this->startDate, $interval, $this->endDate);
-            /** @var DateTime $date */
-            foreach ($period as $date) {
-                if (in_array($date->format('N'), $this->repetitions->getArray())) {
-                    $add($date);
-                }
-            }
+        /** @var DateTime $date */
+        foreach ($period as $date) {
+            if (in_array($date->format('N'), $this->repetitions->getArray())) {
+                $occurrence = $factory->createFromArray([
+                      'startDate' => $date,
+                      'duration'  => new OccurrenceDuration($this->duration()->minutes()),
+                      'event'     => $this,
+                ]);
 
-            if(null !== $this->occurrences && 0 < $this->occurrences->count()) {
-                /** @var OccurrenceInterface[]|ArrayCollection $paddedCollection */
-                $paddedCollection = $this->occurrences()->filter(function(Occurrence $occurrence) use ($startDate, $endDate) {
-                    return $startDate <= $occurrence->startDate() && $occurrence->endDate() <= $endDate;
-                });
-
-                $result = new ArrayCollection();
-
-                foreach($newCollection as $newOccurrence) {
-                    foreach($paddedCollection as $oldOccurrence) {
-                        if ($newOccurrence->startDate()->format("Ymd") === $oldOccurrence->startDate()->format("Ymd")) {
-                            $oldOccurrence->synchronizeWithEvent();
-                            $result->add($oldOccurrence);
-
-                            continue 2;
-                        }
-                    }
-
-                    $result->add($newOccurrence);
-                }
-
-                $newCollection = $result;
+                $tmpCollection->add($occurrence);
             }
         }
 
-        $this->occurrences = $newCollection;
+        /** @var OccurrenceInterface[]|ArrayCollection $paddedCollection */
+        $paddedCollection = $oldCollection->filter(function(Occurrence $occurrence) use ($startDate, $endDate) {
+            return $startDate <= $occurrence->startDate() && $occurrence->endDate() <= $endDate;
+        });
+
+        foreach($tmpCollection as $newOccurrence) {
+            foreach($paddedCollection as $oldOccurrence) {
+                if ($newOccurrence->startDate()->format("Ymd") === $oldOccurrence->startDate()->format("Ymd")) {
+                    $oldOccurrence->synchronizeWithEvent();
+                    $this->occurrences->add($oldOccurrence);
+
+                    continue 2;
+                }
+            }
+
+            $this->occurrences->add($newOccurrence);
+        }
     }
-
-
 
     public function id() : IdInterface
     {
@@ -385,15 +352,6 @@ class Event
         });
 
         return implode(' ', $array->getValues());
-    }
-
-    public function resize(DateTime $newStartDate = null, DateTime $newEndDate = null, Repetitions $repetitions = null)
-    {
-        $this->startDate = $newStartDate ?: $this->startDate;
-        $this->endDate = $newEndDate ?: $this->endDate;
-        $this->repetitions = $repetitions ?: $this->repetitions;
-
-        $this->regenerateOccurrenceCollection();
     }
 
     public function findPivotDate(OccurrenceInterface $editedOccurrence) : DateTime

@@ -60,6 +60,11 @@ class Repetitions
         ]);
     }
 
+    public static function create(array $array = [])
+    {
+        return new self($array);
+    }
+
     /**
      * @return array
      */

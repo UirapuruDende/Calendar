@@ -29,6 +29,7 @@ final class UpdateEventHandlerTest extends PHPUnit_Framework_TestCase
 {
     public function testHandleUpdateCommand()
     {
+        $this->markTestIncomplete();
         $event      = new Event(EventId::create(), Calendar::create('test'), EventType::single(), new DateTime('12:00'), new DateTime('13:00'), 'some Title', new Repetitions());
         $occurrence = new Occurrence(OccurrenceId::create(), $event, new DateTime('+1 hour'), new OccurrenceDuration(60));
 

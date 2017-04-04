@@ -3,6 +3,7 @@ namespace Dende\Calendar\Tests\Unit\Domain\Calendar;
 
 use Carbon\Carbon;
 use DateTime;
+use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\EventId;
@@ -20,84 +21,132 @@ class EventTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function it_tests_resizing_both_sides_without_repetition_change()
+    public function it_tests_resizing_both_sides()
     {
+        $base = Carbon::instance(new DateTime('last monday 12:00:00'));
+
+        /** @var OccurrenceFactoryInterface $factory */
+        $factory = new Event::$occurrenceFactoryClass;
+
+        $collection = new ArrayCollection();
+
         $event = new Event(
             EventId::create(),
             Calendar::create('title'),
             EventType::weekly(),
-            new DateTime('2015-09-10 12:00:00'),
-            new DateTime('2015-09-20 13:30:00'),
+            $base->copy(),
+            $base->copy()->addDays(6)->addHours(2),
             'some title',
             new Repetitions([
                 Repetitions::MONDAY,
                 Repetitions::WEDNESDAY,
                 Repetitions::FRIDAY,
+            ]),
+            $collection
+        );
+
+        $occurrenceId1 = OccurrenceId::create();
+        $occurrenceId2 = OccurrenceId::create();
+        $occurrenceId3 = OccurrenceId::create();
+
+        $collection->add($factory->createFromArray([
+            "occurrenceId" => $occurrenceId1,
+            "startDate" => $base->copy(),
+            "duration"  => new OccurrenceDuration($event->duration()->minutes()),
+            "event" =>  $event
+        ]));
+
+        $collection->add($factory->createFromArray([
+            "occurrenceId" => $occurrenceId2,
+            "startDate" => $base->copy()->addDays(2),
+            "duration"  => new OccurrenceDuration($event->duration()->minutes()),
+            "event" =>  $event
+        ]));
+
+        $collection->add($factory->createFromArray([
+            "occurrenceId" => $occurrenceId3,
+            "startDate" => $base->copy()->addDays(4),
+            "duration"  => new OccurrenceDuration($event->duration()->minutes()),
+            "event" =>  $event
+        ]));
+
+        $event->resize(
+            $event->startDate()->copy()->subDays(7),
+            $event->endDate()->copy()->addDays(7),
+            Repetitions::create([
+                Repetitions::MONDAY,
+                Repetitions::FRIDAY,
             ])
         );
 
-        $oldIds = $event->occurrences()->map(function(Occurrence $occurrence){
-            return $occurrence->id();
-        });
+        $this->assertCount(6, $collection);
 
-        $this->assertCount(4, $event->occurrences());
+        $this->assertEquals($collection[0]->startDate(), $base->copy()->subDays(7));
 
-        $event->resize(
-            new DateTime('2015-09-01 12:00:00'),
-            new DateTime('2015-09-30 13:30:00'),
-            new Repetitions([Repetitions::MONDAY, Repetitions::WEDNESDAY, Repetitions::FRIDAY])
-        );
+        $this->assertEquals($collection[1]->startDate(), $base->copy()->subDays(3));
 
-        $this->assertCount(13, $event->occurrences());
+        $this->assertEquals($collection[2]->startDate(), $base);
+        $this->assertEquals($collection[2]->id(), $occurrenceId1);
 
-        $this->assertTrue($event->occurrences()->get(4)->id()->equals($oldIds->get(0)));
-        $this->assertTrue($event->occurrences()->get(5)->id()->equals($oldIds->get(1)));
-        $this->assertTrue($event->occurrences()->get(6)->id()->equals($oldIds->get(2)));
-        $this->assertTrue($event->occurrences()->get(7)->id()->equals($oldIds->get(3)));
+        $this->assertEquals($collection[3]->startDate(), $base->copy()->addDays(4));
+        $this->assertEquals($collection[3]->id(), $occurrenceId3);
+
+        $this->assertEquals($collection[4]->startDate(), $base->copy()->addDays(7));
+
+        $this->assertEquals($collection[5]->startDate(), $base->copy()->addDays(11));
     }
 
     /**
      * @test
      */
-    public function it_tests_shrinking_both_sides_without_repetition_change()
+    public function it_tests_shrinking_both_sides()
     {
+        $base = Carbon::instance(new DateTime('last monday 12:00:00'));
+
+        $collection = new ArrayCollection();
+
         $event = new Event(
             EventId::create(),
             Calendar::create('title'),
             EventType::weekly(),
-            new DateTime('2015-09-01 12:00:00'),
-            new DateTime('2015-09-30 13:30:00'),
-
+            $base->copy(),
+            $base->copy()->addDays(20)->addHours(2),
             'some title',
             new Repetitions([
                 Repetitions::MONDAY,
                 Repetitions::WEDNESDAY,
                 Repetitions::FRIDAY,
-            ])
+            ]),
+            $collection
         );
 
-        $oldIds = $event->occurrences()->map(function(Occurrence $occurrence){
-            return $occurrence->id();
-        });
+        $event->resize();
+        $this->assertCount(9, $collection);
 
-        $this->assertCount(13, $event->occurrences());
+        $ids = $collection->map(function(Occurrence $occurrence){ return $occurrence->id(); })->toArray();
 
         $event->resize(
-            new DateTime('2015-09-10 12:00:00'),
-            new DateTime('2015-09-20 13:30:00'),
-            new Repetitions([Repetitions::MONDAY, Repetitions::WEDNESDAY, Repetitions::FRIDAY])
+            $event->startDate()->copy()->addDays(7),
+            $event->endDate()->copy()->subDays(7),
+            Repetitions::workingDays()
         );
 
-        $this->assertCount(4, $event->occurrences());
+        $this->assertCount(5, $collection);
 
-        $this->assertTrue($event->occurrences()->get(0)->id()->equals($oldIds->get(4)));
-        $this->assertTrue($event->occurrences()->get(1)->id()->equals($oldIds->get(5)));
-        $this->assertTrue($event->occurrences()->get(2)->id()->equals($oldIds->get(6)));
-        $this->assertTrue($event->occurrences()->get(3)->id()->equals($oldIds->get(7)));
+        $this->assertEquals($collection[0]->id(), $ids[3]);
+        $this->assertEquals($collection[2]->id(), $ids[4]);
+        $this->assertEquals($collection[4]->id(), $ids[5]);
+
+        for($days = 7; $days<12; $days++) {
+            $this->assertEquals($collection[0]->startDate(), $base->copy()->addDays(7));
+            $this->assertEquals($collection[0]->endDate(), $base->copy()->addDays(7)->addHours(2));
+        }
     }
 
     public function testCalculateOccurrencesDatesWeekly()
     {
+        $this->markTestIncomplete();
+
         $event = new Event(
             EventId::create(),
             Calendar::create('title'),
@@ -133,6 +182,8 @@ class EventTest extends PHPUnit_Framework_TestCase
 
     public function testCalculateOccurrencesDatesSingle()
     {
+        $this->markTestIncomplete();
+
         $event = new Event(
             EventId::create(),
             Calendar::create('test'),
