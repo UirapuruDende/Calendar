@@ -119,7 +119,6 @@ class Event
             }
         }
 
-
         if ($type->isWeekly() && count($repetitions->getArray()) === 0) {
             throw new Exception('Weekly repeated event must have at least one repetition');
         }
@@ -132,9 +131,9 @@ class Event
         $this->type        = $type;
         $this->title       = $title;
         $this->repetitions = $repetitions;
-        $this->occurrences = $occurrences ?: new ArrayCollection();
+        $this->occurrences = $occurrences;
 
-        if (0 === $this->occurrences()->count()) {
+        if (null === $occurrences) {
             $this->regenerateOccurrenceCollection();
         }
     }
@@ -334,10 +333,10 @@ class Event
                 }
             }
 
-            if(0 < $this->occurrences()->count()) {
+            if(null !== $this->occurrences && 0 < $this->occurrences->count()) {
                 /** @var OccurrenceInterface[]|ArrayCollection $paddedCollection */
                 $paddedCollection = $this->occurrences()->filter(function(Occurrence $occurrence) use ($startDate, $endDate) {
-                    return $startDate <= $occurrence->startDate() && $occurrence->endDate() <= $endDate && !$occurrence->isDeleted();
+                    return $startDate <= $occurrence->startDate() && $occurrence->endDate() <= $endDate;
                 });
 
                 $result = new ArrayCollection();

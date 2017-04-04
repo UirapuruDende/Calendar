@@ -16,8 +16,6 @@ use Exception;
  */
 class Occurrence implements OccurrenceInterface
 {
-    use SoftDeleteable;
-
     /**
      * Doctrine id.
      *
@@ -70,8 +68,6 @@ class Occurrence implements OccurrenceInterface
         $this->startDate    = $startDate;
         $this->duration     = $duration;
         $this->updateEndDate();
-
-        $this->event()->occurrences()->add($this);
     }
 
     /**

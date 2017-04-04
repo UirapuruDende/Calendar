@@ -1,14 +1,19 @@
 <?php
 namespace Dende\Calendar\Tests\Unit\Domain\Calendar;
 
+use Carbon\Carbon;
 use DateTime;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
+use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
+use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
+use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit_Framework_TestCase;
+use Ramsey\Uuid\Uuid;
 
 class EventTest extends PHPUnit_Framework_TestCase
 {
@@ -202,68 +207,97 @@ class EventTest extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider closeAtDateDataProvider
      *
+     * @param array $id
      * @param DateTime $closingDate
-     * @param array    $expected
+     * @param array $expected
+     * @param int $expectedCount
      */
-    public function testCloseAtDate(DateTime $closingDate, array $expected)
+    public function testCloseAtDate(array $id, DateTime $closingDate, array $expected)
     {
+        $this->markTestIncomplete();
+
+        $baseDate  = Carbon::instance(new DateTime('last monday 12:00:00'));
+        $occurrences = new ArrayCollection();
+
+        $factory = new Event::$occurrenceFactoryClass();
+
         $event = new Event(
             EventId::create(),
             Calendar::create('test'),
             EventType::weekly(),
-            new DateTime('last monday 12:00:00'),
-            (new DateTime('last monday 12:30:00'))->modify('+6 days'),
+            $baseDate,
+            $baseDate->copy()->addDays(6)->addMinutes(30),
             'some title',
-            new Repetitions([1, 3, 5])
+            new Repetitions([Repetitions::MONDAY, Repetitions::WEDNESDAY, Repetitions::FRIDAY]),
+            $occurrences
         );
+
+        $occurrences->add($factory->createFromArray([
+            'occurrenceId' => OccurrenceId::create($id[0]),
+            'startDate' => $baseDate->copy(),
+            'duration'  => new OccurrenceDuration(30),
+            'event'     => $event,
+        ]));
+
+        $occurrences->add($factory->createFromArray([
+            'occurrenceId' => OccurrenceId::create($id[1]),
+            'startDate' => $baseDate->copy()->addDays(2),
+            'duration'  => new OccurrenceDuration(30),
+            'event'     => $event,
+        ]));
+
+        $occurrences->add($factory->createFromArray([
+            'occurrenceId' => OccurrenceId::create($id[2]),
+            'startDate' => $baseDate->copy()->addDays(4),
+            'duration'  => new OccurrenceDuration(30),
+            'event'     => $event,
+        ]));
 
         $this->assertCount(3, $event->occurrences());
 
         $event->closeAtDate($closingDate);
 
-        $this->assertEquals($closingDate, $event->endDate(), null, 2);
+        $this->assertEquals($closingDate, $event->endDate());
 
-        $this->assertEquals($expected[0], $event->occurrences()->get(0)->getDeletedAt(), null, 2);
-        $this->assertEquals($expected[1], $event->occurrences()->get(1)->getDeletedAt(), null, 2);
-        $this->assertEquals($expected[2], $event->occurrences()->get(2)->getDeletedAt(), null, 2);
+        $this->assertCount(count($expected), $event->occurrences());
+
     }
 
     public function closeAtDateDataProvider() : array
     {
-        $base = new DateTime('last monday 12:00:00');
+        $base = Carbon::instance(new DateTime('last monday 12:00:00'));
+
+        $id1 = Uuid::uuid4();
+        $id2 = Uuid::uuid4();
+        $id3 = Uuid::uuid4();
+
+        $idsArray = [$id1, $id2, $id3];
 
         return [
-            'before first' => [
-                'closingDate' => (clone $base)->modify('-1 day'),
-                'expected'    => [
-                    new DateTime(),
-                    new DateTime(),
-                    new DateTime(),
-                ],
+            'before monday' => [
+                'id'          => $idsArray,
+                'closingDate' => $base->copy()->addDays(-1),
+                'expected'    => [],
             ],
             'tuesday' => [
-                'closingDate' => (clone $base)->modify('+1 day'),
-                'expected'    => [
-                    null,
-                    new DateTime(),
-                    new DateTime(),
-                ],
+                'id'          => $idsArray,
+                'closingDate' => $base->copy()->addDays(1),
+                'expected'    => [$id1],
+            ],
+            'wednesday on time' => [
+                'id'          => $idsArray,
+                'closingDate' => $base->copy()->addDays(2),
+                'expected'    => [],
             ],
             'thursday' => [
-                'closingDate' => (clone $base)->modify('+3 day'),
-                'expected'    => [
-                    null,
-                    null,
-                    new DateTime(),
-                ],
+                'id'          => $idsArray,
+                'closingDate' => $base->copy()->addDays(3),
+                'expected'    => [],
             ],
             'last' => [
-                'closingDate' => (clone $base)->modify('+5 day'),
-                'expected'    => [
-                    null,
-                    null,
-                    null,
-                ],
+                'id'          => $idsArray,
+                'closingDate' => $base->copy()->addDays(5),
+                'expected'    => [],
             ],
         ];
     }
