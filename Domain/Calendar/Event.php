@@ -381,7 +381,7 @@ class Event
     public function dumpOccurrencesDatesAsString() : string
     {
         $array = $this->occurrences()->map(function (Occurrence $occurrence) {
-            return sprintf('[%s:%s:%s]', $occurrence->startDate()->format(self::DUMP_FORMAT), $occurrence->duration()->minutes(), $occurrence->getDeletedAt() ? $occurrence->getDeletedAt()->format(self::DUMP_FORMAT) : '_');
+            return sprintf('[%s:%s]', $occurrence->startDate()->format(self::DUMP_FORMAT), $occurrence->duration()->minutes());
         });
 
         return implode(' ', $array->getValues());

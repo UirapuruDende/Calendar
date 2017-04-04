@@ -1,6 +1,7 @@
 <?php
 namespace Dende\Calendar\Tests\Unit\Application\Handler;
 
+use Carbon\Carbon;
 use DateTime;
 use Dende\Calendar\Application\Command\CreateEventCommand;
 use Dende\Calendar\Application\Handler\CreateEventHandler;
@@ -21,12 +22,13 @@ class CreateEventHandlerTest extends PHPUnit_Framework_TestCase
      */
     public function it_tests_creation_of_single_event()
     {
+        $base = Carbon::instance(new DateTime('12:00'));
         $calendar = Calendar::create('test');
 
         $command = CreateEventCommand::fromArray([
             'calendarId'  => $calendar->id()->__toString(),
-            'startDate'   => new DateTime('12:00'),
-            'endDate'     => (new DateTime('12:00'))->modify('+1 day +2 hours'), // this is intended, endDate should be auto adjusted
+            'startDate'   => $base,
+            'endDate'     => $base->copy()->addDays(1)->addHours(2),
             'type'        => EventType::TYPE_SINGLE,
             'title'       => 'some-title',
             'repetitions' => [],
