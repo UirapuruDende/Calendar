@@ -6,7 +6,6 @@ use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Factory\EventFactoryInterface;
 use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
 use Dende\Calendar\Application\Handler\UpdateEventHandler;
-use Dende\Calendar\Application\Handler\UpdateStrategy\Single;
 use Dende\Calendar\Application\Repository\EventRepositoryInterface;
 use Dende\Calendar\Application\Repository\OccurrenceRepositoryInterface;
 use Dende\Calendar\Domain\Calendar;
@@ -19,24 +18,24 @@ use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryEventRepository;
 use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryOccurrenceRepository;
+use Dende\Calendar\Application\Handler\UpdateStrategy\UpdateStrategyInterface;
 use Mockery as m;
+use PHPUnit_Framework_TestCase;
 
 /**
  * Class EventTest.
  */
-final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
+final class UpdateEventHandlerTest extends PHPUnit_Framework_TestCase
 {
     public function testHandleUpdateCommand()
     {
-        $this->markTestIncomplete();
-
-        $event      = new Event(EventId::create(), Calendar::create('test'), EventType::single(), new DateTime('+1 hour'), new DateTime('+2 hour'), 'some Title', new Repetitions());
+        $event      = new Event(EventId::create(), Calendar::create('test'), EventType::single(), new DateTime('12:00'), new DateTime('13:00'), 'some Title', new Repetitions());
         $occurrence = new Occurrence(OccurrenceId::create(), $event, new DateTime('+1 hour'), new OccurrenceDuration(60));
 
         $command = UpdateEventCommand::fromArray([
             'method'       => UpdateEventHandler::MODE_SINGLE,
-            'startDate'    => new DateTime('+1 hour'),
-            'endDate'      => new DateTime('+3 hour'),
+            'startDate'    => new DateTime('12:00'),
+            'endDate'      => new DateTime('14:00'),
             'title'        => $event->title(),
             'repetitions'  => [],
             'occurrenceId' => $occurrence->id()->__toString(),
@@ -45,8 +44,13 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
         $eventRepository      = new InMemoryEventRepository();
         $occurrenceRepository = new InMemoryOccurrenceRepository();
 
+        $strategyMock = $this->prophesize(UpdateStrategyInterface::class);
+        $strategyMock->update($command)->shouldBeCalled()->willReturn(null);
+        $strategyMock->setEventRepository($eventRepository)->shouldBeCalled()->willReturn(null);
+        $strategyMock->setOccurrenceRepository($occurrenceRepository)->shouldBeCalled()->willReturn(null);
+
         $handler = new UpdateEventHandler($eventRepository, $occurrenceRepository);
-        $handler->addStrategy(UpdateEventHandler::MODE_SINGLE, new Single());
+        $handler->addStrategy(UpdateEventHandler::MODE_SINGLE, $strategyMock->reveal());
 
         $handler->handle($command);
     }
@@ -60,15 +64,10 @@ final class UpdateEventHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $command            = new UpdateEventCommand();
         $command->method    = UpdateEventHandler::MODE_SINGLE;
-        $command->startDate = new DateTime('+1 hour');
-        $command->endDate   = new DateTime('+2 hour');
+        $command->startDate = new DateTime('12:00');
+        $command->endDate   = new DateTime('13:00');
 
-        $eventRepositoryMock      = m::mock(EventRepositoryInterface::class);
-        $occurrenceRepositoryMock = m::mock(OccurrenceRepositoryInterface::class);
-        $eventFactoryMock         = m::mock(EventFactoryInterface::class);
-        $occurrenceFactoryMock    = m::mock(OccurrenceFactoryInterface::class);
-
-        $handler = new UpdateEventHandler($eventRepositoryMock, $occurrenceRepositoryMock, $eventFactoryMock, $occurrenceFactoryMock);
+        $handler = new UpdateEventHandler(new InMemoryEventRepository(), new InMemoryOccurrenceRepository());
 
         $handler->handle($command);
     }

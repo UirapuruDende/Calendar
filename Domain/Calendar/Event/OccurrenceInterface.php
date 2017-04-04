@@ -42,5 +42,7 @@ interface OccurrenceInterface
 
     public function isModified() : bool;
 
-    public function synchronizeWithEvent(Event $event);
+    public function isDeleted() : bool;
+
+    public function synchronizeWithEvent();
 }

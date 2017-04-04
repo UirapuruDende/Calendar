@@ -22,14 +22,14 @@ class EventFactory implements EventFactoryInterface
      *
      * @return Event
      */
-    public function createFromArray(array $array = []) : Event
+    static public function createFromArray(array $array = []) : Event
     {
         $template = [
             'eventId'     => EventId::create(),
             'title'       => '',
-            'repetitions' => new Repetitions([]),
+            'repetitions' => new Repetitions(),
             'type'        => new EventType(),
-            'occurrences' => new ArrayCollection([]),
+            'occurrences' => new ArrayCollection(),
             'calendar'    => null,
             'startDate'   => new DateTime('now'),
             'endDate'     => new DateTime('now'),
@@ -49,23 +49,8 @@ class EventFactory implements EventFactoryInterface
         );
     }
 
-    public function create() : Event
+    static public function create() : Event
     {
         return self::createFromArray([]);
-    }
-
-    /**
-     * @param CreateEventCommand|UpdateEventCommand $command
-     */
-    public function createFromCommand(EventCommandInterface $command) : Event
-    {
-        return static::createFromArray([
-            'title'       => $command->title,
-            'calendar'    => $command->calendar,
-            'repetitions' => new Repetitions($command->repetitions),
-            'type'        => new EventType($command->type),
-            'startDate'   => $command->startDate,
-            'endDate'     => $command->endDate,
-        ]);
     }
 }

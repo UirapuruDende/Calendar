@@ -6,11 +6,91 @@ use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
+use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use PHPUnit_Framework_TestCase;
 
 class EventTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @test
+     */
+    public function it_tests_resizing_both_sides_without_repetition_change()
+    {
+        $event = new Event(
+            EventId::create(),
+            Calendar::create('title'),
+            EventType::weekly(),
+            new DateTime('2015-09-10 12:00:00'),
+            new DateTime('2015-09-20 13:30:00'),
+            'some title',
+            new Repetitions([
+                Repetitions::MONDAY,
+                Repetitions::WEDNESDAY,
+                Repetitions::FRIDAY,
+            ])
+        );
+
+        $oldIds = $event->occurrences()->map(function(Occurrence $occurrence){
+            return $occurrence->id();
+        });
+
+        $this->assertCount(4, $event->occurrences());
+
+        $event->resize(
+            new DateTime('2015-09-01 12:00:00'),
+            new DateTime('2015-09-30 13:30:00'),
+            new Repetitions([Repetitions::MONDAY, Repetitions::WEDNESDAY, Repetitions::FRIDAY])
+        );
+
+        $this->assertCount(13, $event->occurrences());
+
+        $this->assertTrue($event->occurrences()->get(4)->id()->equals($oldIds->get(0)));
+        $this->assertTrue($event->occurrences()->get(5)->id()->equals($oldIds->get(1)));
+        $this->assertTrue($event->occurrences()->get(6)->id()->equals($oldIds->get(2)));
+        $this->assertTrue($event->occurrences()->get(7)->id()->equals($oldIds->get(3)));
+    }
+
+    /**
+     * @test
+     */
+    public function it_tests_shrinking_both_sides_without_repetition_change()
+    {
+        $event = new Event(
+            EventId::create(),
+            Calendar::create('title'),
+            EventType::weekly(),
+            new DateTime('2015-09-01 12:00:00'),
+            new DateTime('2015-09-30 13:30:00'),
+
+            'some title',
+            new Repetitions([
+                Repetitions::MONDAY,
+                Repetitions::WEDNESDAY,
+                Repetitions::FRIDAY,
+            ])
+        );
+
+        $oldIds = $event->occurrences()->map(function(Occurrence $occurrence){
+            return $occurrence->id();
+        });
+
+        $this->assertCount(13, $event->occurrences());
+
+        $event->resize(
+            new DateTime('2015-09-10 12:00:00'),
+            new DateTime('2015-09-20 13:30:00'),
+            new Repetitions([Repetitions::MONDAY, Repetitions::WEDNESDAY, Repetitions::FRIDAY])
+        );
+
+        $this->assertCount(4, $event->occurrences());
+
+        $this->assertTrue($event->occurrences()->get(0)->id()->equals($oldIds->get(4)));
+        $this->assertTrue($event->occurrences()->get(1)->id()->equals($oldIds->get(5)));
+        $this->assertTrue($event->occurrences()->get(2)->id()->equals($oldIds->get(6)));
+        $this->assertTrue($event->occurrences()->get(3)->id()->equals($oldIds->get(7)));
+    }
+
     public function testCalculateOccurrencesDatesWeekly()
     {
         $event = new Event(
@@ -81,6 +161,42 @@ class EventTest extends PHPUnit_Framework_TestCase
                 Repetitions::TUESDAY,
             ])
         );
+    }
+
+    /**
+     * @test
+     * @dataProvider findingPivotDataProvider
+     * @param int $clickedIndex
+     * @param int $expectedPivotDateIndex
+     */
+    public function finding_pivot_date(int $clickedIndex, int $expectedPivotDateIndex)
+    {
+        $event = new Event(
+            EventId::create(),
+            Calendar::create(''),
+            EventType::weekly(),
+            new DateTime('last monday 12:00:00'),
+            (new DateTime('last monday 12:01:00'))->modify('+6 days'),
+            'title',
+            Repetitions::workingDays()
+        );
+
+        $this->assertCount(5, $event->occurrences());
+
+        $pivotDate = $event->findPivotDate($event->occurrences()[$clickedIndex]);
+
+        $this->assertEquals($event->occurrences()->toArray()[$expectedPivotDateIndex]->endDate(), $pivotDate);
+    }
+
+    public function findingPivotDataProvider() : array
+    {
+        return [
+            ['clickedIndex' => 0, 'expectedPivotDateIndex' => 0],
+            ['clickedIndex' => 1, 'expectedPivotDateIndex' => 0],
+            ['clickedIndex' => 2, 'expectedPivotDateIndex' => 1],
+            ['clickedIndex' => 3, 'expectedPivotDateIndex' => 2],
+            ['clickedIndex' => 4, 'expectedPivotDateIndex' => 3],
+        ];
     }
 
     /**

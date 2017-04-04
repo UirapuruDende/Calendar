@@ -5,7 +5,7 @@ use Dende\Calendar\Domain\Calendar\Event;
 
 interface EventFactoryInterface
 {
-    public function create() : Event;
+    static public function create() : Event;
 
-    public function createFromArray(array $array = []) : Event;
+    static public function createFromArray(array $array = []) : Event;
 }

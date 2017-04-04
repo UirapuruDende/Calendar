@@ -70,4 +70,9 @@ final class EventType
     {
         return $this->isType(self::TYPE_WEEKLY);
     }
+
+    public function isSingle() : bool
+    {
+        return $this->isType(self::TYPE_SINGLE);
+    }
 }

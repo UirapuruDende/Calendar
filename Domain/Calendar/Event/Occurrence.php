@@ -70,6 +70,8 @@ class Occurrence implements OccurrenceInterface
         $this->startDate    = $startDate;
         $this->duration     = $duration;
         $this->updateEndDate();
+
+        $this->event()->occurrences()->add($this);
     }
 
     /**
@@ -182,15 +184,16 @@ class Occurrence implements OccurrenceInterface
         return $this->modified;
     }
 
-    public function synchronizeWithEvent(Event $event)
+    public function synchronizeWithEvent()
     {
-        if ($event->isSingle()) {
-            $this->changeStartDate($event->startDate());
-        } elseif ($event->isWeekly()) {
-            $this->startDate->modify($event->startDate()->format('H:i:s'));
+        if ($this->event()->isSingle()) {
+            $this->changeStartDate($this->event()->startDate());
+        } elseif ($this->event()->isWeekly()) {
+            $this->startDate->modify($this->event()->startDate()->format('H:i:s'));
         }
 
-        $this->changeDuration(new OccurrenceDuration($event->duration()->minutes()));
+        $this->changeDuration(new OccurrenceDuration($this->event()->duration()->minutes()));
+        $this->modified = false;
     }
 
     public function event() : Event

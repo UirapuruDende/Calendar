@@ -6,6 +6,7 @@ use Dende\Calendar\Application\Command\CreateEventCommand;
 use Dende\Calendar\Application\Handler\CreateEventHandler;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\CalendarId;
+use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryCalendarRepository;
@@ -22,12 +23,10 @@ class CreateEventHandlerTest extends PHPUnit_Framework_TestCase
     {
         $calendar = Calendar::create('test');
 
-        $calendarId = $calendar->id()->__toString();
-
         $command = CreateEventCommand::fromArray([
-            'calendarId'  => $calendarId,
-            'startDate'   => new DateTime('+1 hour'),
-            'endDate'     => new DateTime('+1 day +3 hours'),
+            'calendarId'  => $calendar->id()->__toString(),
+            'startDate'   => new DateTime('12:00'),
+            'endDate'     => (new DateTime('12:00'))->modify('+1 day +2 hours'), // this is intended, endDate should be auto adjusted
             'type'        => EventType::TYPE_SINGLE,
             'title'       => 'some-title',
             'repetitions' => [],
@@ -42,10 +41,14 @@ class CreateEventHandlerTest extends PHPUnit_Framework_TestCase
         $handler = new CreateEventHandler($calendarRepository, $eventRepository, $occurrenceRepository);
         $handler->handle($command);
 
+        /** @var Event $event */
         $event = $calendar->events()->last();
 
-        $this->assertEquals(new DateTime('+3 hours'), $event->endDate());
-        $this->assertCount(1, $event->occurrences());
+        $this->assertCount(1, $calendar->events());
+        $this->assertCount(1, $eventRepository->findAll());
+
+        $this->assertEquals(new DateTime('14:00'), $event->endDate());
+        $this->assertCount(1, $event->occurrences(), $event->dumpOccurrencesDatesAsString());
     }
 
     /**

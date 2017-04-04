@@ -29,7 +29,7 @@ class NextInclusive implements UpdateStrategyInterface
             throw new Exception('This strategy is for series types events!');
         }
 
-        $pivotDate = $this->findPivotDate($occurrence, $originalEvent);
+        $pivotDate = $originalEvent->findPivotDate($occurrence);
         $originalEvent->closeAtDate($pivotDate);
 
         foreach ($originalEvent->occurrences() as $occurrence) {
@@ -45,36 +45,5 @@ class NextInclusive implements UpdateStrategyInterface
         }
 
         $this->eventRepository->update($originalEvent);
-    }
-
-    /**
-     * @param OccurrenceInterface $occurrence
-     * @param Event               $event
-     *
-     * @return DateTime
-     *
-     * @internal param UpdateEventCommand $command
-     */
-    public function findPivotDate(OccurrenceInterface $editedOccurrence, Event $event) : DateTime
-    {
-        /** @var ArrayCollection|Occurrence[] $occurrences */
-        $occurrences = $event->occurrences();
-
-        /** @var ArrayCollection $filteredOccurrencesBeforeEdited */
-        $filteredOccurrencesBeforeEdited = $occurrences->filter(function (Occurrence $occurrence) use ($editedOccurrence) {
-            return $occurrence->endDate() <= $editedOccurrence->startDate();
-        });
-
-        $iterator = $filteredOccurrencesBeforeEdited->getIterator();
-
-        $iterator->uasort(function (Occurrence $a, Occurrence $b) {
-            return $a->startDate() > $b->startDate();
-        });
-
-        if ($latestOccurrence = end($iterator)) {
-            return $latestOccurrence->endDate();
-        }
-
-        return $editedOccurrence->endDate();
     }
 }
