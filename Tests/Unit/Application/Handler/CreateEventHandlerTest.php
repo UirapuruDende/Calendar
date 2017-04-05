@@ -22,7 +22,7 @@ class CreateEventHandlerTest extends PHPUnit_Framework_TestCase
      */
     public function it_tests_creation_of_single_event()
     {
-        $base = Carbon::instance(new DateTime('12:00'));
+        $base     = Carbon::instance(new DateTime('12:00'));
         $calendar = Calendar::create('test');
 
         $command = CreateEventCommand::fromArray([

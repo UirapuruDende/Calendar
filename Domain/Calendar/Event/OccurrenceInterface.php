@@ -38,8 +38,6 @@ interface OccurrenceInterface
 
     public function changeStartDate(DateTime $startDate);
 
-    public function changeDuration(OccurrenceDuration $duration);
-
     public function isModified() : bool;
 
     public function synchronizeWithEvent();

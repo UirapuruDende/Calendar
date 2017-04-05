@@ -74,7 +74,7 @@ class Calendar
             'type'        => $type,
             'repetitions' => $repetitions,
             'calendar'    => $this,
-            'occurrences' => $occurrences
+            'occurrences' => $occurrences,
         ]);
 
         $this->events->add($event);

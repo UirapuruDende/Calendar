@@ -3,11 +3,8 @@ namespace Dende\Calendar\Tests\Unit\Application\Handler;
 
 use DateTime;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
-use Dende\Calendar\Application\Factory\EventFactoryInterface;
-use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
 use Dende\Calendar\Application\Handler\UpdateEventHandler;
-use Dende\Calendar\Application\Repository\EventRepositoryInterface;
-use Dende\Calendar\Application\Repository\OccurrenceRepositoryInterface;
+use Dende\Calendar\Application\Handler\UpdateStrategy\UpdateStrategyInterface;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\EventId;
@@ -18,7 +15,6 @@ use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryEventRepository;
 use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryOccurrenceRepository;
-use Dende\Calendar\Application\Handler\UpdateStrategy\UpdateStrategyInterface;
 use Mockery as m;
 use PHPUnit_Framework_TestCase;
 

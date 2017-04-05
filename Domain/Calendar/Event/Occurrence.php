@@ -8,7 +8,6 @@ use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 use Dende\Calendar\Domain\IdInterface;
-use Dende\Calendar\Domain\SoftDeleteable;
 use Exception;
 
 /**
@@ -60,13 +59,32 @@ class Occurrence implements OccurrenceInterface
      * @param Event                    $event
      * @param DateTime                 $startDate
      * @param OccurrenceDuration       $duration
+     *
+     * @throws Exception
      */
-    public function __construct(IdInterface $occurrenceId, Event $event, DateTime $startDate, OccurrenceDuration $duration)
+    public function __construct(IdInterface $occurrenceId = null, Event $event, DateTime $startDate = null, OccurrenceDuration $duration = null)
     {
-        $this->occurrenceId = $occurrenceId;
+        $this->occurrenceId = $occurrenceId ?: OccurrenceId::create();
         $this->event        = $event;
         $this->startDate    = $startDate;
         $this->duration     = $duration;
+
+        if (null === $this->startDate) {
+            if ($this->event()->isSingle()) {
+                $this->synchronizeWithEvent();
+            } else {
+                throw new Exception('StartDate for weekly type of event has to be set!');
+            }
+        }
+
+        if (null === $this->event) {
+            throw new Exception('Event has to be set!');
+        }
+
+        if (null === $this->duration) {
+            $this->synchronizeWithEvent();
+        }
+
         $this->updateEndDate();
     }
 
@@ -161,15 +179,6 @@ class Occurrence implements OccurrenceInterface
         $this->setAsModified();
     }
 
-    /**
-     * @param OccurrenceDuration $duration
-     */
-    public function changeDuration(OccurrenceDuration $duration)
-    {
-        $this->duration = $duration;
-        $this->updateEndDate();
-    }
-
     protected function setAsModified()
     {
         $this->modified = true;
@@ -188,8 +197,10 @@ class Occurrence implements OccurrenceInterface
             $this->startDate->modify($this->event()->startDate()->format('H:i:s'));
         }
 
-        $this->changeDuration(new OccurrenceDuration($this->event()->duration()->minutes()));
+        $this->duration = new OccurrenceDuration($this->event()->duration()->minutes());
         $this->modified = false;
+
+        $this->updateEndDate();
     }
 
     public function event() : Event
@@ -197,6 +208,10 @@ class Occurrence implements OccurrenceInterface
         return $this->event;
     }
 
+    /**
+     * @return string
+     * @codeCoverageIgnore
+     */
     public function dumpDatesAsString() : string
     {
         return sprintf('[%s:%s:%s]', $this->startDate()->format('d/m'), $this->duration()->minutes(), $this->getDeletedAt() ? $this->getDeletedAt()->format('d/m') : '_');

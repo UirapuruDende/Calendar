@@ -52,9 +52,4 @@ final class CreateEventCommand implements EventCommandInterface
 
         return $command;
     }
-
-    public function toArray() : array
-    {
-        return get_object_vars($this);
-    }
 }

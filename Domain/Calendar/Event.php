@@ -13,6 +13,7 @@ use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
+use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 use Dende\Calendar\Domain\Calendar\Event\OccurrenceInterface;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Domain\IdInterface;
@@ -111,11 +112,11 @@ class Event
 
         $duration = Duration::calculate($startDate, $endDate);
 
-        if($type->isSingle()) {
-            $endDate = (clone $startDate)->modify(sprintf("+ %d minutes", $duration->minutes()));
+        if ($type->isSingle()) {
+            $endDate = (clone $startDate)->modify(sprintf('+ %d minutes', $duration->minutes()));
 
-            if($startDate->format("Ymd") !== $endDate->format("Ymd")) {
-                throw new Exception("Single event should finish at the same day");
+            if ($startDate->format('Ymd') !== $endDate->format('Ymd')) {
+                throw new Exception('Single event should finish at the same day');
             }
         }
 
@@ -249,12 +250,12 @@ class Event
      */
     public function closeAtDate(DateTime $date)
     {
-        $test = function(DateTime $occurrenceDate) use ($date) {
+        $testIfOlder = function (DateTime $occurrenceDate) use ($date) {
             return $occurrenceDate > $date;
         };
 
         foreach ($this->occurrences as $occurrence) {
-            if ($test($occurrence->endDate())) {
+            if ($testIfOlder($occurrence->endDate())) {
                 $this->occurrences()->removeElement($occurrence);
             }
         }
@@ -262,11 +263,10 @@ class Event
         $this->endDate = $date;
     }
 
-
     public function resize(DateTime $newStartDate = null, DateTime $newEndDate = null, Repetitions $repetitions = null)
     {
-        $this->startDate = $newStartDate ?: $this->startDate;
-        $this->endDate = $newEndDate ?: $this->endDate;
+        $this->startDate   = $newStartDate ?: $this->startDate;
+        $this->endDate     = $newEndDate ?: $this->endDate;
         $this->repetitions = $repetitions ?: $this->repetitions;
 
         $this->regenerateOccurrences();
@@ -275,7 +275,7 @@ class Event
     protected function regenerateOccurrences()
     {
         /** @var OccurrenceFactoryInterface $factory */
-        $factory           = new self::$occurrenceFactoryClass();
+        $factory = new self::$occurrenceFactoryClass();
 
         $oldCollection = new ArrayCollection($this->occurrences->toArray());
         $this->occurrences->clear();
@@ -283,10 +283,9 @@ class Event
         $tmpCollection = new ArrayCollection();
 
         $startDate = $this->startDate();
-        $endDate = $this->endDate();
+        $endDate   = $this->endDate();
 
-        if ($this->isSingle())
-        {
+        if ($this->isSingle()) {
             $this->occurrences->add($factory->createFromArray([
               'startDate' => $this->startDate(),
               'duration'  => new OccurrenceDuration($this->duration()->minutes()),
@@ -312,13 +311,13 @@ class Event
         }
 
         /** @var OccurrenceInterface[]|ArrayCollection $paddedCollection */
-        $paddedCollection = $oldCollection->filter(function(Occurrence $occurrence) use ($startDate, $endDate) {
+        $paddedCollection = $oldCollection->filter(function (Occurrence $occurrence) use ($startDate, $endDate) {
             return $startDate <= $occurrence->startDate() && $occurrence->endDate() <= $endDate;
         });
 
-        foreach($tmpCollection as $newOccurrence) {
-            foreach($paddedCollection as $oldOccurrence) {
-                if ($newOccurrence->startDate()->format("Ymd") === $oldOccurrence->startDate()->format("Ymd")) {
+        foreach ($tmpCollection as $newOccurrence) {
+            foreach ($paddedCollection as $oldOccurrence) {
+                if ($newOccurrence->startDate()->format('Ymd') === $oldOccurrence->startDate()->format('Ymd')) {
                     $oldOccurrence->synchronizeWithEvent();
                     $this->occurrences->add($oldOccurrence);
 
@@ -328,6 +327,19 @@ class Event
 
             $this->occurrences->add($newOccurrence);
         }
+    }
+
+    public function getOccurrenceById(IdInterface $occurrenceId) : OccurrenceId
+    {
+        $result = $this->occurrences()->filter(function (Event $event) use ($occurrenceId) {
+            return $event->id()->equals($occurrenceId);
+        });
+
+        return $result->first();
+    }
+
+    protected function regenerateOccurrencesWithPivot(Occurrence $pivotOccurrence)
+    {
     }
 
     public function id() : IdInterface
@@ -340,11 +352,17 @@ class Event
         return $this->calendar;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function dumpDatesAsString() : string
     {
         return sprintf('[%s-%s-%s]', $this->startDate()->format(self::DUMP_FORMAT), $this->endDate()->format(self::DUMP_FORMAT), $this->getDeletedAt() ? $this->getDeletedAt()->format(self::DUMP_FORMAT) : '_');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function dumpOccurrencesDatesAsString() : string
     {
         $array = $this->occurrences()->map(function (Occurrence $occurrence) {
@@ -373,5 +391,4 @@ class Event
 
         return $editedOccurrence->endDate();
     }
-
 }

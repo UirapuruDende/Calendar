@@ -14,7 +14,6 @@ use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit_Framework_TestCase;
-use Ramsey\Uuid\Uuid;
 
 class EventTest extends PHPUnit_Framework_TestCase
 {
@@ -26,7 +25,7 @@ class EventTest extends PHPUnit_Framework_TestCase
         $base = Carbon::instance(new DateTime('last monday 12:00:00'));
 
         /** @var OccurrenceFactoryInterface $factory */
-        $factory = new Event::$occurrenceFactoryClass;
+        $factory = new Event::$occurrenceFactoryClass();
 
         $collection = new ArrayCollection();
 
@@ -50,24 +49,24 @@ class EventTest extends PHPUnit_Framework_TestCase
         $occurrenceId3 = OccurrenceId::create();
 
         $collection->add($factory->createFromArray([
-            "occurrenceId" => $occurrenceId1,
-            "startDate" => $base->copy(),
-            "duration"  => new OccurrenceDuration($event->duration()->minutes()),
-            "event" =>  $event
+            'occurrenceId' => $occurrenceId1,
+            'startDate'    => $base->copy(),
+            'duration'     => new OccurrenceDuration($event->duration()->minutes()),
+            'event'        => $event,
         ]));
 
         $collection->add($factory->createFromArray([
-            "occurrenceId" => $occurrenceId2,
-            "startDate" => $base->copy()->addDays(2),
-            "duration"  => new OccurrenceDuration($event->duration()->minutes()),
-            "event" =>  $event
+            'occurrenceId' => $occurrenceId2,
+            'startDate'    => $base->copy()->addDays(2),
+            'duration'     => new OccurrenceDuration($event->duration()->minutes()),
+            'event'        => $event,
         ]));
 
         $collection->add($factory->createFromArray([
-            "occurrenceId" => $occurrenceId3,
-            "startDate" => $base->copy()->addDays(4),
-            "duration"  => new OccurrenceDuration($event->duration()->minutes()),
-            "event" =>  $event
+            'occurrenceId' => $occurrenceId3,
+            'startDate'    => $base->copy()->addDays(4),
+            'duration'     => new OccurrenceDuration($event->duration()->minutes()),
+            'event'        => $event,
         ]));
 
         $event->resize(
@@ -123,7 +122,9 @@ class EventTest extends PHPUnit_Framework_TestCase
         $event->resize();
         $this->assertCount(9, $collection);
 
-        $ids = $collection->map(function(Occurrence $occurrence){ return $occurrence->id(); })->toArray();
+        $ids = $collection->map(function (Occurrence $occurrence) {
+            return $occurrence->id();
+        })->toArray();
 
         $event->resize(
             $event->startDate()->copy()->addDays(7),
@@ -137,7 +138,7 @@ class EventTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($collection[2]->id(), $ids[4]);
         $this->assertEquals($collection[4]->id(), $ids[5]);
 
-        for($days = 7; $days<12; $days++) {
+        for ($days = 7; $days < 12; ++$days) {
             $this->assertEquals($collection[0]->startDate(), $base->copy()->addDays(7));
             $this->assertEquals($collection[0]->endDate(), $base->copy()->addDays(7)->addHours(2));
         }
@@ -145,8 +146,6 @@ class EventTest extends PHPUnit_Framework_TestCase
 
     public function testCalculateOccurrencesDatesWeekly()
     {
-        $this->markTestIncomplete();
-
         $event = new Event(
             EventId::create(),
             Calendar::create('title'),
@@ -182,8 +181,6 @@ class EventTest extends PHPUnit_Framework_TestCase
 
     public function testCalculateOccurrencesDatesSingle()
     {
-        $this->markTestIncomplete();
-
         $event = new Event(
             EventId::create(),
             Calendar::create('test'),
@@ -222,6 +219,7 @@ class EventTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      * @dataProvider findingPivotDataProvider
+     *
      * @param int $clickedIndex
      * @param int $expectedPivotDateIndex
      */
@@ -258,18 +256,16 @@ class EventTest extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider closeAtDateDataProvider
      *
-     * @param array $id
+     * @param array    $id
      * @param DateTime $closingDate
-     * @param array $expected
-     * @param int $expectedCount
+     * @param array    $expected
      */
     public function testCloseAtDate(array $id, DateTime $closingDate, array $expected)
     {
-        $this->markTestIncomplete();
-
-        $baseDate  = Carbon::instance(new DateTime('last monday 12:00:00'));
+        $baseDate    = Carbon::instance(new DateTime('last monday 12:00:00'));
         $occurrences = new ArrayCollection();
 
+        /** @var OccurrenceFactoryInterface $factory */
         $factory = new Event::$occurrenceFactoryClass();
 
         $event = new Event(
@@ -284,45 +280,42 @@ class EventTest extends PHPUnit_Framework_TestCase
         );
 
         $occurrences->add($factory->createFromArray([
-            'occurrenceId' => OccurrenceId::create($id[0]),
-            'startDate' => $baseDate->copy(),
-            'duration'  => new OccurrenceDuration(30),
-            'event'     => $event,
+            'occurrenceId' => $id[0],
+            'startDate'    => $baseDate->copy(),
+            'event'        => $event,
         ]));
 
         $occurrences->add($factory->createFromArray([
-            'occurrenceId' => OccurrenceId::create($id[1]),
-            'startDate' => $baseDate->copy()->addDays(2),
-            'duration'  => new OccurrenceDuration(30),
-            'event'     => $event,
+            'occurrenceId' => $id[1],
+            'startDate'    => $baseDate->copy()->addDays(2),
+            'event'        => $event,
         ]));
 
         $occurrences->add($factory->createFromArray([
-            'occurrenceId' => OccurrenceId::create($id[2]),
-            'startDate' => $baseDate->copy()->addDays(4),
-            'duration'  => new OccurrenceDuration(30),
-            'event'     => $event,
+            'occurrenceId' => $id[2],
+            'startDate'    => $baseDate->copy()->addDays(4),
+            'event'        => $event,
         ]));
-
-        $this->assertCount(3, $event->occurrences());
 
         $event->closeAtDate($closingDate);
 
+        $this->assertCount(count($expected), $event->occurrences());
         $this->assertEquals($closingDate, $event->endDate());
 
-        $this->assertCount(count($expected), $event->occurrences());
-
+        foreach ($expected as $key => $occurrenceId) {
+            $this->assertNotNull($event->getOccurrenceById($occurrenceId), sprintf('Id[%d] %s not found', $key, $occurrences));
+        }
     }
 
     public function closeAtDateDataProvider() : array
     {
         $base = Carbon::instance(new DateTime('last monday 12:00:00'));
 
-        $id1 = Uuid::uuid4();
-        $id2 = Uuid::uuid4();
-        $id3 = Uuid::uuid4();
+        $occurrenceId1 = OccurrenceId::create();
+        $occurrenceId2 = OccurrenceId::create();
+        $occurrenceId3 = OccurrenceId::create();
 
-        $idsArray = [$id1, $id2, $id3];
+        $idsArray = [$occurrenceId1, $occurrenceId2, $occurrenceId3];
 
         return [
             'before monday' => [
@@ -333,22 +326,22 @@ class EventTest extends PHPUnit_Framework_TestCase
             'tuesday' => [
                 'id'          => $idsArray,
                 'closingDate' => $base->copy()->addDays(1),
-                'expected'    => [$id1],
+                'expected'    => [$occurrenceId1],
             ],
             'wednesday on time' => [
                 'id'          => $idsArray,
                 'closingDate' => $base->copy()->addDays(2),
-                'expected'    => [],
+                'expected'    => [$occurrenceId1],
             ],
             'thursday' => [
                 'id'          => $idsArray,
                 'closingDate' => $base->copy()->addDays(3),
-                'expected'    => [],
+                'expected'    => [$occurrenceId3],
             ],
             'last' => [
                 'id'          => $idsArray,
                 'closingDate' => $base->copy()->addDays(5),
-                'expected'    => [],
+                'expected'    => [$occurrenceId1, $occurrenceId2, $occurrenceId3],
             ],
         ];
     }

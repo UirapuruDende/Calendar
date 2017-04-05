@@ -2,9 +2,6 @@
 namespace Dende\Calendar\Application\Factory;
 
 use DateTime;
-use Dende\Calendar\Application\Command\CreateEventCommand;
-use Dende\Calendar\Application\Command\EventCommandInterface;
-use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\EventId;
@@ -22,7 +19,7 @@ class EventFactory implements EventFactoryInterface
      *
      * @return Event
      */
-    static public function createFromArray(array $array = []) : Event
+    public static function createFromArray(array $array = []) : Event
     {
         $template = [
             'eventId'     => EventId::create(),
@@ -49,7 +46,7 @@ class EventFactory implements EventFactoryInterface
         );
     }
 
-    static public function create() : Event
+    public static function create() : Event
     {
         return self::createFromArray([]);
     }

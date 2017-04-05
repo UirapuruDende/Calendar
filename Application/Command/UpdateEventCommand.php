@@ -43,20 +43,6 @@ final class UpdateEventCommand implements EventCommandInterface, UpdateEventComm
      */
     public $repetitions = [];
 
-    public static function fromArray(array $array = []) : UpdateEventCommand
-    {
-        $command = new self();
-
-        $command->occurrenceId = $array['occurrenceId'];
-        $command->method       = $array['method'];
-        $command->startDate    = $array['startDate'];
-        $command->endDate      = $array['endDate'];
-        $command->title        = $array['title'];
-        $command->repetitions  = $array['repetitions'];
-
-        return $command;
-    }
-
     public function method(): string
     {
         return $this->method;
