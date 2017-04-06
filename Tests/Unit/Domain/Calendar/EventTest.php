@@ -145,6 +145,59 @@ class EventTest extends PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @test
+     */
+    public function it_tests_extending_right_side_with_pivot()
+    {
+        $base = Carbon::instance(new DateTime('last monday 12:00:00'));
+
+        $collection = new ArrayCollection();
+
+        $event = new Event(
+            EventId::create(),
+            Calendar::create('title'),
+            EventType::weekly(),
+            $base->copy(),
+            $base->copy()->addDays(6)->addHours(2),
+            'some title',
+            Repetitions::workingDays(),
+            $collection
+        );
+
+        $event->resize();
+        $this->assertCount(5, $collection);
+
+        $ids = $collection->map(function (Occurrence $occurrence) {
+            return $occurrence->id();
+        })->toArray();
+
+        $event->resize(
+            $event->startDate()->copy()->addDays(7),
+            $event->endDate()->copy()->subDays(7),
+            new Repetitions([
+                Repetitions::MONDAY,
+                Repetitions::WEDNESDAY,
+                Repetitions::FRIDAY,
+            ]),
+            $event->occurrences()->get(3)
+        );
+
+        $this->assertCount(6, $collection);
+
+        $this->assertEquals($collection[0]->id(), $ids[0]);
+        $this->assertEquals($collection[1]->id(), $ids[1]);
+        $this->assertEquals($collection[2]->id(), $ids[2]);
+        $this->assertNotEquals($collection[3]->id(), $ids[3]);
+        $this->assertNotEquals($collection[4]->id(), $ids[4]);
+        $this->assertNotEquals($collection[5]->id(), $ids[5]);
+
+        for ($days = 7; $days < 12; ++$days) {
+            $this->assertEquals($collection[0]->startDate(), $base->copy()->addDays(7));
+            $this->assertEquals($collection[0]->endDate(), $base->copy()->addDays(7)->addHours(2));
+        }
+    }
+
     public function testCalculateOccurrencesDatesWeekly()
     {
         $event = new Event(

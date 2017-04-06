@@ -243,31 +243,57 @@ class Event
         $this->resize(null, $date, null);
     }
 
-    public function resize(DateTime $newStartDate = null, DateTime $newEndDate = null, Repetitions $repetitions = null)
+    public function resize(DateTime $newStartDate = null, DateTime $newEndDate = null, Repetitions $repetitions = null, Occurrence $occurrence = null)
     {
         $this->startDate   = $newStartDate ?: $this->startDate;
         $this->endDate     = $newEndDate ?: $this->endDate;
         $this->repetitions = $repetitions ?: $this->repetitions;
 
-        $this->regenerateOccurrences();
+        if(null === $occurrence) {
+            $this->regenerateOccurrences();
+        } else {
+            $this->regenerateOccurrences($this->findPivotDate($occurrence));
+        }
+
     }
 
     protected function regenerateOccurrences(DateTime $pivotDate = null)
     {
+        if(null !== $pivotDate && $this->startDate <= $pivotDate && $pivotDate <= $this->endDate) {
+            throw new Exception("Pivot must be between startDate and endDate!");
+        }
+
         /** @var OccurrenceFactoryInterface $factory */
         $factory = new self::$occurrenceFactoryClass();
 
         $oldCollection = new ArrayCollection($this->occurrences->toArray());
-        $this->occurrences->clear();
+
+        if(null === $pivotDate) {
+            $this->occurrences->clear();
+        } else {
+            $oldCollection = new ArrayCollection($this->occurrences->toArray());
+            $oldCollection = $oldCollection->filter(function(Occurrence $occurrence) use ($pivotDate) {
+                return $occurrence->startDate() >= $pivotDate;
+            });
+            $this->occurrences = $this->occurrences->filter(function(Occurrence $occurrence) use ($pivotDate) {
+                return $occurrence->endDate() < $pivotDate;
+            });
+        }
 
         $tmpCollection = new ArrayCollection();
 
         $startDate = $this->startDate();
         $endDate   = $this->endDate();
 
+        if(null === $pivotDate) {
+            $pivotDate = $startDate;
+        }
+
         if ($this->isSingle()) {
+            $this->occurrences->clear();
+
             $this->occurrences->add($factory->createFromArray([
-              'startDate' => $this->startDate(),
+              'startDate' => $this->startDate,
               'duration'  => new OccurrenceDuration($this->duration()->minutes()),
               'event'     => $this,
             ]));
@@ -275,7 +301,7 @@ class Event
             return;
         }
 
-        $period = new DatePeriod($this->startDate, new DateInterval('P1D'), $this->endDate);
+        $period = new DatePeriod($pivotDate, new DateInterval('P1D'), $this->endDate);
 
         /** @var DateTime $date */
         foreach ($period as $date) {
@@ -291,8 +317,8 @@ class Event
         }
 
         /** @var OccurrenceInterface[]|ArrayCollection $paddedCollection */
-        $paddedCollection = $oldCollection->filter(function (Occurrence $occurrence) use ($startDate, $endDate) {
-            return $startDate <= $occurrence->startDate() && $occurrence->endDate() <= $endDate;
+        $paddedCollection = $oldCollection->filter(function (Occurrence $occurrence) use ($pivotDate, $endDate) {
+            return $pivotDate <= $occurrence->startDate() && $occurrence->endDate() <= $endDate;
         });
 
         foreach ($tmpCollection as $newOccurrence) {
@@ -318,10 +344,6 @@ class Event
         return $result->first();
     }
 
-    protected function regenerateOccurrencesWithPivot(Occurrence $pivotOccurrence)
-    {
-    }
-
     public function id() : IdInterface
     {
         return $this->eventId;
@@ -345,7 +367,7 @@ class Event
      */
     public function dumpOccurrencesDatesAsString() : string
     {
-        $array = $this->occurrences()->map(function (Occurrence $occurrence) {
+        $array = $this->occurrences()->map(function (OccurrenceInterface $occurrence) {
             return sprintf('[%s:%s]', $occurrence->startDate()->format(self::DUMP_FORMAT), $occurrence->duration()->minutes());
         });
 
@@ -355,7 +377,7 @@ class Event
     public function findPivotDate(OccurrenceInterface $editedOccurrence) : DateTime
     {
         /** @var ArrayCollection $filteredOccurrencesBeforeEdited */
-        $filteredOccurrencesBeforeEdited = $this->occurrences->filter(function (Occurrence $occurrence) use ($editedOccurrence) {
+        $filteredOccurrencesBeforeEdited = $this->occurrences->filter(function (OccurrenceInterface $occurrence) use ($editedOccurrence) {
             return $occurrence->endDate() <= $editedOccurrence->startDate();
         });
 
