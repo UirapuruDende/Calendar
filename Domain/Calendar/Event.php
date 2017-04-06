@@ -329,10 +329,10 @@ class Event
         }
     }
 
-    public function getOccurrenceById(IdInterface $occurrenceId) : OccurrenceId
+    public function getOccurrenceById(IdInterface $occurrenceId) : Occurrence
     {
-        $result = $this->occurrences()->filter(function (Event $event) use ($occurrenceId) {
-            return $event->id()->equals($occurrenceId);
+        $result = $this->occurrences()->filter(function (Occurrence $occurrence) use ($occurrenceId) {
+            return $occurrence->id()->equals($occurrenceId);
         });
 
         return $result->first();

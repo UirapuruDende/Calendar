@@ -336,7 +336,7 @@ class EventTest extends PHPUnit_Framework_TestCase
             'thursday' => [
                 'id'          => $idsArray,
                 'closingDate' => $base->copy()->addDays(3),
-                'expected'    => [$occurrenceId3],
+                'expected'    => [$occurrenceId1, $occurrenceId2],
             ],
             'last' => [
                 'id'          => $idsArray,

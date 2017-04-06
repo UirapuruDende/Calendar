@@ -49,9 +49,9 @@ class Calendar
      * @param string               $title
      * @param ArrayCollection|null $events
      */
-    public function __construct(IdInterface $calendarId, string $title = '', ArrayCollection $events = null)
+    public function __construct(IdInterface $calendarId = null, string $title = '', ArrayCollection $events = null)
     {
-        $this->calendarId = $calendarId;
+        $this->calendarId = $calendarId ?: CalendarId::create();
         $this->title      = $title;
         $this->events     = $events ?: new ArrayCollection();
     }
