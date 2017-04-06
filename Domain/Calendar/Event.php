@@ -249,6 +249,7 @@ class Event
         $this->endDate     = $newEndDate ?: $this->endDate;
         $this->repetitions = $repetitions ?: $this->repetitions;
 
+
         if(null === $occurrence) {
             $this->regenerateOccurrences();
         } else {

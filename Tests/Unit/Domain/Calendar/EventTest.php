@@ -173,8 +173,8 @@ class EventTest extends PHPUnit_Framework_TestCase
         })->toArray();
 
         $event->resize(
-            $event->startDate()->copy()->addDays(7),
-            $event->endDate()->copy()->subDays(7),
+            $event->startDate()->copy(),
+            $event->endDate()->copy()->addDays(4),
             new Repetitions([
                 Repetitions::MONDAY,
                 Repetitions::WEDNESDAY,
@@ -185,17 +185,20 @@ class EventTest extends PHPUnit_Framework_TestCase
 
         $this->assertCount(6, $collection);
 
-        $this->assertEquals($collection[0]->id(), $ids[0]);
-        $this->assertEquals($collection[1]->id(), $ids[1]);
-        $this->assertEquals($collection[2]->id(), $ids[2]);
-        $this->assertNotEquals($collection[3]->id(), $ids[3]);
-        $this->assertNotEquals($collection[4]->id(), $ids[4]);
-        $this->assertNotEquals($collection[5]->id(), $ids[5]);
+        $this->assertEquals($base->copy(), $collection[0]->startDate());
+        $this->assertEquals($base->copy()->addDays(1), $collection[1]->startDate());
+        $this->assertEquals($base->copy()->addDays(2), $collection[2]->startDate());
+        $this->assertEquals($base->copy()->addDays(4), $collection[3]->startDate());
+        $this->assertEquals($base->copy()->addDays(7), $collection[4]->startDate());
+        $this->assertEquals($base->copy()->addDays(9), $collection[5]->startDate());
 
-        for ($days = 7; $days < 12; ++$days) {
-            $this->assertEquals($collection[0]->startDate(), $base->copy()->addDays(7));
-            $this->assertEquals($collection[0]->endDate(), $base->copy()->addDays(7)->addHours(2));
-        }
+
+//        $this->assertEquals($collection[0]->id(), $ids[0]);
+//        $this->assertEquals($collection[1]->id(), $ids[1]);
+//        $this->assertEquals($collection[2]->id(), $ids[2]);
+//        $this->assertNotEquals($collection[3]->id(), $ids[3]);
+//        $this->assertNotEquals($collection[4]->id(), $ids[4]);
+//        $this->assertNotEquals($collection[5]->id(), $ids[5]);
     }
 
     public function testCalculateOccurrencesDatesWeekly()
