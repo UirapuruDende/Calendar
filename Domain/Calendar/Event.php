@@ -13,7 +13,6 @@ use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
-use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 use Dende\Calendar\Domain\Calendar\Event\OccurrenceInterface;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Domain\IdInterface;
@@ -100,7 +99,7 @@ class Event
      *
      * @internal param string $id
      */
-    public function __construct(IdInterface $eventId, Calendar $calendar, EventType $type, DateTime $startDate, DateTime $endDate, string $title, Repetitions $repetitions, ArrayCollection $occurrences = null)
+    public function __construct(IdInterface $eventId = null, Calendar $calendar, EventType $type, DateTime $startDate, DateTime $endDate, string $title, Repetitions $repetitions = null, ArrayCollection $occurrences = null)
     {
         if (Carbon::instance($startDate)->gte(Carbon::instance($endDate))) {
             throw new Exception(sprintf(
@@ -120,14 +119,14 @@ class Event
             }
         }
 
-        if ($type->isWeekly() && count($repetitions->getArray()) === 0) {
+        if ($type->isWeekly() && (null === $repetitions || count($repetitions->getArray()) === 0)) {
             throw new Exception('Weekly repeated event must have at least one repetition');
         }
 
         $this->duration    = $duration;
         $this->startDate   = $startDate;
         $this->endDate     = $endDate;
-        $this->eventId     = $eventId;
+        $this->eventId     = $eventId ?: EventId::create();
         $this->calendar    = $calendar;
         $this->type        = $type;
         $this->title       = $title;
@@ -197,15 +196,6 @@ class Event
     }
 
     /**
-     * @param Duration $duration
-     */
-//    public function resize(Duration $duration)
-//    {
-//        $this->duration = $duration;
-//        $this->resetAllOccurrences();
-//    }
-
-    /**
      * @param DateTime $startDate
      */
 //    public function move(DateTime $startDate)
@@ -250,17 +240,7 @@ class Event
      */
     public function closeAtDate(DateTime $date)
     {
-        $testIfOlder = function (DateTime $occurrenceDate) use ($date) {
-            return $occurrenceDate > $date;
-        };
-
-        foreach ($this->occurrences as $occurrence) {
-            if ($testIfOlder($occurrence->endDate())) {
-                $this->occurrences()->removeElement($occurrence);
-            }
-        }
-
-        $this->endDate = $date;
+        $this->resize(null, $date, null);
     }
 
     public function resize(DateTime $newStartDate = null, DateTime $newEndDate = null, Repetitions $repetitions = null)
@@ -272,7 +252,7 @@ class Event
         $this->regenerateOccurrences();
     }
 
-    protected function regenerateOccurrences()
+    protected function regenerateOccurrences(DateTime $pivotDate = null)
     {
         /** @var OccurrenceFactoryInterface $factory */
         $factory = new self::$occurrenceFactoryClass();

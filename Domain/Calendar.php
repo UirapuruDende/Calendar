@@ -61,7 +61,7 @@ class Calendar
         return new self(CalendarId::create(), $title);
     }
 
-    public function addEvent(IdInterface $eventId, string $title, DateTime $startDate, DateTime $endDate, EventType $type, Repetitions $repetitions, ArrayCollection $occurrences = null)
+    public function addEvent(IdInterface $eventId, string $title, DateTime $startDate, DateTime $endDate, EventType $type, Repetitions $repetitions = null, ArrayCollection $occurrences = null)
     {
         /** @var EventFactoryInterface $factory */
         $factory = new self::$eventFactoryClass();
@@ -93,9 +93,6 @@ class Calendar
         return $this->calendarId;
     }
 
-    /**
-     * @return string
-     */
     public function title() : string
     {
         return $this->title;

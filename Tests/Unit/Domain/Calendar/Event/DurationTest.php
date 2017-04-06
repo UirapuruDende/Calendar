@@ -3,8 +3,9 @@ namespace Tests\Unit\Domain\Calendar\Event;
 
 use DateTime;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
+use PHPUnit_Framework_TestCase;
 
-class DurationTest extends \PHPUnit_Framework_TestCase
+class DurationTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @test
@@ -17,6 +18,15 @@ class DurationTest extends \PHPUnit_Framework_TestCase
     public function testCalculate(DateTime $startDate, DateTime $endDate, int $expectedResult)
     {
         $this->assertEquals($expectedResult, Duration::calculate($startDate, $endDate)->minutes());
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Event duration has to be greater than 0
+     */
+    public function testConstructor()
+    {
+        new Duration(0);
     }
 
     public function calculateDataProvider() : array

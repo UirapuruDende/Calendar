@@ -13,6 +13,7 @@ use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Doctrine\Common\Collections\ArrayCollection;
+use Exception;
 use PHPUnit_Framework_TestCase;
 
 class EventTest extends PHPUnit_Framework_TestCase
@@ -198,10 +199,10 @@ class EventTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException Exception
      * @expectedExceptionMessage End date '2015-08-01 12:00:00' cannot be before start date '2015-09-01 12:00:00'
      */
-    public function testConstructorExceptions()
+    public function test_swapped_dates_in_constructor()
     {
         new Event(
             EventId::create(),
@@ -213,6 +214,23 @@ class EventTest extends PHPUnit_Framework_TestCase
             new Repetitions([
                 Repetitions::TUESDAY,
             ])
+        );
+    }
+
+    /**
+     * @expectedException Exception
+     * @expectedExceptionMessage Weekly repeated event must have at least one repetition
+     */
+    public function test_no_repetitions_with_weekly_in_constructor()
+    {
+        new Event(
+            null,
+            Calendar::create('test'),
+            EventType::weekly(),
+            new DateTime('2015-09-01 12:00:00'),
+            new DateTime('2015-10-01 12:05:00'),
+            'some title',
+            new Repetitions()
         );
     }
 
