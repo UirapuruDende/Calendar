@@ -13,7 +13,6 @@ use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Doctrine\Common\Collections\ArrayCollection;
-use Exception;
 use PHPUnit_Framework_TestCase;
 
 class EventTest extends PHPUnit_Framework_TestCase
@@ -152,6 +151,9 @@ class EventTest extends PHPUnit_Framework_TestCase
     {
         $base = Carbon::instance(new DateTime('last monday 12:00:00'));
 
+        /** @var OccurrenceFactoryInterface $factory */
+        $factory = new Event::$occurrenceFactoryClass();
+
         $collection = new ArrayCollection();
 
         $event = new Event(
@@ -165,8 +167,30 @@ class EventTest extends PHPUnit_Framework_TestCase
             $collection
         );
 
-        $event->resize();
-        $this->assertCount(5, $collection);
+        $collection->add($factory->createFromArray([
+            'startDate' => $base->copy(),
+            'event'     => $event,
+        ]));
+
+        $collection->add($factory->createFromArray([
+           'startDate' => $base->copy()->addDays(1),
+           'event'     => $event,
+       ]));
+
+        $collection->add($factory->createFromArray([
+           'startDate' => $base->copy()->addDays(2),
+           'event'     => $event,
+       ]));
+
+        $collection->add($factory->createFromArray([
+           'startDate' => $base->copy()->addDays(3),
+           'event'     => $event,
+       ]));
+
+        $collection->add($factory->createFromArray([
+           'startDate' => $base->copy()->addDays(4),
+           'event'     => $event,
+       ]));
 
         $ids = $collection->map(function (Occurrence $occurrence) {
             return $occurrence->id();
@@ -183,15 +207,16 @@ class EventTest extends PHPUnit_Framework_TestCase
             $event->occurrences()->get(3)
         );
 
+        $collection = $event->occurrences();
+
         $this->assertCount(6, $collection);
 
-        $this->assertEquals($base->copy(), $collection[0]->startDate());
-        $this->assertEquals($base->copy()->addDays(1), $collection[1]->startDate());
-        $this->assertEquals($base->copy()->addDays(2), $collection[2]->startDate());
-        $this->assertEquals($base->copy()->addDays(4), $collection[3]->startDate());
-        $this->assertEquals($base->copy()->addDays(7), $collection[4]->startDate());
+        $this->assertEquals($base->copy(),                    $collection[0]->startDate());
+        $this->assertEquals($base->copy()->addDays(1),  $collection[1]->startDate());
+        $this->assertEquals($base->copy()->addDays(2),  $collection[2]->startDate());
+        $this->assertEquals($base->copy()->addDays(4),  $collection[3]->startDate());
+        $this->assertEquals($base->copy()->addDays(7),  $collection[4]->startDate());
         $this->assertEquals($base->copy()->addDays(9), $collection[5]->startDate());
-
 
 //        $this->assertEquals($collection[0]->id(), $ids[0]);
 //        $this->assertEquals($collection[1]->id(), $ids[1]);
@@ -255,7 +280,7 @@ class EventTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \Exception
      * @expectedExceptionMessage End date '2015-08-01 12:00:00' cannot be before start date '2015-09-01 12:00:00'
      */
     public function test_swapped_dates_in_constructor()
@@ -274,7 +299,7 @@ class EventTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \Exception
      * @expectedExceptionMessage Weekly repeated event must have at least one repetition
      */
     public function test_no_repetitions_with_weekly_in_constructor()

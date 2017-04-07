@@ -249,19 +249,24 @@ class Event
         $this->endDate     = $newEndDate ?: $this->endDate;
         $this->repetitions = $repetitions ?: $this->repetitions;
 
-
-        if(null === $occurrence) {
+        if (null === $occurrence) {
             $this->regenerateOccurrences();
         } else {
             $this->regenerateOccurrences($this->findPivotDate($occurrence));
         }
-
     }
 
     protected function regenerateOccurrences(DateTime $pivotDate = null)
     {
-        if(null !== $pivotDate && $this->startDate <= $pivotDate && $pivotDate <= $this->endDate) {
-            throw new Exception("Pivot must be between startDate and endDate!");
+        if (null !== $pivotDate && ($pivotDate <= $this->startDate && $pivotDate >= $this->endDate)) {
+            throw new Exception(
+                sprintf(
+                    'Pivot (%s) must be between startDate (%s) and endDate (%s)!',
+                    $pivotDate->format('Y/m/d H:i:s'),
+                    $this->startDate->format('Y/m/d H:i:s'),
+                    $this->endDate->format('Y/m/d H:i:s')
+                )
+            );
         }
 
         /** @var OccurrenceFactoryInterface $factory */
@@ -269,26 +274,24 @@ class Event
 
         $oldCollection = new ArrayCollection($this->occurrences->toArray());
 
-        if(null === $pivotDate) {
+        if (null === $pivotDate) {
             $this->occurrences->clear();
+            $pivotDate = $this->startDate();
         } else {
+            $pivotDate = Carbon::instance($pivotDate)->subMinutes($this->duration()->minutes())->addDays(1);
+
             $oldCollection = new ArrayCollection($this->occurrences->toArray());
-            $oldCollection = $oldCollection->filter(function(Occurrence $occurrence) use ($pivotDate) {
+            $oldCollection = $oldCollection->filter(function (Occurrence $occurrence) use ($pivotDate) {
                 return $occurrence->startDate() >= $pivotDate;
             });
-            $this->occurrences = $this->occurrences->filter(function(Occurrence $occurrence) use ($pivotDate) {
+            $this->occurrences = $this->occurrences->filter(function (Occurrence $occurrence) use ($pivotDate) {
                 return $occurrence->endDate() < $pivotDate;
             });
         }
 
         $tmpCollection = new ArrayCollection();
 
-        $startDate = $this->startDate();
-        $endDate   = $this->endDate();
-
-        if(null === $pivotDate) {
-            $pivotDate = $startDate;
-        }
+        $endDate = $this->endDate();
 
         if ($this->isSingle()) {
             $this->occurrences->clear();
@@ -309,7 +312,6 @@ class Event
             if (in_array($date->format('N'), $this->repetitions->getArray())) {
                 $occurrence = $factory->createFromArray([
                       'startDate' => $date,
-                      'duration'  => new OccurrenceDuration($this->duration()->minutes()),
                       'event'     => $this,
                 ]);
 

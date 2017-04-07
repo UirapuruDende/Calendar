@@ -91,8 +91,8 @@ return Symfony\CS\Config\Config::create()
 //    'phpdoc_var_to_type',
     'short_array_syntax',
 //    'short_echo_tag',
-//    'strict',
-//    'strict_param',
+    'strict',
+    'strict_param',
     ])
     ->setUsingCache(true)
     ->finder(Symfony\CS\Finder\DefaultFinder::create()
