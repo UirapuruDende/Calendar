@@ -258,7 +258,21 @@ class Event
 
     protected function regenerateOccurrences(DateTime $pivotDate = null)
     {
-        if (null !== $pivotDate && ($pivotDate <= $this->startDate && $pivotDate >= $this->endDate)) {
+        /** @var OccurrenceFactoryInterface $factory */
+        $factory = new self::$occurrenceFactoryClass();
+
+        if ($this->isSingle()) {
+            $this->occurrences->clear();
+
+            $this->occurrences->add($factory->createFromArray([
+              'startDate' => $this->startDate,
+              'event'     => $this,
+            ]));
+
+            return;
+        }
+
+        if (null !== $pivotDate && ($pivotDate <= $this->startDate || $pivotDate >= $this->endDate)) {
             throw new Exception(
                 sprintf(
                     'Pivot (%s) must be between startDate (%s) and endDate (%s)!',
@@ -268,9 +282,6 @@ class Event
                 )
             );
         }
-
-        /** @var OccurrenceFactoryInterface $factory */
-        $factory = new self::$occurrenceFactoryClass();
 
         $oldCollection = new ArrayCollection($this->occurrences->toArray());
 
@@ -293,30 +304,18 @@ class Event
 
         $endDate = $this->endDate();
 
-        if ($this->isSingle()) {
-            $this->occurrences->clear();
-
-            $this->occurrences->add($factory->createFromArray([
-              'startDate' => $this->startDate,
-              'duration'  => new OccurrenceDuration($this->duration()->minutes()),
-              'event'     => $this,
-            ]));
-
-            return;
-        }
-
         $period = new DatePeriod($pivotDate, new DateInterval('P1D'), $this->endDate);
 
         /** @var DateTime $date */
         foreach ($period as $date) {
-            if (in_array($date->format('N'), $this->repetitions->getArray())) {
-                $occurrence = $factory->createFromArray([
-                      'startDate' => $date,
-                      'event'     => $this,
-                ]);
-
-                $tmpCollection->add($occurrence);
+            if (!in_array($date->format('N'), $this->repetitions->getArray(), true)) {
+                continue;
             }
+
+            $tmpCollection->add($factory->createFromArray([
+              'startDate' => $date,
+              'event'     => $this,
+          ]));
         }
 
         /** @var OccurrenceInterface[]|ArrayCollection $paddedCollection */
@@ -362,7 +361,7 @@ class Event
      */
     public function dumpDatesAsString() : string
     {
-        return sprintf('[%s-%s-%s]', $this->startDate()->format(self::DUMP_FORMAT), $this->endDate()->format(self::DUMP_FORMAT), $this->getDeletedAt() ? $this->getDeletedAt()->format(self::DUMP_FORMAT) : '_');
+        return sprintf('[%s - %s]', $this->startDate()->format(self::DUMP_FORMAT), $this->endDate()->format(self::DUMP_FORMAT));
     }
 
     /**

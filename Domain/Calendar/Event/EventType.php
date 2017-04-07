@@ -31,7 +31,7 @@ final class EventType
      */
     public function __construct($type = self::TYPE_SINGLE)
     {
-        if (!in_array($type, self::$availableTypes)) {
+        if (!in_array($type, self::$availableTypes, true)) {
             throw new Exception(sprintf(
                 "Not allowed event type '%s', only [%s] allowed",
                 $type,

@@ -86,7 +86,7 @@ class Repetitions
         sort($a);
         sort($b);
 
-        return $a == $b;
+        return $a === $b;
     }
 
     public static function workingDays() : Repetitions
