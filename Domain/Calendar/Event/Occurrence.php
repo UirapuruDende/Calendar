@@ -113,7 +113,7 @@ class Occurrence implements OccurrenceInterface
     /**
      * @return OccurrenceDuration
      */
-    public function duration() : OccurrenceDuration
+    public function duration() : DurationInterface
     {
         return $this->occurrenceData->duration();
     }

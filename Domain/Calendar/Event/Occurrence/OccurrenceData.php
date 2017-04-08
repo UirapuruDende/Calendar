@@ -4,6 +4,7 @@ namespace Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Carbon\Carbon;
 use DateTime;
 use Dende\Calendar\Domain\Calendar\Event;
+use Dende\Calendar\Domain\Calendar\Event\DurationInterface;
 use Exception;
 
 class OccurrenceData
@@ -87,9 +88,9 @@ class OccurrenceData
         throw new Exception('Can create only from Single type event!');
     }
 
-    public function updateDuration(OccurrenceDuration $duration) : self
+    public function updateDuration(DurationInterface $duration) : self
     {
-        return new self($this->startDate, $duration);
+        return new self($this->startDate, new OccurrenceDuration($duration->minutes()));
     }
 
     public function updateStartDate(DateTime $startDate) : self
