@@ -73,9 +73,8 @@ class Occurrence implements OccurrenceInterface
     /**
      * @param OccurrenceDuration $newDuration
      */
-    public function resize(OccurrenceDuration $newDuration)
+    public function resize(DurationInterface $newDuration)
     {
-        $this->modified       = true;
         $this->occurrenceData = $this->occurrenceData->updateDuration($newDuration);
     }
 
@@ -84,7 +83,6 @@ class Occurrence implements OccurrenceInterface
      */
     public function move(DateTime $startDate)
     {
-        $this->modified       = true;
         $this->occurrenceData = $this->occurrenceData->updateStartDate($startDate);
     }
 
@@ -147,6 +145,7 @@ class Occurrence implements OccurrenceInterface
     {
         if ($this->event->isSingle()) {
             $this->move($this->event->startDate());
+            $this->resize($this->event->duration());
         } elseif ($this->event->isWeekly()) {
             $newStartDate = $this->occurrenceData->startDate();
             $newStartDate->modify($this->event->startDate()->format('H:i:s'));

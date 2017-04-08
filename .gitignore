@@ -1,6 +1,5 @@
 /bin/
 /vendor/
-/.idea/
 /.php_cs.cache
 /humbuglog.json
 /humbuglog.txt

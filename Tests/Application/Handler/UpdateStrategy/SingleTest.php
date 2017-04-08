@@ -15,6 +15,7 @@ use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryEventRepository;
 use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryOccurrenceRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit_Framework_TestCase;
 
 /**
@@ -27,6 +28,8 @@ final class SingleTest extends PHPUnit_Framework_TestCase
      */
     public function test_updating_single_event()
     {
+        $collection = new ArrayCollection();
+
         $event = new Event(
             EventId::create(),
             Calendar::create('test'),
@@ -34,11 +37,15 @@ final class SingleTest extends PHPUnit_Framework_TestCase
             new DateTime('11:00'),
             new DateTime('12:00'),
             'some Title',
-            new Repetitions()
+            new Repetitions(),
+            $collection
         );
+
         $occurrence = new Occurrence(
             OccurrenceId::create(), $event, new DateTime('+1 hour'), new OccurrenceDuration(60)
         );
+
+        $collection->add($occurrence);
 
         $command = UpdateEventCommand::fromArray(
             [
@@ -67,6 +74,9 @@ final class SingleTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(new DateTime('12:00'), $event->startDate());
         $this->assertEquals(new DateTime('14:00'), $event->endDate());
         $this->assertEquals(120, $event->duration()->minutes());
+        $this->assertCount(1, $event->occurrences());
+        $this->assertEquals(new DateTime('12:00'), $occurrence->startDate());
+        $this->assertEquals(120, $occurrence->duration()->minutes());
     }
 
     public function test_updating_weekly_event()

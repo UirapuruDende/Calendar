@@ -26,7 +26,6 @@ final class Single implements UpdateStrategyInterface
 
         if ($event->isSingle()) {
             $event->update(new EventData($command->startDate, $command->endDate, $command->title, new Repetitions($command->repetitions)));
-            $occurrence->synchronizeWithEvent();
         } elseif ($event->isWeekly()) {
             $occurrence->update(new OccurrenceData($command->startDate, OccurrenceDuration::calculate($command->startDate, $command->endDate)));
         }

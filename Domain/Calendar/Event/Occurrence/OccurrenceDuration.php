@@ -1,13 +1,15 @@
 <?php
 namespace Dende\Calendar\Domain\Calendar\Event\Occurrence;
 
+use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\CalculateTrait;
+use Dende\Calendar\Domain\Calendar\Event\DurationInterface;
 use Exception;
 
 /**
  * Class Duration.
  */
-class OccurrenceDuration
+class OccurrenceDuration implements DurationInterface
 {
     use CalculateTrait;
 
@@ -38,5 +40,15 @@ class OccurrenceDuration
     public function minutes() : int
     {
         return $this->minutes;
+    }
+
+    public function equals(DurationInterface $duration): bool
+    {
+        return $this->minutes === $duration->minutes();
+    }
+
+    public static function fromEvent(Event $event) : self
+    {
+        return new self($event->duration()->minutes());
     }
 }

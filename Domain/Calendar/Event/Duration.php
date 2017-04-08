@@ -6,7 +6,7 @@ use Exception;
 /**
  * Class Duration.
  */
-class Duration
+class Duration implements DurationInterface
 {
     use CalculateTrait;
 
@@ -34,5 +34,10 @@ class Duration
     public function minutes() : int
     {
         return $this->minutes;
+    }
+
+    public function equals(DurationInterface $duration): bool
+    {
+        return $this->minutes === $duration->minutes();
     }
 }

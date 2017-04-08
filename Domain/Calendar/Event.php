@@ -358,5 +358,9 @@ class Event
     {
         $this->eventData = $data;
         $this->duration  = Duration::calculate($this->startDate(), $this->endDate());
+
+        if($this->isSingle()) {
+            $this->occurrences->first()->synchronizeWithEvent();
+        }
     }
 }
