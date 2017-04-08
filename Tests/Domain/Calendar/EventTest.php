@@ -473,20 +473,20 @@ class EventTest extends PHPUnit_Framework_TestCase
         );
 
         $pivotOccurrence = $factory->createFromArray([
-             'startDate'    => $baseDate->copy()->subDays(7),
-             'event'        => $event,
+             'startDate' => $baseDate->copy()->subDays(7),
+             'event'     => $event,
         ]);
 
         $occurrences->add($pivotOccurrence);
 
         $occurrences->add($factory->createFromArray([
-            'startDate'    => $baseDate->copy()->addDays(2),
-            'event'        => $event,
+            'startDate' => $baseDate->copy()->addDays(2),
+            'event'     => $event,
         ]));
 
         $occurrences->add($factory->createFromArray([
-            'startDate'    => $baseDate->copy()->addDays(4),
-            'event'        => $event,
+            'startDate' => $baseDate->copy()->addDays(4),
+            'event'     => $event,
         ]));
 
         $event->resize(null, $baseDate->copy()->addDays(7), null, $pivotOccurrence);

@@ -18,9 +18,9 @@ use Dende\Calendar\Domain\IdInterface;
  */
 interface OccurrenceInterface
 {
-    public function resize(OccurrenceDuration $newDuration);
+    public function resize(OccurrenceDuration $duration);
 
-    public function move(DateTime $newStartDate);
+    public function move(DateTime $startDate);
 
     public function isOngoing() : bool;
 
@@ -35,8 +35,6 @@ interface OccurrenceInterface
     public function id() : IdInterface;
 
     public function event() : Event;
-
-    public function changeStartDate(DateTime $startDate);
 
     public function isModified() : bool;
 

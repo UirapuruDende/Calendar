@@ -9,6 +9,7 @@ use Dende\Calendar\Application\Factory\OccurrenceFactory;
 use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
+use Dende\Calendar\Domain\Calendar\Event\EventData;
 use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\OccurrenceInterface;
@@ -52,26 +53,6 @@ class Event
     protected $type;
 
     /**
-     * @var DateTime
-     */
-    protected $startDate;
-
-    /**
-     * @var DateTime
-     */
-    protected $endDate;
-
-    /**
-     * @var string
-     */
-    protected $title;
-
-    /**
-     * @var Repetitions
-     */
-    protected $repetitions;
-
-    /**
      * @var Duration
      */
     protected $duration;
@@ -82,18 +63,24 @@ class Event
     protected $occurrences;
 
     /**
+     * @var EventData
+     */
+    protected $eventData;
+
+    /**
      * Event constructor.
      *
-     * @param EventId|IdInterface $eventId
-     * @param Calendar $calendar
-     * @param EventType $type
-     * @param DateTime $startDate
-     * @param DateTime $endDate
-     * @param string $title
-     * @param Repetitions $repetitions
+     * @param EventId|IdInterface                   $eventId
+     * @param Calendar                              $calendar
+     * @param EventType                             $type
+     * @param DateTime                              $startDate
+     * @param DateTime                              $endDate
+     * @param string                                $title
+     * @param Repetitions                           $repetitions
      * @param ArrayCollection|OccurrenceInterface[] $occurrences
      *
      * @throws Exception
+     *
      * @internal param string $id
      */
     public function __construct(IdInterface $eventId = null, Calendar $calendar, EventType $type, DateTime $startDate, DateTime $endDate, string $title, Repetitions $repetitions = null, ArrayCollection $occurrences = null)
@@ -121,13 +108,10 @@ class Event
         }
 
         $this->duration    = $duration;
-        $this->startDate   = $startDate;
-        $this->endDate     = $endDate;
         $this->eventId     = $eventId ?: EventId::create();
         $this->calendar    = $calendar;
         $this->type        = $type;
-        $this->title       = $title;
-        $this->repetitions = $repetitions;
+        $this->eventData   = new EventData($startDate, $endDate, $title, $repetitions ?: new Repetitions());
         $this->occurrences = $occurrences;
 
         if (null === $occurrences) {
@@ -149,7 +133,7 @@ class Event
      */
     public function title() : string
     {
-        return $this->title;
+        return $this->eventData->title();
     }
 
     /**
@@ -165,7 +149,7 @@ class Event
      */
     public function repetitions() : Repetitions
     {
-        return $this->repetitions;
+        return $this->eventData->repetitions();
     }
 
     /**
@@ -181,7 +165,7 @@ class Event
      */
     public function startDate() : DateTime
     {
-        return $this->startDate;
+        return $this->eventData->startDate();
     }
 
     /**
@@ -189,7 +173,7 @@ class Event
      */
     public function endDate() : DateTime
     {
-        return $this->endDate;
+        return $this->eventData->endDate();
     }
 
     /**
@@ -197,17 +181,9 @@ class Event
      */
 //    public function move(DateTime $startDate)
 //    {
-//        $this->startDate = $startDate;
+//        $this->eventData->startDate() = $startDate;
 //        $this->resetAllOccurrences();
 //    }
-
-    /**
-     * @param $title
-     */
-    public function changeTitle(string $title)
-    {
-        $this->title = $title;
-    }
 
     public function isSingle() : bool
     {
@@ -220,19 +196,6 @@ class Event
     }
 
     /**
-     * @param OccurrenceInterface $occurrenceToRemove
-     */
-    public function removeOccurrence(OccurrenceInterface $occurrenceToRemove)
-    {
-        foreach ($this->occurrences() as $key => $occurrence) {
-            if ($occurrence->id() === $occurrenceToRemove->id()) {
-                $this->occurrences->remove($key);
-                break;
-            }
-        }
-    }
-
-    /**
      * @param DateTime $date
      */
     public function closeAtDate(DateTime $date)
@@ -242,9 +205,7 @@ class Event
 
     public function resize(DateTime $newStartDate = null, DateTime $newEndDate = null, Repetitions $repetitions = null, OccurrenceInterface $occurrence = null)
     {
-        $this->startDate   = $newStartDate ?: $this->startDate;
-        $this->endDate     = $newEndDate ?: $this->endDate;
-        $this->repetitions = $repetitions ?: $this->repetitions;
+        $this->eventData = $this->eventData->update($newStartDate, $newEndDate, $this->eventData->title(), $repetitions);
 
         if (null === $occurrence) {
             $this->regenerateOccurrences();
@@ -262,20 +223,20 @@ class Event
             $this->occurrences->clear();
 
             $this->occurrences->add($factory->createFromArray([
-              'startDate' => $this->startDate,
+              'startDate' => $this->eventData->startDate(),
               'event'     => $this,
             ]));
 
             return;
         }
 
-        if (null !== $pivotDate && ($pivotDate < $this->startDate || $pivotDate > $this->endDate)) {
+        if (null !== $pivotDate && ($pivotDate < $this->eventData->startDate() || $pivotDate > $this->eventData->endDate())) {
             throw new Exception(
                 sprintf(
                     'Pivot (%s) must be between startDate (%s) and endDate (%s)!',
                     $pivotDate->format('Y/m/d H:i:s'),
-                    $this->startDate->format('Y/m/d H:i:s'),
-                    $this->endDate->format('Y/m/d H:i:s')
+                    $this->eventData->startDate()->format('Y/m/d H:i:s'),
+                    $this->eventData->endDate()->format('Y/m/d H:i:s')
                 )
             );
         }
@@ -284,7 +245,7 @@ class Event
 
         if (null === $pivotDate) {
             $this->occurrences->clear();
-            $pivotDate = $this->startDate();
+            $pivotDate = $this->eventData->startDate();
         } else {
             $pivotDate = Carbon::instance($pivotDate)->subMinutes($this->duration()->minutes())->addDays(1);
 
@@ -305,7 +266,7 @@ class Event
 
         /** @var DateTime $date */
         foreach ($period as $date) {
-            if (!in_array((int) $date->format('N'), $this->repetitions->getArray(), false)) {
+            if (!in_array((int) $date->format('N'), $this->eventData->repetitions()->getArray(), false)) {
                 continue;
             }
 
@@ -358,7 +319,7 @@ class Event
      */
     public function dumpDatesAsString() : string
     {
-        return sprintf('[%s - %s]', $this->startDate()->format(self::DUMP_FORMAT), $this->endDate()->format(self::DUMP_FORMAT));
+        return sprintf('[%s - %s]', $this->eventData->startDate()->format(self::DUMP_FORMAT), $this->eventData->endDate()->format(self::DUMP_FORMAT));
     }
 
     /**
@@ -391,5 +352,11 @@ class Event
         }
 
         return $editedOccurrence->endDate();
+    }
+
+    public function update(EventData $data)
+    {
+        $this->eventData = $data;
+        $this->duration  = Duration::calculate($this->startDate(), $this->endDate());
     }
 }

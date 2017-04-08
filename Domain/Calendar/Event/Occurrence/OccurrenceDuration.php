@@ -1,6 +1,7 @@
 <?php
 namespace Dende\Calendar\Domain\Calendar\Event\Occurrence;
 
+use Dende\Calendar\Domain\Calendar\Event\CalculateTrait;
 use Exception;
 
 /**
@@ -8,6 +9,8 @@ use Exception;
  */
 class OccurrenceDuration
 {
+    use CalculateTrait;
+
     /**
      * @var int
      */
@@ -17,6 +20,8 @@ class OccurrenceDuration
      * Duration constructor.
      *
      * @param int $minutes
+     *
+     * @throws Exception
      */
     public function __construct(int $minutes = 1)
     {

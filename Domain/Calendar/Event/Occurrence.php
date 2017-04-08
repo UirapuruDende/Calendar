@@ -2,9 +2,9 @@
 namespace Dende\Calendar\Domain\Calendar\Event;
 
 use Carbon\Carbon;
-use DateInterval;
 use DateTime;
 use Dende\Calendar\Domain\Calendar\Event;
+use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceData;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 use Dende\Calendar\Domain\IdInterface;
@@ -23,29 +23,19 @@ class Occurrence implements OccurrenceInterface
     protected $id;
 
     /**
-     * @var DateTime
+     * @var OccurrenceId
      */
-    protected $startDate;
+    protected $occurrenceId;
 
     /**
-     * @var DateTime
+     * @var OccurrenceData
      */
-    protected $endDate;
-
-    /**
-     * @var OccurrenceDuration
-     */
-    protected $duration;
+    protected $occurrenceData;
 
     /**
      * @var bool
      */
     protected $modified = false;
-
-    /**
-     * @var OccurrenceId
-     */
-    protected $occurrenceId;
 
     /**
      * @var Event
@@ -66,26 +56,18 @@ class Occurrence implements OccurrenceInterface
     {
         $this->occurrenceId = $occurrenceId ?: OccurrenceId::create();
         $this->event        = $event;
-        $this->startDate    = $startDate;
-        $this->duration     = $duration;
-
-        if (null === $this->startDate) {
-            if ($this->event()->isSingle()) {
-                $this->synchronizeWithEvent();
-            } else {
-                throw new Exception('StartDate for weekly type of event has to be set!');
-            }
-        }
 
         if (null === $this->event) {
             throw new Exception('Event has to be set!');
         }
 
-        if (null === $this->duration) {
-            $this->synchronizeWithEvent();
+        if (null === $startDate) {
+            $this->occurrenceData = OccurrenceData::createFromEvent($event);
+        } elseif (null === $duration) {
+            $this->occurrenceData = new OccurrenceData($startDate, new OccurrenceDuration($event->duration()->minutes()));
+        } else {
+            $this->occurrenceData = new OccurrenceData($startDate, $duration);
         }
-
-        $this->updateEndDate();
     }
 
     /**
@@ -93,19 +75,17 @@ class Occurrence implements OccurrenceInterface
      */
     public function resize(OccurrenceDuration $newDuration)
     {
-        $this->modified = true;
-        $this->duration = $newDuration;
-        $this->updateEndDate();
+        $this->modified       = true;
+        $this->occurrenceData = $this->occurrenceData->updateDuration($newDuration);
     }
 
     /**
-     * @param DateTime $newStartDate
+     * @param DateTime $startDate
      */
-    public function move(DateTime $newStartDate)
+    public function move(DateTime $startDate)
     {
-        $this->modified  = true;
-        $this->startDate = $newStartDate;
-        $this->updateEndDate();
+        $this->modified       = true;
+        $this->occurrenceData = $this->occurrenceData->updateStartDate($startDate);
     }
 
     /**
@@ -124,25 +104,12 @@ class Occurrence implements OccurrenceInterface
         return Carbon::now()->greaterThan(Carbon::instance($this->endDate()));
     }
 
-    protected function updateEndDate()
-    {
-        $endDate = clone $this->startDate();
-        $diff    = new DateInterval(sprintf('PT%dM', abs($this->duration()->minutes())));
-        $endDate->add($diff);
-
-        if ($this->startDate()->format('Ymd') !== $endDate->format('Ymd')) {
-            new Exception(sprintf("Event occurrence can't overlap to new day (start: %s end: %s)", $this->startDate()->format('Y.m.d H:i:s'), $endDate->format('Y.m.d H:i:s')));
-        }
-
-        $this->endDate = $endDate;
-    }
-
     /**
      * @return DateTime
      */
     public function startDate() : DateTime
     {
-        return $this->startDate;
+        return $this->occurrenceData->startDate();
     }
 
     /**
@@ -150,7 +117,7 @@ class Occurrence implements OccurrenceInterface
      */
     public function duration() : OccurrenceDuration
     {
-        return $this->duration;
+        return $this->occurrenceData->duration();
     }
 
     /**
@@ -158,25 +125,12 @@ class Occurrence implements OccurrenceInterface
      */
     public function endDate() : DateTime
     {
-        if (is_null($this->endDate)) {
-            $this->updateEndDate();
-        }
-
-        return $this->endDate;
+        return $this->occurrenceData->endDate();
     }
 
     public function id() : IdInterface
     {
         return $this->occurrenceId;
-    }
-
-    /**
-     * @param DateTime $startDate
-     */
-    public function changeStartDate(DateTime $startDate)
-    {
-        $this->startDate = $startDate;
-        $this->setAsModified();
     }
 
     protected function setAsModified()
@@ -191,16 +145,15 @@ class Occurrence implements OccurrenceInterface
 
     public function synchronizeWithEvent()
     {
-        if ($this->event()->isSingle()) {
-            $this->changeStartDate($this->event()->startDate());
-        } elseif ($this->event()->isWeekly()) {
-            $this->startDate->modify($this->event()->startDate()->format('H:i:s'));
+        if ($this->event->isSingle()) {
+            $this->move($this->event->startDate());
+        } elseif ($this->event->isWeekly()) {
+            $newStartDate = $this->occurrenceData->startDate();
+            $newStartDate->modify($this->event->startDate()->format('H:i:s'));
+            $this->move($newStartDate);
         }
 
-        $this->duration = new OccurrenceDuration($this->event()->duration()->minutes());
         $this->modified = false;
-
-        $this->updateEndDate();
     }
 
     public function event() : Event
@@ -214,6 +167,6 @@ class Occurrence implements OccurrenceInterface
      */
     public function dumpDatesAsString() : string
     {
-        return sprintf('[%s:%s:%s]', $this->startDate()->format('d/m'), $this->duration()->minutes(), $this->getDeletedAt() ? $this->getDeletedAt()->format('d/m') : '_');
+        return sprintf('[%s:%s]', $this->startDate()->format('d/m'), $this->duration()->minutes());
     }
 }
