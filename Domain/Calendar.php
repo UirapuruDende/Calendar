@@ -66,6 +66,7 @@ class Calendar
         /** @var EventFactoryInterface $factory */
         $factory = new self::$eventFactoryClass();
 
+
         $event = $factory->createFromArray([
             'eventId'     => $eventId,
             'title'       => $title,

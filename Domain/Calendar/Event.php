@@ -304,11 +304,11 @@ class Event
 
         $endDate = $this->endDate();
 
-        $period = new DatePeriod($pivotDate, new DateInterval('P1D'), $this->endDate);
+        $period = new DatePeriod($pivotDate, new DateInterval('P1D'), $endDate);
 
         /** @var DateTime $date */
         foreach ($period as $date) {
-            if (!in_array($date->format('N'), $this->repetitions->getArray(), true)) {
+            if (!in_array((int) $date->format('N'), $this->repetitions->getArray(), false)) {
                 continue;
             }
 
