@@ -1,5 +1,5 @@
 <?php
-namespace Dende\Calendar\Tests\Unit\Domain\Calendar;
+namespace Dende\Calendar\Tests\Domain\Calendar;
 
 use DateTime;
 use Dende\Calendar\Domain\Calendar;

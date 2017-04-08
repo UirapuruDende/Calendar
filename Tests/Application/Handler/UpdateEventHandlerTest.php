@@ -1,5 +1,5 @@
 <?php
-namespace Dende\Calendar\Tests\Unit\Application\Handler;
+namespace Dende\Calendar\Tests\Application\Handler;
 
 use DateTime;
 use Dende\Calendar\Application\Command\UpdateEventCommand;

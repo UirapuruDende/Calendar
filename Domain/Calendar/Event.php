@@ -11,8 +11,6 @@ use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
 use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
-use Dende\Calendar\Domain\Calendar\Event\Occurrence;
-use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
 use Dende\Calendar\Domain\Calendar\Event\OccurrenceInterface;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Domain\IdInterface;
@@ -79,24 +77,23 @@ class Event
     protected $duration;
 
     /**
-     * @var ArrayCollection|Occurrence[]
+     * @var ArrayCollection|OccurrenceInterface[]
      */
     protected $occurrences;
 
     /**
      * Event constructor.
      *
-     * @param EventId                      $eventId
-     * @param Calendar                     $calendar
-     * @param EventType                    $type
-     * @param DateTime                     $startDate
-     * @param DateTime                     $endDate
-     * @param string                       $title
-     * @param Repetitions                  $repetitions
-     * @param ArrayCollection|Occurrence[] $occurrences
+     * @param EventId|IdInterface $eventId
+     * @param Calendar $calendar
+     * @param EventType $type
+     * @param DateTime $startDate
+     * @param DateTime $endDate
+     * @param string $title
+     * @param Repetitions $repetitions
+     * @param ArrayCollection|OccurrenceInterface[] $occurrences
      *
      * @throws Exception
-     *
      * @internal param string $id
      */
     public function __construct(IdInterface $eventId = null, Calendar $calendar, EventType $type, DateTime $startDate, DateTime $endDate, string $title, Repetitions $repetitions = null, ArrayCollection $occurrences = null)
@@ -140,7 +137,7 @@ class Event
     }
 
     /**
-     * @return ArrayCollection|Occurrence[]
+     * @return ArrayCollection|OccurrenceInterface[]
      */
     public function occurrences() : ArrayCollection
     {
@@ -223,9 +220,9 @@ class Event
     }
 
     /**
-     * @param Occurrence $occurrenceToRemove
+     * @param OccurrenceInterface $occurrenceToRemove
      */
-    public function removeOccurrence(Occurrence $occurrenceToRemove)
+    public function removeOccurrence(OccurrenceInterface $occurrenceToRemove)
     {
         foreach ($this->occurrences() as $key => $occurrence) {
             if ($occurrence->id() === $occurrenceToRemove->id()) {
@@ -243,7 +240,7 @@ class Event
         $this->resize(null, $date, null);
     }
 
-    public function resize(DateTime $newStartDate = null, DateTime $newEndDate = null, Repetitions $repetitions = null, Occurrence $occurrence = null)
+    public function resize(DateTime $newStartDate = null, DateTime $newEndDate = null, Repetitions $repetitions = null, OccurrenceInterface $occurrence = null)
     {
         $this->startDate   = $newStartDate ?: $this->startDate;
         $this->endDate     = $newEndDate ?: $this->endDate;
@@ -272,7 +269,7 @@ class Event
             return;
         }
 
-        if (null !== $pivotDate && ($pivotDate <= $this->startDate || $pivotDate >= $this->endDate)) {
+        if (null !== $pivotDate && ($pivotDate < $this->startDate || $pivotDate > $this->endDate)) {
             throw new Exception(
                 sprintf(
                     'Pivot (%s) must be between startDate (%s) and endDate (%s)!',
@@ -292,10 +289,10 @@ class Event
             $pivotDate = Carbon::instance($pivotDate)->subMinutes($this->duration()->minutes())->addDays(1);
 
             $oldCollection = new ArrayCollection($this->occurrences->toArray());
-            $oldCollection = $oldCollection->filter(function (Occurrence $occurrence) use ($pivotDate) {
+            $oldCollection = $oldCollection->filter(function (OccurrenceInterface $occurrence) use ($pivotDate) {
                 return $occurrence->startDate() >= $pivotDate;
             });
-            $this->occurrences = $this->occurrences->filter(function (Occurrence $occurrence) use ($pivotDate) {
+            $this->occurrences = $this->occurrences->filter(function (OccurrenceInterface $occurrence) use ($pivotDate) {
                 return $occurrence->endDate() < $pivotDate;
             });
         }
@@ -319,7 +316,7 @@ class Event
         }
 
         /** @var OccurrenceInterface[]|ArrayCollection $paddedCollection */
-        $paddedCollection = $oldCollection->filter(function (Occurrence $occurrence) use ($pivotDate, $endDate) {
+        $paddedCollection = $oldCollection->filter(function (OccurrenceInterface $occurrence) use ($pivotDate, $endDate) {
             return $pivotDate <= $occurrence->startDate() && $occurrence->endDate() <= $endDate;
         });
 
@@ -337,9 +334,9 @@ class Event
         }
     }
 
-    public function getOccurrenceById(IdInterface $occurrenceId) : Occurrence
+    public function getOccurrenceById(IdInterface $occurrenceId) : OccurrenceInterface
     {
-        $result = $this->occurrences()->filter(function (Occurrence $occurrence) use ($occurrenceId) {
+        $result = $this->occurrences()->filter(function (OccurrenceInterface $occurrence) use ($occurrenceId) {
             return $occurrence->id()->equals($occurrenceId);
         });
 
@@ -385,7 +382,7 @@ class Event
 
         $iterator = $filteredOccurrencesBeforeEdited->getIterator();
 
-        $iterator->uasort(function (Occurrence $a, Occurrence $b) {
+        $iterator->uasort(function (OccurrenceInterface $a, OccurrenceInterface $b) {
             return $a->startDate() > $b->startDate();
         });
 

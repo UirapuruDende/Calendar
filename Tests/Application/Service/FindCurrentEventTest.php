@@ -1,5 +1,5 @@
 <?php
-namespace Dende\Calendar\Tests\Unit\Application\Service\FindCurrentEventTest;
+namespace Dende\Calendar\Tests\Application\Service\FindCurrentEventTest;
 
 use DateTime;
 use Dende\Calendar\Application\Service\FindCurrentEvent;

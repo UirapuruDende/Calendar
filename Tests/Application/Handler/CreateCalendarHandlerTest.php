@@ -1,5 +1,5 @@
 <?php
-namespace Dende\Calendar\Tests\Unit\Application\Handler;
+namespace Dende\Calendar\Tests\Application\Handler;
 
 use Dende\Calendar\Application\Command\CreateCalendarCommand;
 use Dende\Calendar\Application\Event\PostCreateCalendar;

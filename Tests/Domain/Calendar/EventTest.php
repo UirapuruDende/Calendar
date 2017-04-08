@@ -1,5 +1,5 @@
 <?php
-namespace Dende\Calendar\Tests\Unit\Domain\Calendar;
+namespace Dende\Calendar\Tests\Domain\Calendar;
 
 use Carbon\Carbon;
 use DateTime;
@@ -13,6 +13,7 @@ use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Doctrine\Common\Collections\ArrayCollection;
+use Exception;
 use PHPUnit_Framework_TestCase;
 
 class EventTest extends PHPUnit_Framework_TestCase
@@ -218,12 +219,12 @@ class EventTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($base->copy()->addDays(7),  $collection[4]->startDate());
         $this->assertEquals($base->copy()->addDays(9), $collection[5]->startDate());
 
-//        $this->assertEquals($collection[0]->id(), $ids[0]);
-//        $this->assertEquals($collection[1]->id(), $ids[1]);
-//        $this->assertEquals($collection[2]->id(), $ids[2]);
-//        $this->assertNotEquals($collection[3]->id(), $ids[3]);
-//        $this->assertNotEquals($collection[4]->id(), $ids[4]);
-//        $this->assertNotEquals($collection[5]->id(), $ids[5]);
+        $this->assertEquals($collection[0]->id(), $ids[0]);
+        $this->assertEquals($collection[1]->id(), $ids[1]);
+        $this->assertEquals($collection[2]->id(), $ids[2]);
+
+        $this->assertNotEquals($collection[3]->id(), $ids[3]);
+        $this->assertNotEquals($collection[4]->id(), $ids[4]);
     }
 
     public function testCalculateOccurrencesDatesWeekly()
@@ -443,5 +444,51 @@ class EventTest extends PHPUnit_Framework_TestCase
                 'expected'    => [$occurrenceId1, $occurrenceId2, $occurrenceId3],
             ],
         ];
+    }
+
+    /**
+     * @test
+     */
+    public function pivot_set_out_of_range()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessageRegExp('@Pivot \(.+\) must be between startDate \(.+\) and endDate \(.+\)!@ui');
+
+        /** @var OccurrenceFactoryInterface $factory */
+        $factory = new Event::$occurrenceFactoryClass();
+
+        $baseDate = Carbon::instance(new DateTime('last monday 12:00:00'));
+
+        $occurrences = new ArrayCollection();
+
+        $event = new Event(
+            EventId::create(),
+            Calendar::create('test'),
+            EventType::weekly(),
+            $baseDate,
+            $baseDate->copy()->addDays(6)->addMinutes(30),
+            'some title',
+            new Repetitions([Repetitions::MONDAY, Repetitions::WEDNESDAY, Repetitions::FRIDAY]),
+            $occurrences
+        );
+
+        $pivotOccurrence = $factory->createFromArray([
+             'startDate'    => $baseDate->copy()->subDays(7),
+             'event'        => $event,
+        ]);
+
+        $occurrences->add($pivotOccurrence);
+
+        $occurrences->add($factory->createFromArray([
+            'startDate'    => $baseDate->copy()->addDays(2),
+            'event'        => $event,
+        ]));
+
+        $occurrences->add($factory->createFromArray([
+            'startDate'    => $baseDate->copy()->addDays(4),
+            'event'        => $event,
+        ]));
+
+        $event->resize(null, $baseDate->copy()->addDays(7), null, $pivotOccurrence);
     }
 }

@@ -27,4 +27,3 @@ Rules:
  - Occurrence can't overlap on more than 1 day
  - There could be many Events in Calendar
  - Event can be of Single or Weekly type
- - UpdateStrategies

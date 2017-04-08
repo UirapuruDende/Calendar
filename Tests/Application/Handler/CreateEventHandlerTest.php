@@ -1,5 +1,5 @@
 <?php
-namespace Dende\Calendar\Tests\Unit\Application\Handler;
+namespace Dende\Calendar\Tests\Application\Handler;
 
 use Carbon\Carbon;
 use DateTime;
