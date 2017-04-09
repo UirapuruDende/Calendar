@@ -7,7 +7,6 @@ use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
-use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Class EventFactory.
