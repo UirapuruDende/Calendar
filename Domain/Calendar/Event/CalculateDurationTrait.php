@@ -1,17 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: uirapuru
- * Date: 08/04/2017
- * Time: 20:17.
- */
-
 namespace Dende\Calendar\Domain\Calendar\Event;
 
 use DateInterval;
 use DateTime;
 
-trait CalculateTrait
+trait CalculateDurationTrait
 {
     /**
      * @param DateTime $startDate

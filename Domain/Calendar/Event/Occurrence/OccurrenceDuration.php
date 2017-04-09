@@ -2,7 +2,7 @@
 namespace Dende\Calendar\Domain\Calendar\Event\Occurrence;
 
 use Dende\Calendar\Domain\Calendar\Event;
-use Dende\Calendar\Domain\Calendar\Event\CalculateTrait;
+use Dende\Calendar\Domain\Calendar\Event\CalculateDurationTrait;
 use Dende\Calendar\Domain\Calendar\Event\DurationInterface;
 use Exception;
 
@@ -11,7 +11,7 @@ use Exception;
  */
 class OccurrenceDuration implements DurationInterface
 {
-    use CalculateTrait;
+    use CalculateDurationTrait;
 
     /**
      * @var int

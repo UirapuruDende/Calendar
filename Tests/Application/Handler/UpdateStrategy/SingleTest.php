@@ -1,6 +1,7 @@
 <?php
 namespace Dende\Calendar\Tests\Application\Handler;
 
+use Carbon\Carbon;
 use DateTime;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Handler\UpdateEventHandler;
@@ -79,8 +80,47 @@ final class SingleTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(120, $occurrence->duration()->minutes());
     }
 
+    /**
+     * @test
+     */
     public function test_updating_weekly_event()
     {
+        $base = Carbon::instance(new DateTime("last monday 12:00"));
+
+        $event = new Event(
+            EventId::create(),
+            Calendar::create('test'),
+            EventType::weekly(),
+            $base->copy(),
+            $base->copy()->addDays(6)->addHours(2),
+            'some Title',
+            Repetitions::workingDays()
+        );
+
+        $occurrence = $event->occurrences()->get(2);
+
+        $command = UpdateEventCommand::fromArray(
+            [
+                'method'       => UpdateEventHandler::MODE_SINGLE,
+                'startDate'    => new DateTime('12:00'),
+                'endDate'      => new DateTime('14:00'),
+                'title'        => 'some new title',
+                'repetitions'  => [],
+                'occurrenceId' => $occurrence->id()->__toString(),
+            ]
+        );
+
+        $eventRepository = new InMemoryEventRepository();
+        $eventRepository->insert($event);
+
+        $occurrenceRepository = new InMemoryOccurrenceRepository();
+        $occurrenceRepository->insert($occurrence);
+
+        $singleStrategy = new Single();
+        $singleStrategy->setOccurrenceRepository($occurrenceRepository);
+        $singleStrategy->setEventRepository($eventRepository);
+
+        $singleStrategy->update($command);
     }
 
     public function remove_occurrence_from_event()
