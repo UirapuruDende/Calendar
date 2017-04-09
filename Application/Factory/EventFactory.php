@@ -26,7 +26,7 @@ class EventFactory implements EventFactoryInterface
             'title'       => '',
             'repetitions' => new Repetitions(),
             'type'        => new EventType(),
-            'occurrences' => new ArrayCollection(),
+            'occurrences' => null,
             'calendar'    => null,
             'startDate'   => new DateTime('now'),
             'endDate'     => new DateTime('now'),
