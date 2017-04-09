@@ -8,7 +8,7 @@ use Exception;
  */
 class Duration implements DurationInterface
 {
-    use CalculateTrait;
+    use CalculateDurationTrait;
 
     /**
      * @var int

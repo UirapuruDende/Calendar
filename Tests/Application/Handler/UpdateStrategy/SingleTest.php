@@ -1,6 +1,7 @@
 <?php
 namespace Dende\Calendar\Tests\Application\Handler;
 
+use Carbon\Carbon;
 use DateTime;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Handler\UpdateEventHandler;
@@ -79,8 +80,51 @@ final class SingleTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(120, $occurrence->duration()->minutes());
     }
 
+    /**
+     * @test
+     */
     public function test_updating_weekly_event()
     {
+        $base = Carbon::instance(new DateTime('last monday 12:00'));
+
+        $event = new Event(
+            EventId::create(),
+            Calendar::create('test'),
+            EventType::weekly(),
+            $base->copy(),
+            $base->copy()->addDays(6)->addHours(2),
+            'some Title',
+            Repetitions::workingDays()
+        );
+
+        /** @var Occurrence $occurrence */
+        $occurrence = $event->occurrences()->get(2);
+
+        $command = UpdateEventCommand::fromArray(
+            [
+                'method'       => UpdateEventHandler::MODE_SINGLE,
+                'startDate'    => $base->copy()->addDays(2)->addHours(2),
+                'endDate'      => $base->copy()->addDays(2)->addHours(5),
+                'title'        => 'some new title',
+                'repetitions'  => [],
+                'occurrenceId' => $occurrence->id()->__toString(),
+            ]
+        );
+
+        $eventRepository = new InMemoryEventRepository();
+        $eventRepository->insert($event);
+
+        $occurrenceRepository = new InMemoryOccurrenceRepository();
+        $occurrenceRepository->insert($occurrence);
+
+        $singleStrategy = new Single();
+        $singleStrategy->setOccurrenceRepository($occurrenceRepository);
+        $singleStrategy->setEventRepository($eventRepository);
+
+        $singleStrategy->update($command);
+
+        $this->assertEquals(180, $occurrence->duration()->minutes());
+        $this->assertEquals(new DateTime('last wednesday 14:00'), $occurrence->startDate());
     }
 
     public function remove_occurrence_from_event()

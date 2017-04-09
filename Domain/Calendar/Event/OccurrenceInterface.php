@@ -3,7 +3,7 @@ namespace Dende\Calendar\Domain\Calendar\Event;
 
 use DateTime;
 use Dende\Calendar\Domain\Calendar\Event;
-use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
+use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceData;
 use Dende\Calendar\Domain\IdInterface;
 
 /**
@@ -11,7 +11,7 @@ use Dende\Calendar\Domain\IdInterface;
  *
  * @property DateTime $startDate
  * @property DateTime $endDate
- * @property OccurrenceDuration $duration
+ * @property DurationInterface $duration
  * @property bool $modified
  * @property Event $event
  * @property string $occurrenceId
@@ -39,4 +39,6 @@ interface OccurrenceInterface
     public function isModified() : bool;
 
     public function synchronizeWithEvent();
+
+    public function update(OccurrenceData $data);
 }

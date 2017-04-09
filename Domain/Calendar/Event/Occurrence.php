@@ -70,6 +70,15 @@ class Occurrence implements OccurrenceInterface
         }
     }
 
+    public function update(OccurrenceData $data)
+    {
+        if ($data->startDate()->format('Ymd') !== $this->occurrenceData->startDate()->format('Ymd')) {
+            throw new Exception("You can't change a day of occurrence, only hour!");
+        }
+
+        $this->occurrenceData = $data;
+    }
+
     /**
      * @param OccurrenceDuration $newDuration
      */
@@ -83,6 +92,10 @@ class Occurrence implements OccurrenceInterface
      */
     public function move(DateTime $startDate)
     {
+        if ($startDate->format('Ymd') !== $this->occurrenceData->startDate()->format('Ymd')) {
+            throw new Exception("You can't change a day of occurrence, only hour!");
+        }
+
         $this->occurrenceData = $this->occurrenceData->updateStartDate($startDate);
     }
 

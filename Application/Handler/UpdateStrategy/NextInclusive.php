@@ -27,10 +27,6 @@ class NextInclusive implements UpdateStrategyInterface
         $pivotDate = $originalEvent->findPivotDate($occurrence);
         $originalEvent->closeAtDate($pivotDate);
 
-//        foreach ($originalEvent->occurrences() as $occurrence) {
-//            $this->occurrenceRepository->update($occurrence);
-//        }
-
         if ($command instanceof UpdateEventCommand) {
             $calendar = $originalEvent->calendar();
             $eventId  = EventId::create();

@@ -2,7 +2,6 @@
 namespace Dende\Calendar\Application\Command;
 
 use DateTime;
-use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 
 /**
  * Class CreateEventCommand.
