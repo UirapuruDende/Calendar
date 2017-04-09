@@ -6,9 +6,8 @@
         "nesbot/carbon": "^1",
         "doctrine/common": "^2.7",
         "doctrine/orm": "^2.5",
-        "humbug/humbug": "~1.0@dev",
         "ramsey/uuid": "^3.6",
-        "symfony/event-dispatcher": "^3"
+        "symfony/event-dispatcher": "^2"
     },
     "autoload": {
         "psr-0": {
@@ -19,6 +18,7 @@
         }
     },
     "require-dev": {
+        "humbug/humbug": "~1.0@dev",
         "phpunit/phpunit": "^5",
         "behat/behat": "^3.0",
         "friendsofphp/php-cs-fixer": "^1.12",
