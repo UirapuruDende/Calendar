@@ -4,6 +4,7 @@ namespace Dende\Calendar\Application\Factory;
 use DateTime;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
+use Dende\Calendar\Domain\Calendar\Event\OccurrenceInterface;
 
 class OccurrenceFactory implements OccurrenceFactoryInterface
 {
@@ -11,7 +12,7 @@ class OccurrenceFactory implements OccurrenceFactoryInterface
     {
     }
 
-    public function createFromArray(array $array = []) : Occurrence
+    public function createFromArray(array $array = []) : OccurrenceInterface
     {
         $template = [
             'occurrenceId' => OccurrenceId::create(),
