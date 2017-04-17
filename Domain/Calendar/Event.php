@@ -179,11 +179,10 @@ class Event
     /**
      * @param DateTime $startDate
      */
-//    public function move(DateTime $startDate)
-//    {
-//        $this->eventData->startDate() = $startDate;
-//        $this->resetAllOccurrences();
-//    }
+    public function move(DateTime $startDate)
+    {
+        throw new Exception('Implement me');
+    }
 
     public function isSingle() : bool
     {

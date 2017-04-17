@@ -7,7 +7,6 @@ use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
-use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Class EventFactory.
@@ -26,7 +25,7 @@ class EventFactory implements EventFactoryInterface
             'title'       => '',
             'repetitions' => new Repetitions(),
             'type'        => new EventType(),
-            'occurrences' => new ArrayCollection(),
+            'occurrences' => null,
             'calendar'    => null,
             'startDate'   => new DateTime('now'),
             'endDate'     => new DateTime('now'),

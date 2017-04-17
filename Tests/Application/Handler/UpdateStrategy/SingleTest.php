@@ -29,21 +29,23 @@ final class SingleTest extends PHPUnit_Framework_TestCase
      */
     public function test_updating_single_event()
     {
+        $baseTime = Carbon::instance(new DateTime('today 11:00'));
+
         $collection = new ArrayCollection();
 
         $event = new Event(
             EventId::create(),
             Calendar::create('test'),
             EventType::single(),
-            new DateTime('11:00'),
-            new DateTime('12:00'),
+            $baseTime->copy(),
+            $baseTime->copy()->modify("+1 hour"),
             'some Title',
             new Repetitions(),
             $collection
         );
 
         $occurrence = new Occurrence(
-            OccurrenceId::create(), $event, new DateTime('+1 hour'), new OccurrenceDuration(60)
+            OccurrenceId::create(), $event, $baseTime->copy(), new OccurrenceDuration(60)
         );
 
         $collection->add($occurrence);
@@ -85,7 +87,7 @@ final class SingleTest extends PHPUnit_Framework_TestCase
      */
     public function test_updating_weekly_event()
     {
-        $base = Carbon::instance(new DateTime("last monday 12:00"));
+        $base = Carbon::instance(new DateTime('last monday 12:00'));
 
         $event = new Event(
             EventId::create(),
@@ -97,13 +99,14 @@ final class SingleTest extends PHPUnit_Framework_TestCase
             Repetitions::workingDays()
         );
 
+        /** @var Occurrence $occurrence */
         $occurrence = $event->occurrences()->get(2);
 
         $command = UpdateEventCommand::fromArray(
             [
                 'method'       => UpdateEventHandler::MODE_SINGLE,
-                'startDate'    => new DateTime('12:00'),
-                'endDate'      => new DateTime('14:00'),
+                'startDate'    => $base->copy()->addDays(2)->addHours(2),
+                'endDate'      => $base->copy()->addDays(2)->addHours(5),
                 'title'        => 'some new title',
                 'repetitions'  => [],
                 'occurrenceId' => $occurrence->id()->__toString(),
@@ -121,6 +124,9 @@ final class SingleTest extends PHPUnit_Framework_TestCase
         $singleStrategy->setEventRepository($eventRepository);
 
         $singleStrategy->update($command);
+
+        $this->assertEquals(180, $occurrence->duration()->minutes());
+        $this->assertEquals(new DateTime('last wednesday 14:00'), $occurrence->startDate());
     }
 
     public function remove_occurrence_from_event()

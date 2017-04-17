@@ -3,6 +3,7 @@ namespace Dende\Calendar\Application\Handler\UpdateStrategy;
 
 use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommandInterface;
+use Exception;
 
 class NextExclusive implements UpdateStrategyInterface
 {
@@ -13,6 +14,6 @@ class NextExclusive implements UpdateStrategyInterface
      */
     public function update(UpdateEventCommandInterface $command)
     {
-        // TODO: Implement update() method.
+        throw new Exception('Implement me');
     }
 }
