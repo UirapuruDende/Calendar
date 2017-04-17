@@ -3,7 +3,6 @@ namespace Dende\Calendar\Application\Command;
 
 use Carbon\Carbon;
 use DateTime;
-use Dende\Calendar\Domain\IdInterface;
 
 /**
  * Class CreateEventCommand.
@@ -42,20 +41,21 @@ final class CreateEventCommand implements EventCommandInterface
 
     /**
      * CreateEventCommand constructor.
-     * @param string $calendarId
-     * @param string $type
+     *
+     * @param string          $calendarId
+     * @param string          $type
      * @param Carbon|DateTime $startDate
      * @param Carbon|DateTime $endDate
-     * @param string $title
-     * @param array $repetitions
+     * @param string          $title
+     * @param array           $repetitions
      */
-    public function __construct(IdInterface $calendarId, string $type, DateTime $startDate, DateTime $endDate, string $title, array $repetitions)
+    public function __construct(string $calendarId = null, string $type, DateTime $startDate, DateTime $endDate, string $title, array $repetitions)
     {
-        $this->calendarId = $calendarId;
-        $this->type = $type;
-        $this->startDate = $startDate;
-        $this->endDate = $endDate;
-        $this->title = $title;
+        $this->calendarId  = $calendarId;
+        $this->type        = $type;
+        $this->startDate   = $startDate;
+        $this->endDate     = $endDate;
+        $this->title       = $title;
         $this->repetitions = $repetitions;
     }
 

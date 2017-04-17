@@ -38,7 +38,7 @@ final class SingleTest extends PHPUnit_Framework_TestCase
             Calendar::create('test'),
             EventType::single(),
             $baseTime->copy(),
-            $baseTime->copy()->modify("+1 hour"),
+            $baseTime->copy()->modify('+1 hour'),
             'some Title',
             new Repetitions(),
             $collection

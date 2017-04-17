@@ -19,6 +19,6 @@ final class CreateCalendarCommand
     public function __construct(IdInterface $calendarId = null, string $title = '')
     {
         $this->calendarId = $calendarId ?: CalendarId::create();
-        $this->title = $title;
+        $this->title      = $title;
     }
 }
