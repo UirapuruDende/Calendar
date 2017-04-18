@@ -125,6 +125,8 @@ final class SingleTest extends PHPUnit_Framework_TestCase
 
         $singleStrategy->update($command);
 
+        $occurrence = $occurrenceRepository->findAll()->first();
+
         $this->assertEquals(180, $occurrence->duration()->minutes());
         $this->assertEquals($base->copy()->addDays(2)->addHours(2), $occurrence->startDate());
     }
