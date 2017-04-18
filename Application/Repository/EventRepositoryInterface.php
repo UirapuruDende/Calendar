@@ -19,7 +19,7 @@ interface EventRepositoryInterface
     /**
      * @return Event[]|ArrayCollection
      */
-    public function findAll() : ArrayCollection;
+    public function findAll();
 
     /**
      * @param Occurrence $occurrence

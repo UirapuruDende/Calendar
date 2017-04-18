@@ -26,7 +26,7 @@ class InMemoryEventRepository implements EventRepositoryInterface
     /**
      * @return Event[]|ArrayCollection
      */
-    public function findAll() : ArrayCollection
+    public function findAll()
     {
         return $this->events;
     }
