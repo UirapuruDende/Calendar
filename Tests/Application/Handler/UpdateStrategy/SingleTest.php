@@ -29,21 +29,23 @@ final class SingleTest extends PHPUnit_Framework_TestCase
      */
     public function test_updating_single_event()
     {
+        $baseTime = Carbon::instance(new DateTime('today 11:00'));
+
         $collection = new ArrayCollection();
 
         $event = new Event(
             EventId::create(),
             Calendar::create('test'),
             EventType::single(),
-            new DateTime('11:00'),
-            new DateTime('12:00'),
+            $baseTime->copy(),
+            $baseTime->copy()->modify('+1 hour'),
             'some Title',
             new Repetitions(),
             $collection
         );
 
         $occurrence = new Occurrence(
-            OccurrenceId::create(), $event, new DateTime('+1 hour'), new OccurrenceDuration(60)
+            OccurrenceId::create(), $event, $baseTime->copy(), new OccurrenceDuration(60)
         );
 
         $collection->add($occurrence);

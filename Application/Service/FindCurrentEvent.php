@@ -33,9 +33,9 @@ final class FindCurrentEvent
      *
      * @return ArrayCollection|Event[]
      */
-    public function getCurrentEvents(Calendar $calendar) : ArrayCollection
+    public function getCurrentEvents(Calendar $calendar, DateTime $date = null) : ArrayCollection
     {
-        $result = $this->occurrenceRepository->findByDateAndCalendar(new DateTime('now'), $calendar);
+        $result = $this->occurrenceRepository->findByDateAndCalendar($date ?: new DateTime('now'), $calendar);
 
         return $result->map(function (Occurrence $occurrence) {
             return $occurrence->event();

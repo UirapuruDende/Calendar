@@ -1,6 +1,7 @@
 <?php
 namespace Dende\Calendar\Tests\Application\Service\FindCurrentEventTest;
 
+use Carbon\Carbon;
 use DateTime;
 use Dende\Calendar\Application\Service\FindCurrentEvent;
 use Dende\Calendar\Domain\Calendar;
@@ -17,6 +18,7 @@ class FindCurrentEventTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetCurrentEvent()
     {
+        $baseTime = Carbon::instance(new DateTime('today 11:00'));
         $calendar = new Calendar(CalendarId::create(), 'title');
 
         $eventId = EventId::create();
@@ -24,8 +26,8 @@ class FindCurrentEventTest extends \PHPUnit_Framework_TestCase
         $calendar->addEvent(
             $eventId,
             'title',
-            new DateTime('-10 minutes'),
-            new DateTime('+10 minutes'),
+            $baseTime->copy()->modify('-10 minutes'),
+            $baseTime->copy()->modify('+ 10 minutes'),
             EventType::single(),
             Repetitions::none()
         );
@@ -35,7 +37,7 @@ class FindCurrentEventTest extends \PHPUnit_Framework_TestCase
         $occurrenceRepository = new InMemoryOccurrenceRepository($occurrences);
 
         $service       = new FindCurrentEvent($occurrenceRepository);
-        $currentEvents = $service->getCurrentEvents($calendar);
+        $currentEvents = $service->getCurrentEvents($calendar, $baseTime->copy());
 
         $this->assertEquals($eventId, $currentEvents->first()->id());
     }
