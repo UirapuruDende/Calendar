@@ -7,6 +7,7 @@ use Dende\Calendar\Application\Repository\CalendarRepositoryInterface;
 use Dende\Calendar\Application\Repository\EventRepositoryInterface;
 use Dende\Calendar\Application\Repository\OccurrenceRepositoryInterface;
 use Dende\Calendar\Domain\Calendar;
+use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
 use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
@@ -89,10 +90,10 @@ final class CreateEventHandler
 
         $event = $calendar->getEventById($eventId);
 
-        $this->eventRepository->insert($event);
-
         foreach ($event->occurrences() as $occurrence) {
             $this->occurrenceRepository->insert($occurrence);
         }
+
+        $this->eventRepository->insert($event);
     }
 }

@@ -28,7 +28,7 @@ class Event
 
     const DUMP_FORMAT = 'd.m H.i';
 
-    public static $occurrenceFactoryClass = OccurrenceFactory::class;
+    protected static $occurrenceFactoryClass;
 
     /**
      * Id for Doctrine.
@@ -361,5 +361,14 @@ class Event
         if ($this->isSingle()) {
             $this->occurrences->first()->synchronizeWithEvent();
         }
+    }
+
+    public static function setFactoryClass(string $class)
+    {
+        if(!class_exists($class)) {
+            throw new Exception(sprintf("Class %s does not exist", $class));
+        }
+
+        self::$occurrenceFactoryClass = $class;
     }
 }
