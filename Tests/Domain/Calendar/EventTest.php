@@ -26,7 +26,7 @@ class EventTest extends PHPUnit_Framework_TestCase
         $base = Carbon::instance(new DateTime('last monday 12:00:00'));
 
         /** @var OccurrenceFactoryInterface $factory */
-        $factory = new Event::$occurrenceFactoryClass();
+        $factory = Event::getOccurrenceFactory();
 
         $collection = new ArrayCollection();
 
@@ -153,7 +153,7 @@ class EventTest extends PHPUnit_Framework_TestCase
         $base = Carbon::instance(new DateTime('last monday 12:00:00'));
 
         /** @var OccurrenceFactoryInterface $factory */
-        $factory = new Event::$occurrenceFactoryClass();
+        $factory = Event::getOccurrenceFactory();
 
         $collection = new ArrayCollection();
 
@@ -366,7 +366,7 @@ class EventTest extends PHPUnit_Framework_TestCase
         $occurrences = new ArrayCollection();
 
         /** @var OccurrenceFactoryInterface $factory */
-        $factory = new Event::$occurrenceFactoryClass();
+        $factory = Event::getOccurrenceFactory();
 
         $event = new Event(
             EventId::create(),
@@ -455,7 +455,7 @@ class EventTest extends PHPUnit_Framework_TestCase
         $this->expectExceptionMessageRegExp('@Pivot \(.+\) must be between startDate \(.+\) and endDate \(.+\)!@ui');
 
         /** @var OccurrenceFactoryInterface $factory */
-        $factory = new Event::$occurrenceFactoryClass();
+        $factory = Event::getOccurrenceFactory();
 
         $baseDate = Carbon::instance(new DateTime('last monday 12:00:00'));
 

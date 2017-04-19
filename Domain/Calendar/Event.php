@@ -28,7 +28,7 @@ class Event
 
     const DUMP_FORMAT = 'd.m H.i';
 
-    protected static $occurrenceFactoryClass;
+    protected static $occurrenceFactoryClass = OccurrenceFactory::class;
 
     /**
      * Id for Doctrine.
@@ -118,6 +118,11 @@ class Event
             $this->occurrences = new ArrayCollection();
             $this->regenerateOccurrences();
         }
+    }
+
+    public static function getOccurrenceFactory() : OccurrenceFactoryInterface
+    {
+        return new self::$occurrenceFactoryClass();
     }
 
     /**
