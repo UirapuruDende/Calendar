@@ -17,6 +17,7 @@ use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Domain\IdInterface;
 use Dende\Calendar\Domain\SoftDeleteable;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Exception;
 
 /**
@@ -128,7 +129,7 @@ class Event
     /**
      * @return ArrayCollection|OccurrenceInterface[]
      */
-    public function occurrences() : ArrayCollection
+    public function occurrences() : Collection
     {
         return $this->occurrences;
     }
