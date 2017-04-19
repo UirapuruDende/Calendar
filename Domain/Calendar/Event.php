@@ -371,8 +371,8 @@ class Event
 
     public static function setFactoryClass(string $class)
     {
-        if(!class_exists($class)) {
-            throw new Exception(sprintf("Class %s does not exist", $class));
+        if (!class_exists($class)) {
+            throw new Exception(sprintf('Class %s does not exist', $class));
         }
 
         self::$occurrenceFactoryClass = $class;
