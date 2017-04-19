@@ -163,6 +163,10 @@ class Event
      */
     public function duration() : Duration
     {
+        if(null === $this->duration) {
+            $this->duration = Duration::calculate($this->eventData->startDate(), $this->eventData->endDate());
+        }
+
         return $this->duration;
     }
 
