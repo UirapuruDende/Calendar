@@ -11,7 +11,7 @@ class AbstractId implements IdInterface
 
     protected function __construct(UuidInterface $id)
     {
-        $this->id = (string) $id;
+        $this->id = $id;
     }
 
     public static function create(UuidInterface $id = null): IdInterface
