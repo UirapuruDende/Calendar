@@ -17,10 +17,10 @@ final class Single implements UpdateStrategyInterface
     /**
      * @param UpdateEventCommandInterface|UpdateEventCommand|RemoveEventCommand $command
      */
-    public function update(UpdateEventCommandInterface $command)
+    public function update(UpdateEventCommand $command)
     {
         /** @var OccurrenceInterface $occurrence */
-        $occurrence = $this->occurrenceRepository->findOneById($command->occurrenceId);
+        $occurrence = $this->occurrenceRepository->findOneBy(['occurrenceId.id' => $command->occurrenceId()]);
 
         $event = $occurrence->event();
 

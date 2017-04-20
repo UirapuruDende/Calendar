@@ -1,6 +1,7 @@
 <?php
 namespace Dende\Calendar\Application\Handler;
 
+use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommandInterface;
 use Dende\Calendar\Application\Handler\UpdateStrategy\UpdateStrategyInterface;
 use Dende\Calendar\Application\Repository\EventRepositoryInterface;
@@ -73,7 +74,7 @@ final class UpdateEventHandler
      *
      * @throws Exception
      */
-    public function handle(UpdateEventCommandInterface $command)
+    public function handle(UpdateEventCommand $command)
     {
         if (!array_key_exists($command->method(), $this->strategy)) {
             throw new Exception(sprintf(

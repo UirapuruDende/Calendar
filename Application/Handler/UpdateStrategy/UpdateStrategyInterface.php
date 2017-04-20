@@ -17,9 +17,9 @@ use Dende\Calendar\Application\Repository\OccurrenceRepositoryInterface;
 interface UpdateStrategyInterface
 {
     /**
-     * @param UpdateEventCommandInterface|UpdateEventCommand|RemoveEventCommand $command
+     * @param UpdateEventCommand $command
      */
-    public function update(UpdateEventCommandInterface $command);
+    public function update(UpdateEventCommand $command);
 
     /**
      * @param EventRepositoryInterface $eventRepository
