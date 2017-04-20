@@ -5,6 +5,7 @@ use Dende\Calendar\Application\Repository\EventRepositoryInterface;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 class InMemoryEventRepository implements EventRepositoryInterface
 {
@@ -24,7 +25,7 @@ class InMemoryEventRepository implements EventRepositoryInterface
     }
 
     /**
-     * @return Event[]|ArrayCollection
+     * @return Event[]|Collection
      */
     public function findAll()
     {
