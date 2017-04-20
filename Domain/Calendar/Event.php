@@ -17,6 +17,7 @@ use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Domain\IdInterface;
 use Dende\Calendar\Domain\SoftDeleteable;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Exception;
 
 /**
@@ -28,7 +29,7 @@ class Event
 
     const DUMP_FORMAT = 'd.m H.i';
 
-    public static $occurrenceFactoryClass = OccurrenceFactory::class;
+    protected static $occurrenceFactoryClass = OccurrenceFactory::class;
 
     /**
      * Id for Doctrine.
@@ -120,10 +121,15 @@ class Event
         }
     }
 
+    public static function getOccurrenceFactory() : OccurrenceFactoryInterface
+    {
+        return new self::$occurrenceFactoryClass();
+    }
+
     /**
      * @return ArrayCollection|OccurrenceInterface[]
      */
-    public function occurrences() : ArrayCollection
+    public function occurrences() : Collection
     {
         return $this->occurrences;
     }
@@ -157,6 +163,10 @@ class Event
      */
     public function duration() : Duration
     {
+        if (null === $this->duration) {
+            $this->duration = Duration::calculate($this->eventData->startDate(), $this->eventData->endDate());
+        }
+
         return $this->duration;
     }
 
@@ -361,5 +371,14 @@ class Event
         if ($this->isSingle()) {
             $this->occurrences->first()->synchronizeWithEvent();
         }
+    }
+
+    public static function setFactoryClass(string $class)
+    {
+        if (!class_exists($class)) {
+            throw new Exception(sprintf('Class %s does not exist', $class));
+        }
+
+        self::$occurrenceFactoryClass = $class;
     }
 }

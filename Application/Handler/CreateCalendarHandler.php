@@ -51,7 +51,7 @@ class CreateCalendarHandler
         }
 
         $calendar = $this->calendarFactory->createFromArray([
-            'calendarId' => CalendarId::create(),
+            'calendarId' => $command->calendarId ?: CalendarId::create(),
             'title'      => $command->title,
         ]);
 

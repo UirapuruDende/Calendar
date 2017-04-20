@@ -9,6 +9,7 @@ use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * Class Calendar.
@@ -83,7 +84,7 @@ class Calendar
     /**
      * @return ArrayCollection|Event[]
      */
-    public function events() : ArrayCollection
+    public function events() : Collection
     {
         return $this->events;
     }

@@ -18,7 +18,7 @@ class FindCurrentEventTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetCurrentEvent()
     {
-        $baseTime = Carbon::instance(new DateTime("today 11:00"));
+        $baseTime = Carbon::instance(new DateTime('today 11:00'));
         $calendar = new Calendar(CalendarId::create(), 'title');
 
         $eventId = EventId::create();
@@ -26,8 +26,8 @@ class FindCurrentEventTest extends \PHPUnit_Framework_TestCase
         $calendar->addEvent(
             $eventId,
             'title',
-            $baseTime->copy()->modify("-10 minutes"),
-            $baseTime->copy()->modify("+ 10 minutes"),
+            $baseTime->copy()->modify('-10 minutes'),
+            $baseTime->copy()->modify('+ 10 minutes'),
             EventType::single(),
             Repetitions::none()
         );
