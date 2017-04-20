@@ -3,7 +3,7 @@ namespace Dende\Calendar\Application\Repository;
 
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * Interface EventRepositoryInterface.
@@ -17,7 +17,7 @@ interface EventRepositoryInterface
     public function remove(Event $event);
 
     /**
-     * @return Event[]|ArrayCollection
+     * @return Event[]|Collection
      */
     public function findAll() : ArrayCollection;
 
