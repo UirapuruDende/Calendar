@@ -73,7 +73,11 @@ class Occurrence implements OccurrenceInterface
     public function update(OccurrenceData $data)
     {
         if ($data->startDate()->format('Ymd') !== $this->occurrenceData->startDate()->format('Ymd')) {
-            throw new Exception("You can't change a day of occurrence, only hour!");
+            throw new Exception(sprintf(
+                "You can't change a day of occurrence, only hour! (new: %s vs old: %s)",
+                $data->startDate()->format('Y-m-d H:i:s'),
+                $this->occurrenceData->startDate()->format('Y-m-d H:i:s')
+            ));
         }
 
         $this->occurrenceData = $data;
