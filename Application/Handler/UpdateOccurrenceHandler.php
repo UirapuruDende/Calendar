@@ -7,6 +7,7 @@ use Dende\Calendar\Application\Command\UpdateOccurrenceCommand;
 use Dende\Calendar\Application\Handler\UpdateStrategy\UpdateStrategyInterface;
 use Dende\Calendar\Application\Repository\EventRepositoryInterface;
 use Dende\Calendar\Application\Repository\OccurrenceRepositoryInterface;
+use Dende\Calendar\Domain\Calendar\Event\OccurrenceInterface;
 use Exception;
 
 /**
@@ -37,6 +38,11 @@ final class UpdateOccurrenceHandler
      */
     public function handle(UpdateOccurrenceCommand $command)
     {
-        die(var_dump($command));
+        /** @var OccurrenceInterface $occurrence */
+        $occurrence = $this->occurrenceRepository->findOneById($command->occurrenceId());
+
+        $occurrence->update($command->startDate(), $command->endDate());
+
+        $this->occurrenceRepository->update($occurrence);
     }
 }

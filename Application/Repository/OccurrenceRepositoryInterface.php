@@ -5,6 +5,7 @@ use DateTime;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
+use Dende\Calendar\Domain\Calendar\Event\OccurrenceInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
@@ -12,7 +13,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 interface OccurrenceRepositoryInterface
 {
-    public function insert(Occurrence $occurrence);
+    public function insert(OccurrenceInterface $occurrence);
 
     public function findAllByEvent(Event $event) : ArrayCollection;
 
@@ -20,11 +21,11 @@ interface OccurrenceRepositoryInterface
 
     public function findAll() : ArrayCollection;
 
-    public function update(Occurrence $occurrence);
+    public function update(OccurrenceInterface $occurrence);
 
     public function findAllByEventUnmodified(Event $event);
 
-    public function remove(Occurrence $occurrence);
+    public function remove(OccurrenceInterface $occurrence);
 
     public function removeAllForEvent(Event $event);
 
