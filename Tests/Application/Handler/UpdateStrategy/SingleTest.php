@@ -24,6 +24,11 @@ use PHPUnit_Framework_TestCase;
  */
 final class SingleTest extends PHPUnit_Framework_TestCase
 {
+    public function setUp()
+    {
+        $this->markTestSkipped('Will be moved to update occurrence handler test');
+    }
+
     /**
      * @test
      */

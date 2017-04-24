@@ -1421,21 +1421,21 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/padraic/humbug.git",
-                "reference": "06b1c059e432dab8c22c36bc8b6e1ffc7e587c07"
+                "url": "https://github.com/humbug/humbug.git",
+                "reference": "3e8e15bbcd25dfadfb7a8a9b71ee4c3fad9e87d4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/padraic/humbug/zipball/06b1c059e432dab8c22c36bc8b6e1ffc7e587c07",
-                "reference": "06b1c059e432dab8c22c36bc8b6e1ffc7e587c07",
+                "url": "https://api.github.com/repos/humbug/humbug/zipball/3e8e15bbcd25dfadfb7a8a9b71ee4c3fad9e87d4",
+                "reference": "3e8e15bbcd25dfadfb7a8a9b71ee4c3fad9e87d4",
                 "shasum": ""
             },
             "require": {
                 "padraic/phar-updater": "^1.0.0",
                 "padraic/phpunit-accelerator": "^1.0.2",
                 "padraic/phpunit-extensions": "^1.0.0",
-                "php": ">=5.4.0",
-                "phpunit/phpunit": "^4.5|^5.0",
+                "php": ">=5.6.0",
+                "phpunit/phpunit": "^5.0",
                 "sebastian/diff": "^1.1",
                 "symfony/console": "^2.6|^3.0",
                 "symfony/event-dispatcher": "^2.6|^3.0",
@@ -1444,6 +1444,7 @@
             },
             "require-dev": {
                 "behat/behat": "^3.0.15",
+                "ciaranmcnulty/versionbasedtestskipper": "^0.2.1",
                 "mikey179/vfsstream": "^1.4",
                 "mockery/mockery": "^0.9",
                 "symfony/filesystem": "^2.6|^3.0"
@@ -1481,20 +1482,20 @@
                 "testing",
                 "unit testing"
             ],
-            "time": "2016-08-01 10:27:00"
+            "time": "2017-04-22 20:42:30"
         },
         {
             "name": "myclabs/deep-copy",
-            "version": "1.6.0",
+            "version": "1.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myclabs/DeepCopy.git",
-                "reference": "5a5a9fc8025a08d8919be87d6884d5a92520cefe"
+                "reference": "8e6e04167378abf1ddb4d3522d8755c5fd90d102"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/5a5a9fc8025a08d8919be87d6884d5a92520cefe",
-                "reference": "5a5a9fc8025a08d8919be87d6884d5a92520cefe",
+                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/8e6e04167378abf1ddb4d3522d8755c5fd90d102",
+                "reference": "8e6e04167378abf1ddb4d3522d8755c5fd90d102",
                 "shasum": ""
             },
             "require": {
@@ -1523,7 +1524,7 @@
                 "object",
                 "object graph"
             ],
-            "time": "2017-01-26 22:05:40"
+            "time": "2017-04-12 18:52:22"
         },
         {
             "name": "padraic/humbug_get_contents",

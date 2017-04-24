@@ -28,12 +28,12 @@ final class UpdateEventHandlerTest extends PHPUnit_Framework_TestCase
         $occurrence = new Occurrence(OccurrenceId::create(), $event, new DateTime('+1 hour'), new OccurrenceDuration(60));
 
         $command = UpdateEventCommand::fromArray([
-            'method'       => UpdateEventHandler::MODE_SINGLE,
-            'startDate'    => new DateTime('12:00'),
-            'endDate'      => new DateTime('14:00'),
-            'title'        => $event->title(),
-            'repetitions'  => [],
-            'occurrenceId' => $occurrence->id()->__toString(),
+             'occurrenceId' => $occurrence->id()->__toString(),
+             'method'       => UpdateEventHandler::MODE_SINGLE,
+            'startDate'     => new DateTime('12:00'),
+            'endDate'       => new DateTime('14:00'),
+            'title'         => $event->title(),
+            'repetitions'   => [],
         ]);
 
         $eventRepository      = new InMemoryEventRepository();
@@ -57,10 +57,14 @@ final class UpdateEventHandlerTest extends PHPUnit_Framework_TestCase
      */
     public function testStrategyNotSetException()
     {
-        $command            = new UpdateEventCommand();
-        $command->method    = UpdateEventHandler::MODE_SINGLE;
-        $command->startDate = new DateTime('12:00');
-        $command->endDate   = new DateTime('13:00');
+        $command = new UpdateEventCommand(
+            '',
+            UpdateEventHandler::MODE_SINGLE,
+            new DateTime('12:00'),
+            new DateTime('13:00'),
+            '',
+            []
+        );
 
         $handler = new UpdateEventHandler(new InMemoryEventRepository(), new InMemoryOccurrenceRepository());
 

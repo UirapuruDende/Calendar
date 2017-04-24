@@ -45,35 +45,34 @@ final class UpdateEventCommand implements EventCommandInterface, UpdateEventComm
 
     /**
      * UpdateEventCommand constructor.
-     * @param string $occurrenceId
-     * @param string $method
+     *
+     * @param string   $occurrenceId
+     * @param string   $method
      * @param DateTime $startDate
      * @param DateTime $endDate
-     * @param string $title
-     * @param array $repetitions
+     * @param string   $title
+     * @param array    $repetitions
      */
     public function __construct(string $occurrenceId, string $method, DateTime $startDate, DateTime $endDate, string $title, array $repetitions)
     {
         $this->occurrenceId = $occurrenceId;
-        $this->method = $method;
-        $this->startDate = $startDate;
-        $this->endDate = $endDate;
-        $this->title = $title;
-        $this->repetitions = $repetitions;
+        $this->method       = $method;
+        $this->startDate    = $startDate;
+        $this->endDate      = $endDate;
+        $this->title        = $title;
+        $this->repetitions  = $repetitions;
     }
 
     public static function fromArray(array $array = []) : UpdateEventCommand
     {
-        $command = new self();
-
-        $command->occurrenceId = $array['occurrenceId'];
-        $command->method       = $array['method'];
-        $command->startDate    = $array['startDate'];
-        $command->endDate      = $array['endDate'];
-        $command->title        = $array['title'];
-        $command->repetitions  = $array['repetitions'];
-
-        return $command;
+        return new self(
+            $array['occurrenceId'],
+            $array['method'],
+            $array['startDate'],
+            $array['endDate'],
+            $array['title'],
+            $array['repetitions']
+        );
     }
 
     public function method(): string
