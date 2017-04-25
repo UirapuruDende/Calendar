@@ -9,6 +9,7 @@ use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceData;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
 use Dende\Calendar\Domain\Calendar\Event\OccurrenceInterface;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
+use Exception;
 
 final class Single implements UpdateStrategyInterface
 {
@@ -27,10 +28,9 @@ final class Single implements UpdateStrategyInterface
         if ($event->isSingle()) {
             $event->update(new EventData($command->startDate, $command->endDate, $command->title, new Repetitions($command->repetitions)));
         } elseif ($event->isWeekly()) {
-            $occurrence->update(new OccurrenceData($command->startDate, OccurrenceDuration::calculate($command->startDate, $command->endDate)));
+            throw new Exception('Only single type event is acceptable for this strategy');
         }
 
-        $this->occurrenceRepository->update($occurrence);
         $this->eventRepository->update($event);
     }
 }
