@@ -4,6 +4,7 @@ namespace Dende\Calendar\Tests\Application\Handler;
 use Carbon\Carbon;
 use DateTime;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
+use Dende\Calendar\Application\Command\UpdateOccurrenceCommand;
 use Dende\Calendar\Application\Handler\UpdateEventHandler;
 use Dende\Calendar\Application\Handler\UpdateOccurrenceHandler;
 use Dende\Calendar\Application\Handler\UpdateStrategy\UpdateStrategyInterface;
@@ -28,7 +29,7 @@ final class UpdateOccurrenceHandlerTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function test_updating_single_event()
+    public function test_updating_single_occurrence()
     {
         $baseTime = Carbon::instance(new DateTime('today 11:00'));
 
@@ -51,16 +52,7 @@ final class UpdateOccurrenceHandlerTest extends PHPUnit_Framework_TestCase
 
         $collection->add($occurrence);
 
-        $command = UpdateEventCommand::fromArray(
-            [
-                'method'       => UpdateEventHandler::MODE_SINGLE,
-                'startDate'    => new DateTime('12:00'),
-                'endDate'      => new DateTime('14:00'),
-                'title'        => 'some new title',
-                'repetitions'  => [],
-                'occurrenceId' => $occurrence->id()->__toString(),
-            ]
-        );
+        $command = new UpdateOccurrenceCommand($occurrence->id()->__toString(), new DateTime('12:00'), new DateTime('14:00'));
 
         $eventRepository = new InMemoryEventRepository();
         $eventRepository->insert($event);
@@ -68,16 +60,15 @@ final class UpdateOccurrenceHandlerTest extends PHPUnit_Framework_TestCase
         $occurrenceRepository = new InMemoryOccurrenceRepository();
         $occurrenceRepository->insert($occurrence);
 
-        $updateOccurrenceHandler = new UpdateOccurrenceHandler();
-        $updateOccurrenceHandler->setOccurrenceRepository($occurrenceRepository);
-        $updateOccurrenceHandler->setEventRepository($eventRepository);
+        $updateOccurrenceHandler = new UpdateOccurrenceHandler(
+            $occurrenceRepository
+        );
 
-        $updateOccurrenceHandler->update($command);
+        $updateOccurrenceHandler->handle($command);
 
-        $this->assertEquals('some new title', $event->title());
-        $this->assertEquals(new DateTime('12:00'), $event->startDate());
-        $this->assertEquals(new DateTime('14:00'), $event->endDate());
-        $this->assertEquals(120, $event->duration()->minutes());
+        $this->assertEquals(new DateTime('11:00'), $event->startDate());
+        $this->assertEquals(new DateTime('12:00'), $event->endDate());
+        $this->assertEquals(60, $event->duration()->minutes());
         $this->assertCount(1, $event->occurrences());
         $this->assertEquals(new DateTime('12:00'), $occurrence->startDate());
         $this->assertEquals(120, $occurrence->duration()->minutes());

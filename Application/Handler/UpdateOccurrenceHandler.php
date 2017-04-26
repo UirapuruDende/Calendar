@@ -38,7 +38,7 @@ final class UpdateOccurrenceHandler
     public function handle(UpdateOccurrenceCommand $command)
     {
         /** @var OccurrenceInterface $occurrence */
-        $occurrence = $this->occurrenceRepository->findOneBy(["occurrenceId.id" => $command->occurrenceId()]);
+        $occurrence = $this->occurrenceRepository->findOneById($command->occurrenceId());
 
         $occurrence->update(new OccurrenceData(
             $command->startDate(),
