@@ -94,28 +94,20 @@ final class UpdateOccurrenceHandlerTest extends PHPUnit_Framework_TestCase
         /** @var Occurrence $occurrence */
         $occurrence = $event->occurrences()->get(2);
 
-        $command = UpdateEventCommand::fromArray(
-            [
-                'method'       => UpdateEventHandler::MODE_SINGLE,
-                'startDate'    => $base->copy()->addDays(2)->addHours(2),
-                'endDate'      => $base->copy()->addDays(2)->addHours(5),
-                'title'        => 'some new title',
-                'repetitions'  => [],
-                'occurrenceId' => $occurrence->id()->__toString(),
-            ]
+        $command = new UpdateOccurrenceCommand(
+            $occurrence->id()->__toString(),
+            $base->copy()->addDays(2)->addHours(2),
+            $base->copy()->addDays(2)->addHours(5)
         );
-
-        $eventRepository = new InMemoryEventRepository();
-        $eventRepository->insert($event);
 
         $occurrenceRepository = new InMemoryOccurrenceRepository();
         $occurrenceRepository->insert($occurrence);
 
-        $singleStrategy = new Single();
-        $singleStrategy->setOccurrenceRepository($occurrenceRepository);
-        $singleStrategy->setEventRepository($eventRepository);
+        $updateOccurrenceHandler = new UpdateOccurrenceHandler(
+            $occurrenceRepository
+        );
 
-        $singleStrategy->update($command);
+        $updateOccurrenceHandler->handle($command);
 
         $occurrence = $occurrenceRepository->findAll()->first();
 
