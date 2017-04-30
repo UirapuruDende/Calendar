@@ -3,8 +3,8 @@ namespace Dende\Calendar\Tests\Application\Handler;
 
 use Carbon\Carbon;
 use DateTime;
-use Dende\Calendar\Application\Command\UpdateEventCommand;
-use Dende\Calendar\Application\Handler\UpdateEventHandler;
+use Dende\Calendar\Application\Command\UpdateCommand;
+use Dende\Calendar\Application\Handler\UpdateManager;
 use Dende\Calendar\Application\Handler\UpdateStrategy\Single;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
@@ -25,5 +25,35 @@ use PHPUnit_Framework_TestCase;
 final class SingleTest extends PHPUnit_Framework_TestCase
 {
 
+    /**
+     * @test
+     */
+    public function it_updates_event()
+    {
+        $this->markTestSkipped();
 
+        $base = Carbon::instance(new DateTime('last monday 12:00'));
+
+        $event = new Event(
+            EventId::create(),
+            Calendar::create('test'),
+            EventType::weekly(),
+            $base->copy(),
+            $base->copy()->addDays(6)->addHours(2),
+            'some Title',
+            Repetitions::workingDays()
+        );
+
+        /** @var Occurrence $occurrence */
+        $occurrence = $event->occurrences()->get(2);
+
+        $command = new UpdateCommand();
+
+        $occurrenceRepository = new InMemoryOccurrenceRepository();
+        $occurrenceRepository->insert($occurrence);
+
+        $singleStrategy = new Single();
+
+        $updateOccurrenceHandler->handle($command);
+    }
 }

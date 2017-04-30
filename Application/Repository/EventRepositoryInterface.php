@@ -27,4 +27,10 @@ interface EventRepositoryInterface
      * @return Event|null
      */
     public function findOneByOccurrence(Occurrence $occurrence);
+
+    /**
+     * @param string $id
+     * @return Event|null
+     */
+    public function findOneById(string $id);
 }

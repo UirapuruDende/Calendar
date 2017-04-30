@@ -1,73 +1,57 @@
 <?php
 namespace Dende\Calendar\Tests\Application\Handler;
 
+
+use Carbon\Carbon;
 use DateTime;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Handler\UpdateEventHandler;
-use Dende\Calendar\Application\Handler\UpdateStrategy\UpdateStrategyInterface;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
-use Dende\Calendar\Domain\Calendar\Event\Occurrence;
-use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
-use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryEventRepository;
-use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryOccurrenceRepository;
 use PHPUnit_Framework_TestCase;
 
-/**
- * Class EventTest.
- */
-final class UpdateEventHandlerTest extends PHPUnit_Framework_TestCase
+class UpdateEventHandlerTest extends PHPUnit_Framework_TestCase
 {
-    public function testHandleUpdateCommand()
-    {
-        $event      = new Event(EventId::create(), Calendar::create('test'), EventType::single(), new DateTime('12:00'), new DateTime('13:00'), 'some Title', new Repetitions());
-        $occurrence = new Occurrence(OccurrenceId::create(), $event, new DateTime('+1 hour'), new OccurrenceDuration(60));
-
-        $command = UpdateEventCommand::fromArray([
-             'occurrenceId' => $occurrence->id()->__toString(),
-             'method'       => UpdateEventHandler::MODE_SINGLE,
-            'startDate'     => new DateTime('12:00'),
-            'endDate'       => new DateTime('14:00'),
-            'title'         => $event->title(),
-            'repetitions'   => [],
-        ]);
-
-        $eventRepository      = new InMemoryEventRepository();
-        $occurrenceRepository = new InMemoryOccurrenceRepository();
-
-        $strategyMock = $this->prophesize(UpdateStrategyInterface::class);
-        $strategyMock->update($command)->shouldBeCalled()->willReturn(null);
-        $strategyMock->setEventRepository($eventRepository)->shouldBeCalled()->willReturn(null);
-        $strategyMock->setOccurrenceRepository($occurrenceRepository)->shouldBeCalled()->willReturn(null);
-
-        $handler = new UpdateEventHandler($eventRepository, $occurrenceRepository);
-        $handler->addStrategy(UpdateEventHandler::MODE_SINGLE, $strategyMock->reveal());
-
-        $handler->handle($command);
-    }
-
     /**
-     * @throws \Exception
-     * @expectedException \Exception
-     * @expectedExceptionMessage Mode 'single' not allowed. Only  allowed.
+     * @test
      */
-    public function testStrategyNotSetException()
+    public function it_updates_event()
     {
-        $command = new UpdateEventCommand(
-            '',
-            UpdateEventHandler::MODE_SINGLE,
-            new DateTime('12:00'),
-            new DateTime('13:00'),
-            '',
-            []
+        $base = Carbon::instance(new DateTime('last monday 12:00'));
+
+        $eventId = EventId::create();
+
+        $event = new Event(
+            $eventId,
+            Calendar::create('test'),
+            EventType::weekly(),
+            $base->copy(),
+            $base->copy()->addDays(6)->addHours(2),
+            'some Title',
+            Repetitions::workingDays()
         );
 
-        $handler = new UpdateEventHandler(new InMemoryEventRepository(), new InMemoryOccurrenceRepository());
+        $eventRepository = new InMemoryEventRepository();
+        $eventRepository->insert($event);
 
+        $command = new UpdateEventCommand(
+            $eventId->__toString(),
+            $base->copy()->addDays(1),
+            $base->copy()->addDays(5)->addHours(3),
+            'new title',
+            Repetitions::weekendDays()->getArray()
+        );
+
+        $handler = new UpdateEventHandler($eventRepository);
         $handler->handle($command);
+
+        $this->assertEquals($event->id(), $eventId);
+        $this->assertEquals($event->startDate(), $base->copy()->addDays(1));
+        $this->assertEquals($event->endDate(), $base->copy()->addDays(5)->addHours(3));
+        $this->assertEquals($event->duration()->minutes(), 180);
     }
 }

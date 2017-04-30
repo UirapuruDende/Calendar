@@ -1,7 +1,7 @@
 <?php
 namespace Dende\Calendar\Application\Handler;
 
-use Dende\Calendar\Application\Command\UpdateEventCommand;
+use Dende\Calendar\Application\Command\UpdateCommand;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Repository\CalendarRepositoryInterface;
 
@@ -21,7 +21,7 @@ final class RemoveCalendarHandler
     private $calendarRepository;
 
     /**
-     * @param UpdateEventCommand $command
+     * @param UpdateCommand $command
      */
     public function remove(Calendar $calendar)
     {

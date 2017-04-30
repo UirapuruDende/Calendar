@@ -64,4 +64,9 @@ class InMemoryEventRepository implements EventRepositoryInterface
 
         return array_pop($events);
     }
+
+    public function findOneById(string $id)
+    {
+        return $this->events[$id];
+    }
 }

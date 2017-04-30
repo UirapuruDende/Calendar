@@ -2,7 +2,7 @@
 namespace Dende\Calendar\Application\Handler\UpdateStrategy;
 
 use Dende\Calendar\Application\Command\RemoveEventCommand;
-use Dende\Calendar\Application\Command\UpdateEventCommand;
+use Dende\Calendar\Application\Command\UpdateCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommandInterface;
 use Dende\Calendar\Domain\Calendar\Event\EventData;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceData;
@@ -16,9 +16,9 @@ final class Single implements UpdateStrategyInterface
     use SetRepositoriesTrait, SetFactoriesTrait, SetDispatcherTrait;
 
     /**
-     * @param UpdateEventCommandInterface|UpdateEventCommand|RemoveEventCommand $command
+     * @param UpdateEventCommandInterface|UpdateCommand|RemoveEventCommand $command
      */
-    public function update(UpdateEventCommand $command)
+    public function update(UpdateCommand $command)
     {
         /** @var OccurrenceInterface $occurrence */
         $occurrence = $this->occurrenceRepository->findOneBy(['occurrenceId.id' => $command->occurrenceId()]);
@@ -27,7 +27,7 @@ final class Single implements UpdateStrategyInterface
 
         if ($event->isSingle()) {
             $event->update(new EventData($command->startDate, $command->endDate, $command->title, new Repetitions($command->repetitions)));
-        } elseif ($event->isWeekly()) {
+        } else {
             throw new Exception('Only single type event is acceptable for this strategy');
         }
 

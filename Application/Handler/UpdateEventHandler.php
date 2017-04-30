@@ -2,88 +2,30 @@
 namespace Dende\Calendar\Application\Handler;
 
 use Dende\Calendar\Application\Command\UpdateEventCommand;
-use Dende\Calendar\Application\Command\UpdateEventCommandInterface;
-use Dende\Calendar\Application\Handler\UpdateStrategy\UpdateStrategyInterface;
 use Dende\Calendar\Application\Repository\EventRepositoryInterface;
-use Dende\Calendar\Application\Repository\OccurrenceRepositoryInterface;
-use Exception;
+use Dende\Calendar\Domain\Calendar\Event;
+use Dende\Calendar\Domain\Calendar\Event\EventData;
+use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 
-/**
- * Class CreateEventHandler.
- */
-final class UpdateEventHandler
+class UpdateEventHandler
 {
-    const MODE_SINGLE         = 'single';
-    const MODE_ALL_INCLUSIVE  = 'allinclusive';
-    const MODE_ALL_EXCLUSIVE  = 'allexclusive';
-    const MODE_NEXT_INCLUSIVE = 'nextinclusive';
-    const MODE_NEXT_EXCLUSIVE = 'nextexclusive';
-    const MODE_OVERWRITE      = 'overwrite';
-
-    /**
-     * @var array
-     */
-    public static $availableModes = [
-        self::MODE_SINGLE,
-//        self::MODE_ALL_INCLUSIVE,
-//        self::MODE_ALL_EXCLUSIVE,
-        self::MODE_NEXT_INCLUSIVE,
-//        self::MODE_NEXT_EXCLUSIVE,
-        self::MODE_OVERWRITE,
-    ];
-
-    /**
-     * @var EventRepositoryInterface
-     */
+    /** @var  EventRepositoryInterface */
     private $eventRepository;
 
     /**
-     * @var OccurrenceRepositoryInterface
+     * UpdateEventHandler constructor.
+     * @param EventRepositoryInterface $eventRepository
      */
-    private $occurrenceRepository;
-
-    /**
-     * @var UpdateStrategyInterface[]
-     */
-    private $strategy = [];
-
-    /**
-     * CreateEventHandler constructor.
-     *
-     * @param EventRepositoryInterface      $eventRepository
-     * @param OccurrenceRepositoryInterface $occurrenceRepository
-     */
-    public function __construct(
-        EventRepositoryInterface $eventRepository,
-        OccurrenceRepositoryInterface $occurrenceRepository
-    ) {
-        $this->eventRepository      = $eventRepository;
-        $this->occurrenceRepository = $occurrenceRepository;
-    }
-
-    public function addStrategy(string $name, UpdateStrategyInterface $strategy)
+    public function __construct(EventRepositoryInterface $eventRepository)
     {
-        $strategy->setEventRepository($this->eventRepository);
-        $strategy->setOccurrenceRepository($this->occurrenceRepository);
-
-        $this->strategy[$name] = $strategy;
+        $this->eventRepository = $eventRepository;
     }
 
-    /**
-     * @param UpdateEventCommandInterface $command
-     *
-     * @throws Exception
-     */
     public function handle(UpdateEventCommand $command)
     {
-        if (!array_key_exists($command->method(), $this->strategy)) {
-            throw new Exception(sprintf(
-                "Mode '%s' not allowed. Only %s allowed.",
-                $command->method(),
-                implode(', ', array_keys($this->strategy))
-            ));
-        }
-
-        $this->strategy[$command->method()]->update($command);
+        /** @var Event $event */
+        $event = $this->eventRepository->findOneById($command->eventId);
+        $event->update(new EventData($command->startDate, $command->endDate, $command->title, new Repetitions($command->repetitions)));
+        $this->eventRepository->update($event);
     }
 }
