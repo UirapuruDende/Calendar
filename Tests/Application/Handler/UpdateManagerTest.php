@@ -2,7 +2,7 @@
 namespace Dende\Calendar\Tests\Application\Handler;
 
 use DateTime;
-use Dende\Calendar\Application\Command\UpdateCommand;
+use Dende\Calendar\Application\Command\UpdateOccurrenceCommand;
 use Dende\Calendar\Application\Handler\UpdateManager;
 use Dende\Calendar\Application\Handler\UpdateStrategy\UpdateStrategyInterface;
 use Dende\Calendar\Domain\Calendar;
@@ -32,7 +32,7 @@ final class UpdateManagerTest extends PHPUnit_Framework_TestCase
         $event      = new Event(EventId::create(), Calendar::create('test'), EventType::single(), new DateTime('12:00'), new DateTime('13:00'), 'some Title', new Repetitions());
         $occurrence = new Occurrence(OccurrenceId::create(), $event, new DateTime('+1 hour'), new OccurrenceDuration(60));
 
-        $command = UpdateCommand::fromArray([
+        $command = UpdateOccurrenceCommand::fromArray([
              'occurrenceId' => $occurrence->id()->__toString(),
              'method'       => UpdateManager::MODE_SINGLE,
             'startDate'     => new DateTime('12:00'),
@@ -62,7 +62,7 @@ final class UpdateManagerTest extends PHPUnit_Framework_TestCase
      */
     public function testStrategyNotSetException()
     {
-        $command = new UpdateCommand(
+        $command = new UpdateOccurrenceCommand(
             '',
             UpdateManager::MODE_SINGLE,
             new DateTime('12:00'),

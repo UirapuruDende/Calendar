@@ -2,7 +2,7 @@
 namespace Dende\Calendar\Application\Service\UpdateStrategy;
 
 use Dende\Calendar\Application\Command\RemoveEventCommand;
-use Dende\Calendar\Application\Command\UpdateCommand;
+use Dende\Calendar\Application\Command\UpdateOccurrenceCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommandInterface;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
@@ -22,7 +22,7 @@ final class AllExclusive implements UpdateStrategyInterface
     use SetRepositoriesTrait, SetFactoriesTrait;
 
     /**
-     * @param UpdateEventCommandInterface|UpdateCommand|RemoveEventCommand $command
+     * @param UpdateEventCommandInterface|UpdateOccurrenceCommand|RemoveEventCommand $command
      */
     public function update(UpdateEventCommandInterface $command)
     {

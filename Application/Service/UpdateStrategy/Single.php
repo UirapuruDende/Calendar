@@ -1,7 +1,7 @@
 <?php
 namespace Dende\Calendar\Application\Handler\UpdateStrategy;
 
-use Dende\Calendar\Application\Command\UpdateCommand;
+use Dende\Calendar\Application\Command\UpdateOccurrenceCommand;
 use Dende\Calendar\Application\Service\UpdateStrategy\SetDispatcherTrait;
 use Dende\Calendar\Application\Service\UpdateStrategy\SetFactoriesTrait;
 use Dende\Calendar\Application\Service\UpdateStrategy\SetRepositoriesTrait;
@@ -14,9 +14,9 @@ final class Single implements UpdateStrategyInterface
     use SetRepositoriesTrait, SetFactoriesTrait, SetDispatcherTrait;
 
     /**
-     * @param UpdateCommand $command
+     * @param UpdateOccurrenceCommand $command
      */
-    public function update(UpdateCommand $command)
+    public function update(UpdateOccurrenceCommand $command)
     {
         $occurrence = $this->occurrenceRepository->findOneById($command->occurrenceId());
         $occurrence->update(new OccurrenceData($command->startDate, OccurrenceDuration::calculate($command->startDate, $command->endDate)));

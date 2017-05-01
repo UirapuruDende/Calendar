@@ -1,7 +1,7 @@
 <?php
 namespace Dende\Calendar\Application\Service\UpdateStrategy;
 
-use Dende\Calendar\Application\Command\UpdateCommand;
+use Dende\Calendar\Application\Command\UpdateOccurrenceCommand;
 use Dende\Calendar\Application\Factory\EventFactory;
 use Dende\Calendar\Application\Factory\EventFactoryInterface;
 use Dende\Calendar\Application\Factory\OccurrenceFactory;
@@ -16,9 +16,9 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 interface UpdateStrategyInterface
 {
     /**
-     * @param UpdateCommand $command
+     * @param UpdateOccurrenceCommand $command
      */
-    public function update(UpdateCommand $command);
+    public function update(UpdateOccurrenceCommand $command);
 
     /**
      * @param EventRepositoryInterface $eventRepository

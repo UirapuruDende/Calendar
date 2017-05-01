@@ -23,6 +23,11 @@ use PHPUnit_Framework_TestCase;
  */
 final class UpdateOccurrenceHandlerTest extends PHPUnit_Framework_TestCase
 {
+    public function setUp()
+    {
+        $this->markTestSkipped();
+    }
+
     /**
      * @test
      */

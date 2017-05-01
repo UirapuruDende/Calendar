@@ -1,7 +1,7 @@
 <?php
 namespace Dende\Calendar\Application\Handler;
 
-use Dende\Calendar\Application\Command\UpdateCommand;
+use Dende\Calendar\Application\Command\UpdateOccurrenceCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommandInterface;
 use Dende\Calendar\Application\Event\PostUpdateEvent;
 use Dende\Calendar\Application\Repository\EventRepositoryInterface;
@@ -75,7 +75,7 @@ final class OccurrenceUpdateManager
      *
      * @throws Exception
      */
-    public function handle(UpdateCommand $command)
+    public function handle(UpdateOccurrenceCommand $command)
     {
         if (!array_key_exists($command->method(), $this->strategy)) {
             throw new Exception(sprintf(
@@ -92,7 +92,7 @@ final class OccurrenceUpdateManager
     {
         $event = $updateEvent->getEvent();
 
-        $this->handle(new UpdateCommand(
+        $this->handle(new UpdateOccurrenceCommand(
             $updateEvent->getOccurrenceId(),
             $updateEvent->getMethod(),
             $event->startDate(),
