@@ -84,7 +84,7 @@ class Event
      *
      * @internal param string $id
      */
-    public function __construct(IdInterface $eventId = null, Calendar $calendar, EventType $type, DateTime $startDate, DateTime $endDate, string $title, Repetitions $repetitions = null, ArrayCollection $occurrences = null)
+    public function __construct(IdInterface $eventId, Calendar $calendar, EventType $type, DateTime $startDate, DateTime $endDate, string $title, Repetitions $repetitions = null, ArrayCollection $occurrences = null)
     {
         if (Carbon::instance($startDate)->gte(Carbon::instance($endDate))) {
             throw new Exception(sprintf(

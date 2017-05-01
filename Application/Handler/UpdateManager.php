@@ -2,7 +2,9 @@
 namespace Dende\Calendar\Application\Handler;
 
 use Dende\Calendar\Application\Command\UpdateCommand;
+use Dende\Calendar\Application\Command\UpdateEventCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommandInterface;
+use Dende\Calendar\Application\Event\PostUpdateEvent;
 use Dende\Calendar\Application\Handler\UpdateStrategy\UpdateStrategyInterface;
 use Dende\Calendar\Application\Repository\EventRepositoryInterface;
 use Dende\Calendar\Application\Repository\OccurrenceRepositoryInterface;
@@ -86,4 +88,19 @@ final class UpdateManager
 
         $this->strategy[$command->method()]->update($command);
     }
+
+    public function postEventUpdate(PostUpdateEvent $updateEvent) {
+        $occurrence = $this->occurrenceRepository->findOneById($updateEvent->getOccurrenceId());
+        $event = $updateEvent->getEvent();
+        $method = $updateEvent->getMethod();
+
+        $this->handle(new UpdateCommand(
+                          $updateEvent->getOccurrenceId(),
+                          $updateEvent->getMethod(),
+                            $event->startDate(),
+                          $event->endDate(),
+                          $event->repetitions()
+                      ));
+    }
+
 }

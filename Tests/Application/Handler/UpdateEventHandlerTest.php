@@ -5,14 +5,19 @@ namespace Dende\Calendar\Tests\Application\Handler;
 use Carbon\Carbon;
 use DateTime;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
+use Dende\Calendar\Application\Events;
 use Dende\Calendar\Application\Handler\UpdateEventHandler;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
+use Dende\Calendar\Domain\Calendar\Event\OccurrenceInterface;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryEventRepository;
+use Prophecy\Prophecy\ObjectProphecy;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use PHPUnit_Framework_TestCase;
+use Prophecy\Argument;
 
 class UpdateEventHandlerTest extends PHPUnit_Framework_TestCase
 {
@@ -38,15 +43,24 @@ class UpdateEventHandlerTest extends PHPUnit_Framework_TestCase
         $eventRepository = new InMemoryEventRepository();
         $eventRepository->insert($event);
 
+        /** @var OccurrenceInterface $occurrence */
+        $occurrence = $event->occurrences()->get(2);
+
         $command = new UpdateEventCommand(
             $eventId->__toString(),
             $base->copy()->addDays(1),
             $base->copy()->addDays(5)->addHours(3),
             'new title',
-            Repetitions::weekendDays()->getArray()
+            Repetitions::weekendDays()->getArray(),
+            $occurrence->id()->__toString(),
+            'single'
         );
 
-        $handler = new UpdateEventHandler($eventRepository);
+        /** @var ObjectProphecy $dispatcherMock */
+        $dispatcherMock = $this->prophesize(EventDispatcherInterface::class);
+        $dispatcherMock->dispatch(Events::POST_UPDATE_EVENT, Argument::type('object'))->shouldBeCalled();
+
+        $handler = new UpdateEventHandler($eventRepository, $dispatcherMock->reveal());
         $handler->handle($command);
 
         $this->assertEquals($event->id(), $eventId);

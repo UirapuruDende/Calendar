@@ -30,8 +30,6 @@ final class SingleTest extends PHPUnit_Framework_TestCase
      */
     public function it_updates_event()
     {
-        $this->markTestSkipped();
-
         $base = Carbon::instance(new DateTime('last monday 12:00'));
 
         $event = new Event(
@@ -47,7 +45,7 @@ final class SingleTest extends PHPUnit_Framework_TestCase
         /** @var Occurrence $occurrence */
         $occurrence = $event->occurrences()->get(2);
 
-        $command = new UpdateCommand();
+        $command = new Single();
 
         $occurrenceRepository = new InMemoryOccurrenceRepository();
         $occurrenceRepository->insert($occurrence);

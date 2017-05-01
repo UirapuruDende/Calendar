@@ -306,7 +306,7 @@ class EventTest extends PHPUnit_Framework_TestCase
     public function test_no_repetitions_with_weekly_in_constructor()
     {
         new Event(
-            null,
+            EventId::create(),
             Calendar::create('test'),
             EventType::weekly(),
             new DateTime('2015-09-01 12:00:00'),
