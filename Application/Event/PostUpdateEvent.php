@@ -6,7 +6,7 @@ use Symfony\Component\EventDispatcher\Event;
 
 class PostUpdateEvent extends Event
 {
-    /** @var  CalendarEvent */
+    /** @var CalendarEvent */
     private $event;
 
     /** @var string */
@@ -17,15 +17,16 @@ class PostUpdateEvent extends Event
 
     /**
      * EventPostUpdate constructor.
+     *
      * @param CalendarEvent $event
-     * @param string $occurrenceId
-     * @param string $method
+     * @param string        $occurrenceId
+     * @param string        $method
      */
     public function __construct(CalendarEvent $event, string $occurrenceId, string $method)
     {
-        $this->event = $event;
+        $this->event        = $event;
         $this->occurrenceId = $occurrenceId;
-        $this->method = $method;
+        $this->method       = $method;
     }
 
     /**

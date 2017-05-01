@@ -1,7 +1,6 @@
 <?php
 namespace Dende\Calendar\Tests\Application\Handler;
 
-
 use Carbon\Carbon;
 use DateTime;
 use Dende\Calendar\Application\Command\UpdateEventCommand;
@@ -14,10 +13,10 @@ use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\OccurrenceInterface;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryEventRepository;
-use Prophecy\Prophecy\ObjectProphecy;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use PHPUnit_Framework_TestCase;
 use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class UpdateEventHandlerTest extends PHPUnit_Framework_TestCase
 {

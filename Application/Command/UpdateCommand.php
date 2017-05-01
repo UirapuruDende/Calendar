@@ -2,7 +2,7 @@
 namespace Dende\Calendar\Application\Command;
 
 use DateTime;
-use Dende\Calendar\Application\Handler\UpdateManager;
+use Dende\Calendar\Application\Handler\OccurrenceUpdateManager;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 
 /**
@@ -22,7 +22,7 @@ final class UpdateCommand implements EventCommandInterface, UpdateEventCommandIn
      *
      * @var string
      */
-    public $method = UpdateManager::MODE_SINGLE;
+    public $method = OccurrenceUpdateManager::MODE_SINGLE;
 
     /**
      * @var DateTime
@@ -42,11 +42,11 @@ final class UpdateCommand implements EventCommandInterface, UpdateEventCommandIn
     /**
      * UpdateEventCommand constructor.
      *
-     * @param string   $occurrenceId
-     * @param string   $method
-     * @param DateTime $startDate
-     * @param DateTime $endDate
-     * @param Repetitions    $repetitions
+     * @param string      $occurrenceId
+     * @param string      $method
+     * @param DateTime    $startDate
+     * @param DateTime    $endDate
+     * @param Repetitions $repetitions
      */
     public function __construct(string $occurrenceId, string $method, DateTime $startDate, DateTime $endDate, Repetitions $repetitions)
     {

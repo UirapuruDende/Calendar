@@ -26,7 +26,7 @@ final class UpdateManagerTest extends PHPUnit_Framework_TestCase
     {
         $this->markTestSkipped();
     }
-    
+
     public function testHandleUpdateCommand()
     {
         $event      = new Event(EventId::create(), Calendar::create('test'), EventType::single(), new DateTime('12:00'), new DateTime('13:00'), 'some Title', new Repetitions());

@@ -2,7 +2,6 @@
 namespace Dende\Calendar\Application\Command;
 
 use DateTime;
-use Dende\Calendar\Application\Handler\UpdateManager;
 
 /**
  * Class CreateEventCommand.
@@ -23,7 +22,7 @@ final class UpdateEventCommand
      * @var string
      */
     public $method;
-    
+
     /**
      * @var DateTime
      */
@@ -47,22 +46,22 @@ final class UpdateEventCommand
     /**
      * UpdateEventCommand constructor.
      *
-     * @param string $eventId
+     * @param string   $eventId
      * @param DateTime $startDate
      * @param DateTime $endDate
-     * @param string $title
-     * @param array $repetitions
-     * @param string $method
-     * @param string $occurrenceId
+     * @param string   $title
+     * @param array    $repetitions
+     * @param string   $method
+     * @param string   $occurrenceId
      */
     public function __construct(string $eventId, DateTime $startDate, DateTime $endDate, string $title, array $repetitions, string $method, string $occurrenceId)
     {
-        $this->eventId = $eventId;
+        $this->eventId      = $eventId;
         $this->startDate    = $startDate;
         $this->endDate      = $endDate;
         $this->title        = $title;
         $this->repetitions  = $repetitions;
-        $this->method = $method;
+        $this->method       = $method;
         $this->occurrenceId = $occurrenceId;
     }
 }

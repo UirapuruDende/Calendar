@@ -1,5 +1,5 @@
 <?php
-namespace Dende\Calendar\Application\Handler\UpdateStrategy;
+namespace Dende\Calendar\Application\Service\UpdateStrategy;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 

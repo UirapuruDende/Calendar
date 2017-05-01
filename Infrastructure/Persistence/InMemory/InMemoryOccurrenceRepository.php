@@ -127,9 +127,9 @@ final class InMemoryOccurrenceRepository implements OccurrenceRepositoryInterfac
     /**
      * @param string $id
      *
-     * @return Occurrence|null
+     * @return OccurrenceInterface
      */
-    public function findOneById(string $id)
+    public function findOneById(string $id) : OccurrenceInterface
     {
         return $this->occurrences->get($id);
     }

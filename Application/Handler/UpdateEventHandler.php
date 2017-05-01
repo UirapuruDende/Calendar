@@ -12,14 +12,15 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class UpdateEventHandler
 {
-    /** @var  EventRepositoryInterface */
+    /** @var EventRepositoryInterface */
     private $eventRepository;
 
-    /** @var  EventDispatcherInterface */
+    /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
     /**
      * UpdateEventHandler constructor.
+     *
      * @param EventRepositoryInterface $eventRepository
      */
     public function __construct(EventRepositoryInterface $eventRepository, EventDispatcherInterface $eventDispatcher)

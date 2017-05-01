@@ -28,5 +28,5 @@ interface OccurrenceRepositoryInterface
 
     public function removeAllForEvent(Event $event);
 
-    public function findOneById(string $id);
+    public function findOneById(string $id) : OccurrenceInterface;
 }

@@ -3,11 +3,8 @@ namespace Dende\Calendar\Tests\Application\Handler;
 
 use Carbon\Carbon;
 use DateTime;
-use Dende\Calendar\Application\Command\UpdateCommand;
 use Dende\Calendar\Application\Command\UpdateOccurrenceCommand;
-use Dende\Calendar\Application\Handler\UpdateManager;
 use Dende\Calendar\Application\Handler\UpdateOccurrenceHandler;
-use Dende\Calendar\Application\Handler\UpdateStrategy\UpdateStrategyInterface;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\EventId;

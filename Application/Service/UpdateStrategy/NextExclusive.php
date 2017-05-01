@@ -1,5 +1,5 @@
 <?php
-namespace Dende\Calendar\Application\Handler\UpdateStrategy;
+namespace Dende\Calendar\Application\Service\UpdateStrategy;
 
 use Dende\Calendar\Application\Command\UpdateCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommandInterface;

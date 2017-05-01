@@ -30,6 +30,7 @@ interface EventRepositoryInterface
 
     /**
      * @param string $id
+     *
      * @return Event|null
      */
     public function findOneById(string $id);
