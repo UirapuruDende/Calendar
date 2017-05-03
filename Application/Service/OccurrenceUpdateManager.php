@@ -1,8 +1,8 @@
 <?php
 namespace Dende\Calendar\Application\Service;
 
+use DateTime;
 use Dende\Calendar\Application\Command\UpdateOccurrenceCommand;
-use Dende\Calendar\Application\Command\UpdateEventCommandInterface;
 use Dende\Calendar\Application\Event\PostUpdateEvent;
 use Dende\Calendar\Application\Repository\EventRepositoryInterface;
 use Dende\Calendar\Application\Repository\OccurrenceRepositoryInterface;
@@ -88,6 +88,15 @@ final class OccurrenceUpdateManager
             $event->startDate(),
             $event->endDate(),
             $event->repetitions()
+        ));
+    }
+
+    public function updateOccurrence(string $occurrenceId, DateTime $startDate, DateTime $endDate)
+    {
+        $this->strategy["single"]->update(new UpdateOccurrenceCommand(
+           $occurrenceId,
+           $startDate,
+           $endDate
         ));
     }
 }

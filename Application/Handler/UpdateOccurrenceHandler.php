@@ -21,6 +21,6 @@ class UpdateOccurrenceHandler
 
     public function handle(UpdateOccurrenceCommand $command)
     {
-        die(var_dump($command));
+        $this->manager->updateOccurrence($command->occurrenceId, $command->startDate, $command->endDate);
     }
 }
