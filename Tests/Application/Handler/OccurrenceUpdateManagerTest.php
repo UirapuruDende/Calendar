@@ -3,8 +3,8 @@ namespace Dende\Calendar\Tests\Application\Handler;
 
 use DateTime;
 use Dende\Calendar\Application\Command\UpdateOccurrenceCommand;
-use Dende\Calendar\Application\Handler\UpdateManager;
-use Dende\Calendar\Application\Handler\UpdateStrategy\UpdateStrategyInterface;
+use Dende\Calendar\Application\Handler\OccurrenceUpdateManager;
+use Dende\Calendar\Application\Service\UpdateStrategy\UpdateStrategyInterface;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\EventId;
@@ -20,11 +20,11 @@ use PHPUnit_Framework_TestCase;
 /**
  * Class EventTest.
  */
-final class UpdateManagerTest extends PHPUnit_Framework_TestCase
+final class OccurrenceUpdateManagerTest extends PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
-        $this->markTestSkipped();
+//        $this->markTestSkipped();
     }
 
     public function testHandleUpdateCommand()
@@ -34,7 +34,7 @@ final class UpdateManagerTest extends PHPUnit_Framework_TestCase
 
         $command = UpdateOccurrenceCommand::fromArray([
              'occurrenceId' => $occurrence->id()->__toString(),
-             'method'       => UpdateManager::MODE_SINGLE,
+             'method'       => OccurrenceUpdateManager::MODE_SINGLE,
             'startDate'     => new DateTime('12:00'),
             'endDate'       => new DateTime('14:00'),
             'title'         => $event->title(),
@@ -49,8 +49,8 @@ final class UpdateManagerTest extends PHPUnit_Framework_TestCase
         $strategyMock->setEventRepository($eventRepository)->shouldBeCalled()->willReturn(null);
         $strategyMock->setOccurrenceRepository($occurrenceRepository)->shouldBeCalled()->willReturn(null);
 
-        $handler = new UpdateManager($eventRepository, $occurrenceRepository);
-        $handler->addStrategy(UpdateManager::MODE_SINGLE, $strategyMock->reveal());
+        $handler = new OccurrenceUpdateManager($eventRepository, $occurrenceRepository);
+        $handler->addStrategy(OccurrenceUpdateManager::MODE_SINGLE, $strategyMock->reveal());
 
         $handler->handle($command);
     }
@@ -62,16 +62,17 @@ final class UpdateManagerTest extends PHPUnit_Framework_TestCase
      */
     public function testStrategyNotSetException()
     {
+        $this->markTestSkipped();
         $command = new UpdateOccurrenceCommand(
             '',
-            UpdateManager::MODE_SINGLE,
+            OccurrenceUpdateManager::MODE_SINGLE,
             new DateTime('12:00'),
             new DateTime('13:00'),
             '',
             []
         );
 
-        $handler = new UpdateManager(new InMemoryEventRepository(), new InMemoryOccurrenceRepository());
+        $handler = new OccurrenceUpdateManager(new InMemoryEventRepository(), new InMemoryOccurrenceRepository());
 
         $handler->handle($command);
     }

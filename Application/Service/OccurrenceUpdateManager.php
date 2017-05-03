@@ -1,5 +1,5 @@
 <?php
-namespace Dende\Calendar\Application\Handler;
+namespace Dende\Calendar\Application\Service;
 
 use Dende\Calendar\Application\Command\UpdateOccurrenceCommand;
 use Dende\Calendar\Application\Command\UpdateEventCommandInterface;
@@ -70,31 +70,21 @@ final class OccurrenceUpdateManager
         $this->strategy[$name] = $strategy;
     }
 
-    /**
-     * @param UpdateEventCommandInterface $command
-     *
-     * @throws Exception
-     */
-    public function handle(UpdateOccurrenceCommand $command)
+    public function postEventUpdate(PostUpdateEvent $updateEvent)
     {
-        if (!array_key_exists($command->method(), $this->strategy)) {
+
+        if (!array_key_exists($updateEvent->getMethod(), $this->strategy)) {
             throw new Exception(sprintf(
                 "Mode '%s' not allowed. Only %s allowed.",
-                $command->method(),
+                $updateEvent->getMethod(),
                 implode(', ', array_keys($this->strategy))
             ));
         }
 
-        $this->strategy[$command->method()]->update($command);
-    }
-
-    public function postEventUpdate(PostUpdateEvent $updateEvent)
-    {
         $event = $updateEvent->getEvent();
 
-        $this->handle(new UpdateOccurrenceCommand(
+        $this->strategy[$updateEvent->getMethod()]->update(new UpdateOccurrenceCommand(
             $updateEvent->getOccurrenceId(),
-            $updateEvent->getMethod(),
             $event->startDate(),
             $event->endDate(),
             $event->repetitions()

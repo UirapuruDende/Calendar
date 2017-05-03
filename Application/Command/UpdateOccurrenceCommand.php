@@ -2,13 +2,12 @@
 namespace Dende\Calendar\Application\Command;
 
 use DateTime;
-use Dende\Calendar\Application\Handler\OccurrenceUpdateManager;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 
 /**
  * Class CreateEventCommand.
  */
-final class UpdateOccurrenceCommand implements EventCommandInterface, UpdateEventCommandInterface
+final class UpdateOccurrenceCommand
 {
     /**
      * Occurrence that was clicked to edit relating event.
@@ -16,13 +15,6 @@ final class UpdateOccurrenceCommand implements EventCommandInterface, UpdateEven
      * @var string
      */
     public $occurrenceId;
-
-    /**
-     * Update Strategy Method.
-     *
-     * @var string
-     */
-    public $method = OccurrenceUpdateManager::MODE_SINGLE;
 
     /**
      * @var DateTime
@@ -46,12 +38,11 @@ final class UpdateOccurrenceCommand implements EventCommandInterface, UpdateEven
      * @param string      $method
      * @param DateTime    $startDate
      * @param DateTime    $endDate
-     * @param Repetitions $repetitions
+     * @param array $repetitions
      */
-    public function __construct(string $occurrenceId, string $method, DateTime $startDate, DateTime $endDate, Repetitions $repetitions)
+    public function __construct(string $occurrenceId, DateTime $startDate, DateTime $endDate, array $repetitions = [])
     {
         $this->occurrenceId = $occurrenceId;
-        $this->method       = $method;
         $this->startDate    = $startDate;
         $this->endDate      = $endDate;
         $this->repetitions  = $repetitions;
@@ -61,17 +52,11 @@ final class UpdateOccurrenceCommand implements EventCommandInterface, UpdateEven
     {
         return new self(
             $array['occurrenceId'],
-            $array['method'],
             $array['startDate'],
             $array['endDate'],
             $array['title'],
             $array['repetitions']
         );
-    }
-
-    public function method(): string
-    {
-        return $this->method;
     }
 
     public function occurrenceId() : string
