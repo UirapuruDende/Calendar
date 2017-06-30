@@ -7,6 +7,7 @@ use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceData;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
+use Dende\Calendar\Domain\Calendar\EventInterface;
 use Dende\Calendar\Domain\IdInterface;
 use Exception;
 
@@ -52,7 +53,7 @@ class Occurrence implements OccurrenceInterface
      *
      * @throws Exception
      */
-    public function __construct(IdInterface $occurrenceId = null, Event $event, DateTime $startDate = null, OccurrenceDuration $duration = null)
+    public function __construct(IdInterface $occurrenceId = null, EventInterface $event, DateTime $startDate = null, OccurrenceDuration $duration = null)
     {
         $this->occurrenceId = $occurrenceId ?: OccurrenceId::create();
         $this->event        = $event;
