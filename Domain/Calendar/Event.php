@@ -23,7 +23,7 @@ use Exception;
 /**
  * Class Event.
  */
-class Event
+class Event implements EventInterface
 {
     use SoftDeleteable;
 
