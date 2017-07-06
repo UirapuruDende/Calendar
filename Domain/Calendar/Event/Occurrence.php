@@ -17,7 +17,6 @@ class Occurrence implements OccurrenceInterface
 {
     /**
      * Doctrine id.
-     *
      * @var int
      */
     protected $id;

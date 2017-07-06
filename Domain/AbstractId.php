@@ -16,7 +16,7 @@ class AbstractId implements IdInterface
 
     public static function create(UuidInterface $id = null): IdInterface
     {
-        return $id ? new self($id) : new self(Uuid::uuid4());
+        return $id ? new static($id) : new static(Uuid::uuid4());
     }
 
     public function id(): string

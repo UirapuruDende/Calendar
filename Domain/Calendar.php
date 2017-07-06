@@ -6,6 +6,7 @@ use Dende\Calendar\Application\Factory\EventFactory;
 use Dende\Calendar\Application\Factory\EventFactoryInterface;
 use Dende\Calendar\Domain\Calendar\CalendarId;
 use Dende\Calendar\Domain\Calendar\Event;
+use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -50,7 +51,7 @@ class Calendar
      * @param string               $title
      * @param ArrayCollection|null $events
      */
-    public function __construct(IdInterface $calendarId = null, string $title = '', ArrayCollection $events = null)
+    public function __construct(CalendarId $calendarId = null, string $title = '', Collection $events = null)
     {
         $this->calendarId = $calendarId ?: CalendarId::create();
         $this->title      = $title;
@@ -59,10 +60,10 @@ class Calendar
 
     public static function create(string $title = '') : Calendar
     {
-        return new self(CalendarId::create(), $title);
+        return new static(CalendarId::create(), $title);
     }
 
-    public function addEvent(IdInterface $eventId, string $title, DateTime $startDate, DateTime $endDate, EventType $type, Repetitions $repetitions = null, ArrayCollection $occurrences = null)
+    public function addEvent(EventId $eventId, string $title, DateTime $startDate, DateTime $endDate, EventType $type, Repetitions $repetitions = null, Collection $occurrences = null)
     {
         /** @var EventFactoryInterface $factory */
         $factory = new self::$eventFactoryClass();
@@ -82,14 +83,14 @@ class Calendar
     }
 
     /**
-     * @return ArrayCollection|Event[]
+     * @return Collection|Event[]
      */
     public function events() : Collection
     {
         return $this->events;
     }
 
-    public function id() : IdInterface
+    public function id() : CalendarId
     {
         return $this->calendarId;
     }
@@ -99,7 +100,7 @@ class Calendar
         return $this->title;
     }
 
-    public function getEventById(IdInterface $eventId) : Event
+    public function getEventById(EventId $eventId) : Event
     {
         $result = $this->events()->filter(function (Event $event) use ($eventId) {
             return $event->id()->equals($eventId);
