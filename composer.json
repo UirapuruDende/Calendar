@@ -18,15 +18,11 @@
         }
     },
     "require-dev": {
-        "phpunit/phpunit": "^5",
-        "behat/behat": "^3.0",
+        "phpunit/phpunit": "^6",
         "friendsofphp/php-cs-fixer": "^1.12",
         "phpmd/phpmd": "^2.6"
     },
     "scripts": {
-        "humbug" : [
-            "./bin/humbug"
-        ],
         "phpunit" : [
             "./bin/phpunit"
         ],
