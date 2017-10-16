@@ -1,7 +1,9 @@
 <?php
 namespace Dende\Calendar\Domain;
 
-interface IdInterface
+use Ramsey\Uuid\UuidInterface;
+
+interface IdInterface extends UuidInterface
 {
     public static function create() : IdInterface;
 
@@ -9,5 +11,5 @@ interface IdInterface
 
     public function __toString() : string;
 
-    public function equals(IdInterface $id) : bool;
+    public function equals($id) : bool;
 }

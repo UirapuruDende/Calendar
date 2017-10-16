@@ -9,6 +9,7 @@ use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 use Dende\Calendar\Domain\Calendar\EventInterface;
 use Dende\Calendar\Domain\IdInterface;
+use Ramsey\Uuid\UuidInterface;
 use Exception;
 
 /**
@@ -17,15 +18,9 @@ use Exception;
 class Occurrence implements OccurrenceInterface
 {
     /**
-     * Doctrine id.
-     * @var int
-     */
-    protected $id;
-
-    /**
      * @var OccurrenceId
      */
-    protected $occurrenceId;
+    protected $id;
 
     /**
      * @var OccurrenceData
@@ -143,9 +138,9 @@ class Occurrence implements OccurrenceInterface
         return $this->occurrenceData->endDate();
     }
 
-    public function id() : IdInterface
+    public function id() : UuidInterface
     {
-        return $this->occurrenceId;
+        return $this->id;
     }
 
     protected function setAsModified()
