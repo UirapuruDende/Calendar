@@ -3,7 +3,7 @@ namespace Dende\Calendar\Domain;
 
 use Ramsey\Uuid\UuidInterface;
 
-interface IdInterface extends UuidInterface
+interface IdInterface
 {
     public static function create() : IdInterface;
 

@@ -29,7 +29,7 @@ class AbstractId implements IdInterface
         return (string) $this->id;
     }
 
-    public function equals(IdInterface $id): bool
+    public function equals($id): bool
     {
         return $id->__toString() === $this->__toString();
     }
