@@ -5,6 +5,7 @@ use DateTime;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceData;
 use Dende\Calendar\Domain\IdInterface;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * Interface OccurrenceInterface.
@@ -32,7 +33,7 @@ interface OccurrenceInterface
 
     public function endDate() : DateTime;
 
-    public function id() : IdInterface;
+    public function id() : UuidInterface;
 
     public function event() : Event;
 
