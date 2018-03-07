@@ -3,22 +3,30 @@ namespace Dende\Calendar\Application\Command;
 
 use Dende\Calendar\Domain\Calendar\CalendarId;
 use Dende\Calendar\Domain\IdInterface;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 final class CreateCalendarCommand
 {
-    /**
-     * @var IdInterface
-     */
-    public $calendarId;
+    /** @var UuidInterface */
+    protected $id;
 
-    /**
-     * @var string
-     */
-    public $title = '';
+    /** @var string */
+    protected $title;
 
-    public function __construct(IdInterface $calendarId = null, string $title = '')
+    public function __construct(?UuidInterface $id = null, string $title = '')
     {
-        $this->calendarId = $calendarId ?: CalendarId::create();
+        $this->id = $id ?? Uuid::uuid4();
         $this->title      = $title;
+    }
+
+    public function id(): UuidInterface
+    {
+        return $this->id;
+    }
+
+    public function title(): string
+    {
+        return $this->title;
     }
 }

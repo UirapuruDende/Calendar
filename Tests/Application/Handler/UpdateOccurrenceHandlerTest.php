@@ -7,21 +7,16 @@ use Dende\Calendar\Application\Command\UpdateOccurrenceCommand;
 use Dende\Calendar\Application\Handler\UpdateOccurrenceHandler;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
-use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
-use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryEventRepository;
 use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryOccurrenceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-/**
- * Class EventTest.
- */
-final class UpdateOccurrenceHandlerTest extends PHPUnit_Framework_TestCase
+final class UpdateOccurrenceHandlerTest extends TestCase
 {
     public function setUp()
     {
@@ -54,7 +49,7 @@ final class UpdateOccurrenceHandlerTest extends PHPUnit_Framework_TestCase
 
         $collection->add($occurrence);
 
-        $command = new UpdateOccurrenceCommand($occurrence->id()->__toString(), new DateTime('12:00'), new DateTime('14:00'));
+        $command = new UpdateOccurrenceCommand($occurrence->id()->toString(), new DateTime('12:00'), new DateTime('14:00'));
 
         $eventRepository = new InMemoryEventRepository();
         $eventRepository->insert($event);
@@ -97,7 +92,7 @@ final class UpdateOccurrenceHandlerTest extends PHPUnit_Framework_TestCase
         $occurrence = $event->occurrences()->get(2);
 
         $command = new UpdateOccurrenceCommand(
-            $occurrence->id()->__toString(),
+            $occurrence->id()->toString(),
             $base->copy()->addDays(2)->addHours(2),
             $base->copy()->addDays(2)->addHours(5)
         );

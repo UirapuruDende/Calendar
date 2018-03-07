@@ -1,29 +1,33 @@
 <?php
 namespace Dende\Calendar\Application\Command;
 
-use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
+use Ramsey\Uuid\UuidInterface;
 
-/**
- * Class RemoveEventCommand.
- */
 final class RemoveEventCommand implements EventCommandInterface, UpdateEventCommandInterface
 {
     /**
-     * Occurrence that was clicked to edit relating event.
-     *
-     * @var OccurrenceId
+     * @var UuidInterface
      */
-    public $occurrenceId;
+    protected $occurrenceId;
 
     /**
-     * Update Strategy Method.
-     *
      * @var string
      */
-    public $method;
+    protected $method;
+
+    public function __construct(UuidInterface $occurrenceId, string $method)
+    {
+        $this->occurrenceId = $occurrenceId;
+        $this->method = $method;
+    }
 
     public function method(): string
     {
         return $this->method;
+    }
+
+    public function occurrenceId(): UuidInterface
+    {
+        return $this->occurrenceId;
     }
 }

@@ -1,13 +1,10 @@
 <?php
 namespace Tests\Unit\Domain\Calendar\Event\EventTypeTest;
 
-use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
+use PHPUnit\Framework\TestCase;
 
-/**
- * Class EventTest.
- */
-class EventTypeTest extends \PHPUnit_Framework_TestCase
+class EventTypeTest extends TestCase
 {
     /**
      * @expectedException \Exception

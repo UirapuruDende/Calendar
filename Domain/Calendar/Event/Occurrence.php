@@ -9,6 +9,7 @@ use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 use Dende\Calendar\Domain\Calendar\EventInterface;
 use Dende\Calendar\Domain\IdInterface;
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use Exception;
 
@@ -18,7 +19,7 @@ use Exception;
 class Occurrence implements OccurrenceInterface
 {
     /**
-     * @var OccurrenceId
+     * @var UuidInterface
      */
     protected $id;
 
@@ -37,24 +38,10 @@ class Occurrence implements OccurrenceInterface
      */
     protected $event;
 
-    /**
-     * Occurrence constructor.
-     *
-     * @param OccurrenceId|IdInterface $occurrenceId
-     * @param Event                    $event
-     * @param DateTime                 $startDate
-     * @param OccurrenceDuration       $duration
-     *
-     * @throws Exception
-     */
-    public function __construct(IdInterface $occurrenceId = null, EventInterface $event, DateTime $startDate = null, OccurrenceDuration $duration = null)
+    public function __construct(UuidInterface $id = null, EventInterface $event, DateTime $startDate = null, ?OccurrenceDuration $duration = null)
     {
-        $this->occurrenceId = $occurrenceId ?: OccurrenceId::create();
+        $this->id = $id ?? Uuid::uuid4();
         $this->event        = $event;
-
-        if (null === $this->event) {
-            throw new Exception('Event has to be set!');
-        }
 
         if (null === $startDate) {
             $this->occurrenceData = OccurrenceData::createFromEvent($event);
@@ -63,6 +50,11 @@ class Occurrence implements OccurrenceInterface
         } else {
             $this->occurrenceData = new OccurrenceData($startDate, $duration);
         }
+    }
+
+    public static function create(UuidInterface $id = null, DateTime $startDate, Event $event) : self
+    {
+        return new self($id, $event, $startDate);
     }
 
     public function update(OccurrenceData $data)

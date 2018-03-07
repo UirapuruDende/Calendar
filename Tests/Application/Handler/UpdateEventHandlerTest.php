@@ -8,17 +8,17 @@ use Dende\Calendar\Application\Events;
 use Dende\Calendar\Application\Handler\UpdateEventHandler;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
-use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\OccurrenceInterface;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryEventRepository;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class UpdateEventHandlerTest extends PHPUnit_Framework_TestCase
+class UpdateEventHandlerTest extends TestCase
 {
     /**
      * @test
@@ -27,7 +27,7 @@ class UpdateEventHandlerTest extends PHPUnit_Framework_TestCase
     {
         $base = Carbon::instance(new DateTime('last monday 12:00'));
 
-        $eventId = EventId::create();
+        $eventId = Uuid::uuid4();
 
         $event = new Event(
             $eventId,
@@ -46,13 +46,13 @@ class UpdateEventHandlerTest extends PHPUnit_Framework_TestCase
         $occurrence = $event->occurrences()->get(2);
 
         $command = new UpdateEventCommand(
-            $eventId->__toString(),
+            $eventId,
+            $occurrence->id(),
+            'single',
             $base->copy()->addDays(1),
             $base->copy()->addDays(5)->addHours(3),
             'new title',
-            Repetitions::weekendDays()->getArray(),
-            $occurrence->id()->__toString(),
-            'single'
+            Repetitions::weekendDays()->getArray()
         );
 
         /** @var ObjectProphecy $dispatcherMock */

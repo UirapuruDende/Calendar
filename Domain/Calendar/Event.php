@@ -5,20 +5,19 @@ use Carbon\Carbon;
 use DateInterval;
 use DatePeriod;
 use DateTime;
-use Dende\Calendar\Application\Factory\OccurrenceFactory;
-use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
 use Dende\Calendar\Domain\Calendar\Event\EventData;
-use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
+use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Calendar\Event\OccurrenceInterface;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
-use Dende\Calendar\Domain\IdInterface;
 use Dende\Calendar\Domain\SoftDeleteable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Exception;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * Class Event.
@@ -29,19 +28,8 @@ class Event implements EventInterface
 
     const DUMP_FORMAT = 'd.m H.i';
 
-    protected static $occurrenceFactoryClass = OccurrenceFactory::class;
-
-    /**
-     * Id for Doctrine.
-     *
-     * @var int
-     */
+    /** @var UuidInterface */
     protected $id;
-
-    /**
-     * @var EventId
-     */
-    protected $eventId;
 
     /**
      * @var Calendar
@@ -68,23 +56,7 @@ class Event implements EventInterface
      */
     protected $eventData;
 
-    /**
-     * Event constructor.
-     *
-     * @param EventId|IdInterface                   $eventId
-     * @param Calendar                              $calendar
-     * @param EventType                             $type
-     * @param DateTime                              $startDate
-     * @param DateTime                              $endDate
-     * @param string                                $title
-     * @param Repetitions                           $repetitions
-     * @param ArrayCollection|OccurrenceInterface[] $occurrences
-     *
-     * @throws Exception
-     *
-     * @internal param string $id
-     */
-    public function __construct(IdInterface $eventId, Calendar $calendar, EventType $type, DateTime $startDate, DateTime $endDate, string $title, Repetitions $repetitions = null, ArrayCollection $occurrences = null)
+    public function __construct(UuidInterface $eventId, Calendar $calendar, EventType $type, DateTime $startDate, DateTime $endDate, string $title, Repetitions $repetitions = null, ArrayCollection $occurrences = null)
     {
         if (Carbon::instance($startDate)->gte(Carbon::instance($endDate))) {
             throw new Exception(sprintf(
@@ -109,7 +81,7 @@ class Event implements EventInterface
         }
 
         $this->duration    = $duration;
-        $this->eventId     = $eventId ?: EventId::create();
+        $this->id     = $eventId ?? Uuid::uuid4();
         $this->calendar    = $calendar;
         $this->type        = $type;
         $this->eventData   = new EventData($startDate, $endDate, $title, $repetitions ?: new Repetitions());
@@ -121,9 +93,9 @@ class Event implements EventInterface
         }
     }
 
-    public static function getOccurrenceFactory() : OccurrenceFactoryInterface
+    public static function create(UuidInterface $eventId, string $title, DateTime $startDate, DateTime $endDate, EventType $type, Repetitions $repetitions, Calendar $calendar, ?Collection $occurrences = null) : self
     {
-        return new self::$occurrenceFactoryClass();
+        return new self($eventId, $calendar, $type,$startDate, $endDate,  $title, $repetitions,  $occurrences);
     }
 
     /**
@@ -134,33 +106,21 @@ class Event implements EventInterface
         return $this->occurrences;
     }
 
-    /**
-     * @return string
-     */
     public function title() : string
     {
         return $this->eventData->title();
     }
 
-    /**
-     * @return EventType
-     */
     public function type() : EventType
     {
         return $this->type;
     }
 
-    /**
-     * @return Repetitions
-     */
     public function repetitions() : Repetitions
     {
         return $this->eventData->repetitions();
     }
 
-    /**
-     * @return Duration
-     */
     public function duration() : Duration
     {
         if (null === $this->duration) {
@@ -170,26 +130,17 @@ class Event implements EventInterface
         return $this->duration;
     }
 
-    /**
-     * @return DateTime
-     */
     public function startDate() : DateTime
     {
         return $this->eventData->startDate();
     }
 
-    /**
-     * @return DateTime
-     */
     public function endDate() : DateTime
     {
         return $this->eventData->endDate();
     }
 
-    /**
-     * @param DateTime $startDate
-     */
-    public function move(DateTime $startDate)
+    public function move(DateTime $startDate) : void
     {
         throw new Exception('Implement me');
     }
@@ -204,9 +155,6 @@ class Event implements EventInterface
         return $this->type()->isWeekly();
     }
 
-    /**
-     * @param DateTime $date
-     */
     public function closeAtDate(DateTime $date)
     {
         $this->resize(null, $date, null);
@@ -225,16 +173,10 @@ class Event implements EventInterface
 
     protected function regenerateOccurrences(DateTime $pivotDate = null)
     {
-        /** @var OccurrenceFactoryInterface $factory */
-        $factory = new self::$occurrenceFactoryClass();
-
         if ($this->isSingle()) {
             $this->occurrences->clear();
 
-            $this->occurrences->add($factory->createFromArray([
-              'startDate' => $this->eventData->startDate(),
-              'event'     => $this,
-            ]));
+            $this->occurrences->add(Occurrence::create(null, $this->eventData->startDate(), $this));
 
             return;
         }
@@ -279,10 +221,7 @@ class Event implements EventInterface
                 continue;
             }
 
-            $tmpCollection->add($factory->createFromArray([
-              'startDate' => $date,
-              'event'     => $this,
-          ]));
+            $tmpCollection->add(Occurrence::create(null,  $date, $this));
         }
 
         /** @var OccurrenceInterface[]|ArrayCollection $paddedCollection */
@@ -304,7 +243,7 @@ class Event implements EventInterface
         }
     }
 
-    public function getOccurrenceById(IdInterface $occurrenceId) : OccurrenceInterface
+    public function getOccurrenceById(UuidInterface $occurrenceId) : OccurrenceInterface
     {
         $result = $this->occurrences()->filter(function (OccurrenceInterface $occurrence) use ($occurrenceId) {
             return $occurrence->id()->equals($occurrenceId);
@@ -313,9 +252,9 @@ class Event implements EventInterface
         return $result->first();
     }
 
-    public function id() : IdInterface
+    public function id() : UuidInterface
     {
-        return $this->eventId;
+        return $this->id;
     }
 
     public function calendar() : Calendar

@@ -3,9 +3,9 @@ namespace Tests\Unit\Domain\Calendar\Event;
 
 use DateTime;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class DurationTest extends PHPUnit_Framework_TestCase
+class DurationTest extends TestCase
 {
     /**
      * @test

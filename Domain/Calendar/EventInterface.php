@@ -2,25 +2,17 @@
 namespace Dende\Calendar\Domain\Calendar;
 
 use DateTime;
-use Dende\Calendar\Application\Factory\OccurrenceFactory;
 use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
-use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event\Duration;
 use Dende\Calendar\Domain\Calendar\Event\EventData;
-use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\OccurrenceInterface;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
-use Dende\Calendar\Domain\IdInterface;
-use Dende\Calendar\Domain\SoftDeleteable;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Ramsey\Uuid\UuidInterface;
 
 interface EventInterface
 {
-
-    public static function getOccurrenceFactory() : OccurrenceFactoryInterface;
-
     public function occurrences() : Collection ;
 
     public function title() : string;
@@ -45,9 +37,9 @@ interface EventInterface
 
     public function resize(DateTime $newStartDate = null, DateTime $newEndDate = null, Repetitions $repetitions = null, OccurrenceInterface $occurrence = null);
 
-    public function getOccurrenceById(IdInterface $occurrenceId) : OccurrenceInterface;
+    public function getOccurrenceById(UuidInterface $occurrenceId) : OccurrenceInterface;
 
-    public function id();
+    public function id() : UuidInterface;
 
     public function calendar();
 

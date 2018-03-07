@@ -1,12 +1,22 @@
 <?php
 namespace Dende\Calendar\Application\Command;
 
-use Dende\Calendar\Domain\Calendar\CalendarId;
+use Ramsey\Uuid\UuidInterface;
 
 final class RemoveCalendarCommand
 {
     /**
-     * @var CalendarId
+     * @var UuidInterface
      */
     public $calendarId;
+
+    public function __construct(UuidInterface $calendarId)
+    {
+        $this->calendarId = $calendarId;
+    }
+
+    public function calendarId(): UuidInterface
+    {
+        return $this->calendarId;
+    }
 }

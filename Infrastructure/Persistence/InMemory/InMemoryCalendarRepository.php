@@ -5,9 +5,6 @@ use Dende\Calendar\Application\Repository\CalendarRepositoryInterface;
 use Dende\Calendar\Domain\Calendar;
 use Doctrine\Common\Collections\ArrayCollection;
 
-/**
- * Class InMemoryCalendarRepository.
- */
 class InMemoryCalendarRepository implements CalendarRepositoryInterface
 {
     /**

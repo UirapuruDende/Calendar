@@ -6,16 +6,15 @@ use DateTime;
 use Dende\Calendar\Application\Command\CreateEventCommand;
 use Dende\Calendar\Application\Handler\CreateEventHandler;
 use Dende\Calendar\Domain\Calendar;
-use Dende\Calendar\Domain\Calendar\CalendarId;
 use Dende\Calendar\Domain\Calendar\Event;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryCalendarRepository;
 use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryEventRepository;
 use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryOccurrenceRepository;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class CreateEventHandlerTest extends PHPUnit_Framework_TestCase
+class CreateEventHandlerTest extends TestCase
 {
     /**
      * @test
@@ -26,7 +25,7 @@ class CreateEventHandlerTest extends PHPUnit_Framework_TestCase
         $calendar = Calendar::create('test');
 
         $command = CreateEventCommand::fromArray([
-            'calendarId'  => $calendar->id()->__toString(),
+            'calendarId'  => $calendar->id(),
             'startDate'   => $base,
             'endDate'     => $base->copy()->addDays(1)->addHours(2),
             'type'        => EventType::TYPE_SINGLE,
@@ -60,13 +59,11 @@ class CreateEventHandlerTest extends PHPUnit_Framework_TestCase
     {
         $calendar = Calendar::create('test');
 
-        $calendarId = $calendar->id()->__toString();
-
         $startDate = new DateTime('last monday');
         $endDate   = (clone $startDate)->modify('+6 days +3 hours');
 
         $command = CreateEventCommand::fromArray([
-            'calendarId'  => $calendarId,
+            'calendarId'  => $calendar->id(),
             'startDate'   => $startDate,
             'endDate'     => $endDate,
             'type'        => EventType::TYPE_WEEKLY,

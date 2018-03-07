@@ -8,25 +8,22 @@ use Dende\Calendar\Application\Handler\CreateCalendarHandler;
 use Dende\Calendar\Domain\AbstractId;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Infrastructure\Persistence\InMemory\InMemoryCalendarRepository;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-final class CreateCalendarHandlerTest extends PHPUnit_Framework_TestCase
+final class CreateCalendarHandlerTest extends TestCase
 {
     public function testHandleCreateCommand()
     {
-        $command = new CreateCalendarCommand();
-
-        $command->title = 'test-calendar';
+        $command = new CreateCalendarCommand(null, 'test-calendar');
 
         $eventDispatcher = $this->prophesize(EventDispatcher::class);
         $eventDispatcher->dispatch('post.create.calendar', Argument::type(PostCreateCalendar::class))->shouldBeCalled();
 
-        $calendarFactory    = new CalendarFactory();
         $calendarRepository = new InMemoryCalendarRepository();
 
-        $handler = new CreateCalendarHandler($calendarFactory, $calendarRepository, $eventDispatcher->reveal());
+        $handler = new CreateCalendarHandler($calendarRepository, $eventDispatcher->reveal());
 
         $handler->handle($command);
 
@@ -37,6 +34,5 @@ final class CreateCalendarHandlerTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('test-calendar', $createdCalendar->title());
         $this->assertCount(0, $createdCalendar->events());
-        $this->assertInstanceOf(AbstractId::class, $createdCalendar->id());
     }
 }

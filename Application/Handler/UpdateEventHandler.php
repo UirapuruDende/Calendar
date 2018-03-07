@@ -32,10 +32,10 @@ class UpdateEventHandler
     public function handle(UpdateEventCommand $command)
     {
         /** @var Event $event */
-        $event = $this->eventRepository->findOneById($command->eventId);
-        $event->update(new EventData($command->startDate, $command->endDate, $command->title, new Repetitions($command->repetitions)));
+        $event = $this->eventRepository->findOneById($command->eventId());
+        $event->update(new EventData($command->startDate(), $command->endDate(), $command->title(), new Repetitions($command->repetitions())));
         $this->eventRepository->update($event);
 
-        $this->eventDispatcher->dispatch(Events::POST_UPDATE_EVENT, new PostUpdateEvent($event, $command->occurrenceId, $command->method));
+        $this->eventDispatcher->dispatch(Events::POST_UPDATE_EVENT, new PostUpdateEvent($event, $command->occurrenceId(), $command->method()));
     }
 }

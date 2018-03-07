@@ -4,13 +4,13 @@ namespace Dende\Calendar\Domain;
 use DateTime;
 use Dende\Calendar\Application\Factory\EventFactory;
 use Dende\Calendar\Application\Factory\EventFactoryInterface;
-use Dende\Calendar\Domain\Calendar\CalendarId;
 use Dende\Calendar\Domain\Calendar\Event;
-use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * Class Calendar.
@@ -20,16 +20,9 @@ class Calendar
     use SoftDeleteable;
 
     /**
-     * Doctrine id.
-     *
-     * @var int
+     * @var UuidInterface
      */
     protected $id;
-
-    /**
-     * @var CalendarId
-     */
-    protected $calendarId;
 
     /**
      * @var string
@@ -46,53 +39,31 @@ class Calendar
      */
     public static $eventFactoryClass = EventFactory::class;
 
-    /**
-     * @param CalendarId|string    $calendarId
-     * @param string               $title
-     * @param ArrayCollection|null $events
-     */
-    public function __construct(CalendarId $calendarId = null, string $title = '', Collection $events = null)
+    public function __construct(UuidInterface $id = null, string $title = '', Collection $events = null)
     {
-        $this->calendarId = $calendarId ?: CalendarId::create();
+        $this->id = $id ?? Uuid::uuid4();
         $this->title      = $title;
         $this->events     = $events ?: new ArrayCollection();
     }
 
     public static function create(string $title = '') : Calendar
     {
-        return new static(CalendarId::create(), $title);
+        return new static(null, $title);
     }
 
-    public function addEvent(EventId $eventId, string $title, DateTime $startDate, DateTime $endDate, EventType $type, Repetitions $repetitions = null, Collection $occurrences = null)
+    public function addEvent(Event $event) : void
     {
-        /** @var EventFactoryInterface $factory */
-        $factory = new self::$eventFactoryClass();
-
-        $event = $factory->createFromArray([
-            'eventId'     => $eventId,
-            'title'       => $title,
-            'startDate'   => $startDate,
-            'endDate'     => $endDate,
-            'type'        => $type,
-            'repetitions' => $repetitions,
-            'calendar'    => $this,
-            'occurrences' => $occurrences,
-        ]);
-
         $this->events->add($event);
     }
 
-    /**
-     * @return Collection|Event[]
-     */
     public function events() : Collection
     {
         return $this->events;
     }
 
-    public function id() : CalendarId
+    public function id() : UuidInterface
     {
-        return $this->calendarId;
+        return $this->id;
     }
 
     public function title() : string
@@ -100,7 +71,7 @@ class Calendar
         return $this->title;
     }
 
-    public function getEventById(EventId $eventId) : Event
+    public function getEventById(UuidInterface $eventId) : Event
     {
         $result = $this->events()->filter(function (Event $event) use ($eventId) {
             return $event->id()->equals($eventId);

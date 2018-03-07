@@ -6,17 +6,17 @@ use DateTime;
 use Dende\Calendar\Application\Factory\OccurrenceFactoryInterface;
 use Dende\Calendar\Domain\Calendar;
 use Dende\Calendar\Domain\Calendar\Event;
-use Dende\Calendar\Domain\Calendar\Event\EventId;
 use Dende\Calendar\Domain\Calendar\Event\EventType;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence;
 use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceDuration;
-use Dende\Calendar\Domain\Calendar\Event\Occurrence\OccurrenceId;
 use Dende\Calendar\Domain\Calendar\Event\Repetitions;
 use Doctrine\Common\Collections\ArrayCollection;
 use Exception;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
-class EventTest extends PHPUnit_Framework_TestCase
+class EventTest extends TestCase
 {
     /**
      * @test
@@ -25,13 +25,10 @@ class EventTest extends PHPUnit_Framework_TestCase
     {
         $base = Carbon::instance(new DateTime('last monday 12:00:00'));
 
-        /** @var OccurrenceFactoryInterface $factory */
-        $factory = Event::getOccurrenceFactory();
-
         $collection = new ArrayCollection();
 
         $event = new Event(
-            EventId::create(),
+            Uuid::uuid4(),
             Calendar::create('title'),
             EventType::weekly(),
             $base->copy(),
@@ -45,30 +42,27 @@ class EventTest extends PHPUnit_Framework_TestCase
             $collection
         );
 
-        $occurrenceId1 = OccurrenceId::create();
-        $occurrenceId2 = OccurrenceId::create();
-        $occurrenceId3 = OccurrenceId::create();
+        $occurrenceId1 = Uuid::uuid4();
+        $occurrenceId2 = Uuid::uuid4();
+        $occurrenceId3 = Uuid::uuid4();
 
-        $collection->add($factory->createFromArray([
-            'occurrenceId' => $occurrenceId1,
-            'startDate'    => $base->copy(),
-            'duration'     => new OccurrenceDuration($event->duration()->minutes()),
-            'event'        => $event,
-        ]));
+        $collection->add(Occurrence::create(
+            $occurrenceId1,
+            $base->copy(),
+            $event
+        ));
 
-        $collection->add($factory->createFromArray([
-            'occurrenceId' => $occurrenceId2,
-            'startDate'    => $base->copy()->addDays(2),
-            'duration'     => new OccurrenceDuration($event->duration()->minutes()),
-            'event'        => $event,
-        ]));
+        $collection->add(Occurrence::create(
+            $occurrenceId2,
+            $base->copy()->addDays(2),
+            $event
+        ));
 
-        $collection->add($factory->createFromArray([
-            'occurrenceId' => $occurrenceId3,
-            'startDate'    => $base->copy()->addDays(4),
-            'duration'     => new OccurrenceDuration($event->duration()->minutes()),
-            'event'        => $event,
-        ]));
+        $collection->add(Occurrence::create(
+            $occurrenceId3,
+            $base->copy()->addDays(4),
+            $event
+        ));
 
         $event->resize(
             $event->startDate()->copy()->subDays(7),
@@ -106,7 +100,7 @@ class EventTest extends PHPUnit_Framework_TestCase
         $collection = new ArrayCollection();
 
         $event = new Event(
-            EventId::create(),
+            Uuid::uuid4(),
             Calendar::create('title'),
             EventType::weekly(),
             $base->copy(),
@@ -152,13 +146,10 @@ class EventTest extends PHPUnit_Framework_TestCase
     {
         $base = Carbon::instance(new DateTime('last monday 12:00:00'));
 
-        /** @var OccurrenceFactoryInterface $factory */
-        $factory = Event::getOccurrenceFactory();
-
         $collection = new ArrayCollection();
 
         $event = new Event(
-            EventId::create(),
+            Uuid::uuid4(),
             Calendar::create('title'),
             EventType::weekly(),
             $base->copy(),
@@ -168,30 +159,35 @@ class EventTest extends PHPUnit_Framework_TestCase
             $collection
         );
 
-        $collection->add($factory->createFromArray([
-            'startDate' => $base->copy(),
-            'event'     => $event,
-        ]));
+        $collection->add(Occurrence::create(
+            null,
+            $base->copy(),
+            $event
+        ));
 
-        $collection->add($factory->createFromArray([
-           'startDate' => $base->copy()->addDays(1),
-           'event'     => $event,
-       ]));
+        $collection->add(Occurrence::create(
+            null,
+            $base->copy()->addDays(1),
+            $event
+        ));
 
-        $collection->add($factory->createFromArray([
-           'startDate' => $base->copy()->addDays(2),
-           'event'     => $event,
-       ]));
+        $collection->add(Occurrence::create(
+            null,
+           $base->copy()->addDays(2),
+           $event
+        ));
 
-        $collection->add($factory->createFromArray([
-           'startDate' => $base->copy()->addDays(3),
-           'event'     => $event,
-       ]));
+        $collection->add(Occurrence::create(
+            null,
+            $base->copy()->addDays(3),
+            $event
+        ));
 
-        $collection->add($factory->createFromArray([
-           'startDate' => $base->copy()->addDays(4),
-           'event'     => $event,
-       ]));
+        $collection->add(Occurrence::create(
+            null,
+           $base->copy()->addDays(4),
+           $event
+       ));
 
         $ids = $collection->map(function (Occurrence $occurrence) {
             return $occurrence->id();
@@ -230,7 +226,7 @@ class EventTest extends PHPUnit_Framework_TestCase
     public function testCalculateOccurrencesDatesWeekly()
     {
         $event = new Event(
-            EventId::create(),
+            Uuid::uuid4(),
             Calendar::create('title'),
             EventType::weekly(),
             new DateTime('2015-09-01 12:00:00'),
@@ -265,7 +261,7 @@ class EventTest extends PHPUnit_Framework_TestCase
     public function testCalculateOccurrencesDatesSingle()
     {
         $event = new Event(
-            EventId::create(),
+            Uuid::uuid4(),
             Calendar::create('test'),
             EventType::single(),
             new DateTime('2015-09-01 12:00:00'),
@@ -287,7 +283,7 @@ class EventTest extends PHPUnit_Framework_TestCase
     public function test_swapped_dates_in_constructor()
     {
         new Event(
-            EventId::create(),
+            Uuid::uuid4(),
             Calendar::create('test'),
             EventType::weekly(),
             new DateTime('2015-09-01 12:00:00'),
@@ -306,7 +302,7 @@ class EventTest extends PHPUnit_Framework_TestCase
     public function test_no_repetitions_with_weekly_in_constructor()
     {
         new Event(
-            EventId::create(),
+            Uuid::uuid4(),
             Calendar::create('test'),
             EventType::weekly(),
             new DateTime('2015-09-01 12:00:00'),
@@ -319,14 +315,11 @@ class EventTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      * @dataProvider findingPivotDataProvider
-     *
-     * @param int $clickedIndex
-     * @param int $expectedPivotDateIndex
      */
     public function finding_pivot_date(int $clickedIndex, int $expectedPivotDateIndex)
     {
         $event = new Event(
-            EventId::create(),
+            Uuid::uuid4(),
             Calendar::create(''),
             EventType::weekly(),
             new DateTime('last monday 12:00:00'),
@@ -355,21 +348,14 @@ class EventTest extends PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider closeAtDateDataProvider
-     *
-     * @param array    $id
-     * @param DateTime $closingDate
-     * @param array    $expected
      */
     public function testCloseAtDate(array $id, DateTime $closingDate, array $expected)
     {
         $baseDate    = Carbon::instance(new DateTime('last monday 12:00:00'));
         $occurrences = new ArrayCollection();
 
-        /** @var OccurrenceFactoryInterface $factory */
-        $factory = Event::getOccurrenceFactory();
-
         $event = new Event(
-            EventId::create(),
+            Uuid::uuid4(),
             Calendar::create('test'),
             EventType::weekly(),
             $baseDate,
@@ -379,23 +365,23 @@ class EventTest extends PHPUnit_Framework_TestCase
             $occurrences
         );
 
-        $occurrences->add($factory->createFromArray([
-            'occurrenceId' => $id[0],
-            'startDate'    => $baseDate->copy(),
-            'event'        => $event,
-        ]));
+        $occurrences->add(Occurrence::create(
+            $id[0],
+            $baseDate->copy(),
+            $event
+        ));
 
-        $occurrences->add($factory->createFromArray([
-            'occurrenceId' => $id[1],
-            'startDate'    => $baseDate->copy()->addDays(2),
-            'event'        => $event,
-        ]));
+        $occurrences->add(Occurrence::create(
+            $id[1],
+            $baseDate->copy()->addDays(2),
+            $event
+        ));
 
-        $occurrences->add($factory->createFromArray([
-            'occurrenceId' => $id[2],
-            'startDate'    => $baseDate->copy()->addDays(4),
-            'event'        => $event,
-        ]));
+        $occurrences->add(Occurrence::create(
+            $id[2],
+            $baseDate->copy()->addDays(4),
+            $event
+        ));
 
         $event->closeAtDate($closingDate);
 
@@ -411,9 +397,9 @@ class EventTest extends PHPUnit_Framework_TestCase
     {
         $base = Carbon::instance(new DateTime('last monday 12:00:00'));
 
-        $occurrenceId1 = OccurrenceId::create();
-        $occurrenceId2 = OccurrenceId::create();
-        $occurrenceId3 = OccurrenceId::create();
+        $occurrenceId1 = Uuid::uuid4();
+        $occurrenceId2 = Uuid::uuid4();
+        $occurrenceId3 = Uuid::uuid4();
 
         $idsArray = [$occurrenceId1, $occurrenceId2, $occurrenceId3];
 
@@ -454,15 +440,12 @@ class EventTest extends PHPUnit_Framework_TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessageRegExp('@Pivot \(.+\) must be between startDate \(.+\) and endDate \(.+\)!@ui');
 
-        /** @var OccurrenceFactoryInterface $factory */
-        $factory = Event::getOccurrenceFactory();
-
         $baseDate = Carbon::instance(new DateTime('last monday 12:00:00'));
 
         $occurrences = new ArrayCollection();
 
         $event = new Event(
-            EventId::create(),
+            Uuid::uuid4(),
             Calendar::create('test'),
             EventType::weekly(),
             $baseDate,
@@ -472,22 +455,25 @@ class EventTest extends PHPUnit_Framework_TestCase
             $occurrences
         );
 
-        $pivotOccurrence = $factory->createFromArray([
-             'startDate' => $baseDate->copy()->subDays(7),
-             'event'     => $event,
-        ]);
+        $pivotOccurrence = Occurrence::create(
+            null,
+            $baseDate->copy()->subDays(7),
+            $event
+        );
 
         $occurrences->add($pivotOccurrence);
 
-        $occurrences->add($factory->createFromArray([
-            'startDate' => $baseDate->copy()->addDays(2),
-            'event'     => $event,
-        ]));
+        $occurrences->add(Occurrence::create(
+            null,
+            $baseDate->copy()->addDays(2),
+            $event
+        ));
 
-        $occurrences->add($factory->createFromArray([
-            'startDate' => $baseDate->copy()->addDays(4),
-            'event'     => $event,
-        ]));
+        $occurrences->add(Occurrence::create(
+            null,
+            $baseDate->copy()->addDays(4),
+            $event
+        ));
 
         $event->resize(null, $baseDate->copy()->addDays(7), null, $pivotOccurrence);
     }

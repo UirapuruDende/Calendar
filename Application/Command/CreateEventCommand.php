@@ -3,53 +3,41 @@ namespace Dende\Calendar\Application\Command;
 
 use Carbon\Carbon;
 use DateTime;
+use Ramsey\Uuid\UuidInterface;
 
-/**
- * Class CreateEventCommand.
- */
 final class CreateEventCommand implements EventCommandInterface
 {
     /**
-     * @var string
+     * @var UuidInterface
      */
-    public $calendarId;
+    protected $calendarId;
 
     /**
      * @var string
      */
-    public $type;
+    protected $type;
 
     /**
      * @var DateTime|Carbon
      */
-    public $startDate;
+    protected $startDate;
 
     /**
      * @var DateTime|Carbon
      */
-    public $endDate;
+    protected $endDate;
 
     /**
      * @var string
      */
-    public $title = '';
+    protected $title;
 
     /**
      * @var array
      */
-    public $repetitions = [];
+    protected $repetitions = [];
 
-    /**
-     * CreateEventCommand constructor.
-     *
-     * @param string          $calendarId
-     * @param string          $type
-     * @param Carbon|DateTime $startDate
-     * @param Carbon|DateTime $endDate
-     * @param string          $title
-     * @param array           $repetitions
-     */
-    public function __construct(string $calendarId = null, string $type, DateTime $startDate, DateTime $endDate, string $title, array $repetitions)
+    public function __construct(UuidInterface $calendarId = null, string $type, DateTime $startDate, DateTime $endDate, string $title, array $repetitions)
     {
         $this->calendarId  = $calendarId;
         $this->type        = $type;
@@ -70,4 +58,35 @@ final class CreateEventCommand implements EventCommandInterface
             $array['repetitions']
         );
     }
+
+    public function calendarId(): UuidInterface
+    {
+        return $this->calendarId;
+    }
+
+    public function type(): string
+    {
+        return $this->type;
+    }
+
+    public function startDate()
+    {
+        return $this->startDate;
+    }
+
+    public function endDate()
+    {
+        return $this->endDate;
+    }
+
+    public function title(): string
+    {
+        return $this->title;
+    }
+
+    public function repetitions(): array
+    {
+        return $this->repetitions;
+    }
+
 }

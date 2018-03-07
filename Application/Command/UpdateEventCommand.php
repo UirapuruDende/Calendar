@@ -2,66 +2,88 @@
 namespace Dende\Calendar\Application\Command;
 
 use DateTime;
+use Ramsey\Uuid\UuidInterface;
 
-/**
- * Class CreateEventCommand.
- */
 final class UpdateEventCommand
 {
     /**
-     * @var string
+     * @var UuidInterface
      */
-    public $eventId;
+    protected $eventId;
+
+    /**
+     * @var UuidInterface
+     */
+    protected $occurrenceId;
 
     /**
      * @var string
      */
-    public $occurrenceId;
-
-    /**
-     * @var string
-     */
-    public $method;
+    protected $method;
 
     /**
      * @var DateTime
      */
-    public $startDate;
+    protected $startDate;
 
     /**
      * @var DateTime
      */
-    public $endDate;
+    protected $endDate;
 
     /**
      * @var string
      */
-    public $title = '';
+    protected $title;
 
     /**
      * @var array
      */
-    public $repetitions = [];
+    protected $repetitions = [];
 
-    /**
-     * UpdateEventCommand constructor.
-     *
-     * @param string   $eventId
-     * @param DateTime $startDate
-     * @param DateTime $endDate
-     * @param string   $title
-     * @param array    $repetitions
-     * @param string   $method
-     * @param string   $occurrenceId
-     */
-    public function __construct(string $eventId, DateTime $startDate, DateTime $endDate, string $title, array $repetitions, string $method, string $occurrenceId)
+    public function __construct(UuidInterface $eventId, UuidInterface $occurrenceId, string $method, DateTime $startDate, DateTime $endDate, string $title, array $repetitions)
     {
-        $this->eventId      = $eventId;
-        $this->startDate    = $startDate;
-        $this->endDate      = $endDate;
-        $this->title        = $title;
-        $this->repetitions  = $repetitions;
-        $this->method       = $method;
+        $this->eventId = $eventId;
         $this->occurrenceId = $occurrenceId;
+        $this->method = $method;
+        $this->startDate = $startDate;
+        $this->endDate = $endDate;
+        $this->title = $title;
+        $this->repetitions = $repetitions;
+    }
+
+    public function eventId(): UuidInterface
+    {
+        return $this->eventId;
+    }
+
+    public function occurrenceId(): UuidInterface
+    {
+        return $this->occurrenceId;
+    }
+
+    public function method(): string
+    {
+        return $this->method;
+    }
+
+    public function startDate(): DateTime
+    {
+        return $this->startDate;
+    }
+
+    public function endDate(): DateTime
+    {
+        return $this->endDate;
+    }
+
+    public function title(): string
+    {
+        return $this->title;
+    }
+
+    public function repetitions(): array
+    {
+        return $this->repetitions;
     }
 }
