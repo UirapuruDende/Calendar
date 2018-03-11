@@ -19,14 +19,13 @@ use Exception;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
-/**
- * Class Event.
- */
 class Event implements EventInterface
 {
     use SoftDeleteable;
 
     const DUMP_FORMAT = 'd.m H.i';
+
+    protected static $occurrenceClass = Occurrence::class;
 
     /** @var UuidInterface */
     protected $id;
@@ -176,7 +175,7 @@ class Event implements EventInterface
         if ($this->isSingle()) {
             $this->occurrences->clear();
 
-            $this->occurrences->add(Occurrence::create(null, $this->eventData->startDate(), $this));
+            $this->occurrences->add(self::$occurrenceClass::create(null, $this->eventData->startDate(), $this));
 
             return;
         }
@@ -221,7 +220,7 @@ class Event implements EventInterface
                 continue;
             }
 
-            $tmpCollection->add(Occurrence::create(null,  $date, $this));
+            $tmpCollection->add(self::$occurrenceClass::create(null,  $date, $this));
         }
 
         /** @var OccurrenceInterface[]|ArrayCollection $paddedCollection */
