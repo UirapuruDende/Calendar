@@ -34,11 +34,6 @@ class Calendar
      */
     protected $events;
 
-    /**
-     * @var string
-     */
-    public static $eventFactoryClass = EventFactory::class;
-
     public function __construct(UuidInterface $id = null, string $title = '', Collection $events = null)
     {
         $this->id = $id ?? Uuid::uuid4();

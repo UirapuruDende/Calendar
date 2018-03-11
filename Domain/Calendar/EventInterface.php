@@ -46,6 +46,4 @@ interface EventInterface
     public function findPivotDate(OccurrenceInterface $editedOccurrence) : DateTime;
 
     public function update(EventData $data);
-
-    public static function setFactoryClass(string $class);
 }
