@@ -310,4 +310,9 @@ class Event implements EventInterface
             $this->occurrences->first()->synchronizeWithEvent();
         }
     }
+
+    public static function setOccurrenceClass(string $occurrenceClass): void
+    {
+        self::$occurrenceClass = $occurrenceClass;
+    }
 }
